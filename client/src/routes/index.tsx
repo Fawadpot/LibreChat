@@ -13,6 +13,7 @@ import ShareRoute from './ShareRoute';
 import ChatRoute from './ChatRoute';
 import Search from './Search';
 import Root from './Root';
+import FileDashboardView from '~/components/Files/FileDashboardView';
 
 const AuthLayout = () => (
   <AuthContextProvider>
@@ -56,6 +57,10 @@ export const router = createBrowserRouter([
             element: <Login />,
           },
         ],
+      },
+      {
+        path: 'file-dashboard',
+        element: <FileDashboardView />,
       },
       {
         path: '/',
