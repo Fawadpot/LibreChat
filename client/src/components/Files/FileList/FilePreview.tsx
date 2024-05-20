@@ -1,97 +1,131 @@
+import { TFile } from 'librechat-data-provider/dist/types';
 import React from 'react';
+import { TThread, TVectorStore } from '~/common';
+import { CheckMark, NewTrashIcon } from '~/components/svg';
+import { Button } from '~/components/ui';
+import DeleteIconButton from '../DeleteIconButton';
+import VectorStoreButton from '../VectorStore/VectorStoreButton';
 
-type File = {
-  id: string;
-  name: string;
-  status: string;
-  size: number;
-  purpose: string;
-  createdAt: string;
-  vectorStoresAttached: { name: string; createdAt: string }[];
-  threads: { id: string; createdAt: string }[];
-};
-
-type Props = {
-  file: File;
+type FilePreviewProps = {
+  file: TFile;
+  threads: TThread[];
+  vectorStoresAttached: TVectorStore[];
   removeFromVectorStore: () => void;
   removeFromThread: () => void;
 };
 
-const FilePreview: React.FC<Props> = ({
-  file: { id, name, status, size, purpose, createdAt, vectorStoresAttached, threads },
+export default function FilePreview({
+  file: { _id, filename, object, bytes, message, createdAt },
+  threads,
+  vectorStoresAttached,
   removeFromVectorStore,
   removeFromThread,
-}: Props) => {
+}: FilePreviewProps) {
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <b>{name}</b>
-        <button>Delete</button>
-        <button>Add To Vector Store</button>
-      </div>
-
-      <div>
-        <div>
-          <span>File ID</span>
-          <span style={{ marginLeft: 'auto' }}>{id}</span>
+    <div className="m-3 bg-white p-10">
+      <div className="flex flex-row justify-between">
+        <div className="flex flex-col">
+          <b>FILE</b>
+          <b className="text-2xl">{filename}</b>
         </div>
-        <div>
-          <span>Status</span>
-          <span style={{ marginLeft: 'auto' }}>{status}</span>
-        </div>
-        <div>
-          <span>Purpose</span>
-          <span style={{ marginLeft: 'auto' }}>{purpose}</span>
-        </div>
-        <div>
-          <span>Size</span>
-          <span style={{ marginLeft: 'auto' }}>{size}</span>
-        </div>
-        <div>
-          <span>Created At</span>
-          <span style={{ marginLeft: 'auto' }}>{createdAt}</span>
+        <div className="flex flex-row">
+          <div>
+            <DeleteIconButton
+              onClick={() => {
+                console.log('click');
+              }}
+            />
+          </div>
+          <div className="ml-3">
+            <VectorStoreButton
+              onClick={() => {
+                console.log('click');
+              }}
+            />
+          </div>
         </div>
       </div>
 
-      <div>
+      <div className="mt-3 flex flex-col">
+        <div className="flex flex-row">
+          <span className="w-1/5">File ID</span>
+          <span className="w-4/5 text-gray-500">{_id}</span>
+        </div>
+        <div className="mt-3 flex flex-row">
+          <span className="w-1/5">Status</span>
+          <div className="w-4/5">
+            <span className="flex w-20 flex-row items-center justify-evenly rounded-full bg-[#f2f8ec] p-1 text-[#91c561]">
+              <CheckMark className="m-0 p-0" />
+              <div>{object}</div>
+            </span>
+          </div>
+        </div>
+        <div className="mt-3 flex flex-row">
+          <span className="w-1/5">Purpose</span>
+          <span className="w-4/5 text-gray-500">{message}</span>
+        </div>
+        <div className="mt-3 flex flex-row">
+          <span className="w-1/5">Size</span>
+          <span className="w-4/5 text-gray-500">{bytes}</span>
+        </div>
+        <div className="mt-3 flex flex-row">
+          <span className="w-1/5">Created At</span>
+          <span className="w-4/5 text-gray-500">{createdAt?.toString()}</span>
+        </div>
+      </div>
+
+      <div className="mt-10 flex flex-col">
         <div>
           <b>Attached To</b>
         </div>
-        <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <div>Vector Stores</div>
-            <div>Uploaded</div>
+        <div className="flex flex-col divide-y">
+          <div className="mt-2 flex flex-row">
+            <div className="w-2/3">Vector Stores</div>
+            <div className="w-1/3">Uploaded</div>
           </div>
-          {vectorStoresAttached.map((file, index) => (
-            <div key={index} style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <div>{file.name}</div>
-              <div>{file.createdAt}</div>
-              <button onClick={removeFromVectorStore}>Delete</button>
-            </div>
-          ))}
+          <div>
+            {vectorStoresAttached.map((vectors, index) => (
+              <div key={index} className="my-2 flex flex-row">
+                <div className="ml-4 w-2/3 content-center">{vectors.name}</div>
+                <div className="flex w-1/3 flex-row">
+                  <div className="content-center">{vectors.created_at.toString()}</div>
+                  <Button
+                    className="my-0 ml-3 bg-transparent p-0 text-[#666666] hover:bg-slate-200"
+                    onClick={removeFromVectorStore}
+                  >
+                    <NewTrashIcon className="m-0 p-0" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div>
-        <div>
-          <b>Used By</b>
-        </div>
-        <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <div>Threads</div>
-            <div>Uploaded</div>
+      <div className="mt-10 flex flex-col">
+        <div className="flex flex-col divide-y">
+          <div className="flex flex-row">
+            <div className="w-2/3">Threads</div>
+            <div className="w-1/3">Uploaded</div>
           </div>
-          {threads.map((thread, index) => (
-            <div key={index} style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <div>ID: {thread.id}</div>
-              <div>{thread.createdAt}</div>
-              <button onClick={removeFromThread}>Delete</button>
-            </div>
-          ))}
+          <div>
+            {threads.map((thread, index) => (
+              <div key={index} className="flex flex-row">
+                <div className="ml-4 w-2/3 content-center">ID: {thread.id}</div>
+                <div className="flex w-1/3 flex-row">
+                  <div className="content-center">{thread.createdAt}</div>
+                  <Button
+                    className="my-0 ml-3 bg-transparent p-0 text-[#666666] hover:bg-slate-200"
+                    onClick={removeFromThread}
+                  >
+                    <NewTrashIcon className="m-0 p-0" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
   );
-};
-
-export default FilePreview;
+}

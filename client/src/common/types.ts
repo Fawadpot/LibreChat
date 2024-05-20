@@ -390,3 +390,20 @@ export interface SwitcherProps {
   endpointKeyProvided: boolean;
   isCollapsed: boolean;
 }
+
+export type TVectorStore = {
+  _id: string;
+  object: 'vector_store';
+  created_at: string | Date;
+  name: string;
+  bytes?: number;
+  file_counts?: {
+    in_progress: number;
+    completed: number;
+    failed: number;
+    cancelled: number;
+    total: number;
+  };
+};
+
+export type TThread = { id: string; createdAt: string };
