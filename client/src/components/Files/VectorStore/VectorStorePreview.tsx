@@ -1,89 +1,143 @@
-import React from 'react';
+import React, { useState } from 'react';
+import DeleteIconButton from '../DeleteIconButton';
+import { Button } from '~/components/ui';
+import { NewTrashIcon } from '~/components/svg';
+import { TFile } from 'librechat-data-provider/dist/types';
+import UploadFileButton from '../FileList/UploadFileButton';
+import UploadFileModal from '../FileList/UploadFileModal';
 
-const VectorStorePreview = ({ vectorStore, deleteFile, deleteVectorStore }) => {
-  const {
-    id,
-    name,
-    usageThisMonth,
-    size,
-    lastActive,
-    expirationPolicy,
-    expires,
-    createdAt,
-    filesAttached,
-    assistants,
-  } = vectorStore;
-
-  return (
-    <div className="vector-store-preview">
-      <div className="row">
-        <div className="left-align bold">{name}</div>
-        <div className="right-align">
-          <button onClick={deleteVectorStore}>Delete</button>
-          <button>Add Files</button>
-        </div>
-      </div>
-
-      <div className="row">
-        <div className="left-align">ID</div>
-        <div className="right-align">{id}</div>
-      </div>
-
-      <div className="row">
-        <div className="left-align">Usage This Month</div>
-        <div className="right-align">{usageThisMonth}</div>
-      </div>
-      <div className="row">
-        <div className="left-align">Size</div>
-        <div className="right-align">{size}</div>
-      </div>
-      <div className="row">
-        <div className="left-align">Last active</div>
-        <div className="right-align">{lastActive}</div>
-      </div>
-      <div className="row">
-        <div className="left-align">Expiration policy</div>
-        <div className="right-align">{expirationPolicy}</div>
-      </div>
-      <div className="row">
-        <div className="left-align">Expires</div>
-        <div className="right-align">{expires}</div>
-      </div>
-      <div className="row">
-        <div className="left-align">Created At</div>
-        <div className="right-align">{createdAt}</div>
-      </div>
-
-      <div className="section">
-        <h3>Files Attached</h3>
-        <div className="table-header">
-          <div>File</div>
-          <div>Uploaded</div>
-        </div>
-        {filesAttached.map((file) => (
-          <div className="row" key={file.id}>
-            <div>{file.name}</div>
-            <div>{file.createdAt}</div>
-            <button onClick={() => deleteFile(file.id)}>Delete</button>
-          </div>
-        ))}
-      </div>
-
-      <div className="section">
-        <h3>Used By</h3>
-        <div className="table-header">
-          <div>Resource</div>
-          <div>ID</div>
-        </div>
-        {assistants.map((assistant) => (
-          <div className="row" key={assistant.id}>
-            <div>{assistant.resource}</div>
-            <div>{assistant.id}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+type VectorStorePreviewProps = {
+  vectorStore;
+  filesAttached: TFile[];
+  assistants: { resource: string; id: string }[];
+  removeFile: (id: string | undefined) => void;
+  deleteVectorStore: () => void;
 };
 
-export default VectorStorePreview;
+export default function VectorStorePreview({
+  vectorStore,
+  filesAttached,
+  assistants,
+  removeFile,
+  deleteVectorStore,
+}: VectorStorePreviewProps) {
+  const [open, setOpen] = useState(false);
+  const { _id, name, usageThisMonth, bytes, lastActive, expirationPolicy, expires, createdAt } =
+    vectorStore;
+
+  return (
+    <div className="m-3 bg-white p-10">
+      <div className="flex flex-row justify-between">
+        <div className="flex flex-col">
+          <b>VECTOR STORE</b>
+          <b className="text-2xl">{name}</b>
+        </div>
+        <div className="flex flex-row">
+          <div>
+            <DeleteIconButton
+              onClick={() => {
+                console.log('click');
+              }}
+            />
+          </div>
+          <div className="ml-3">
+            <UploadFileButton
+              onClick={() => {
+                setOpen(true);
+              }}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-3 flex flex-col">
+        <div className="flex flex-row">
+          <span className="w-1/5">ID</span>
+          <span className="w-4/5 text-gray-500">{_id}</span>
+        </div>
+        <div className="mt-3 flex flex-row">
+          <span className="w-1/5">Usage this month</span>
+          <div className="w-4/5">
+            <p className="w-4/5 text-gray-500">
+              <span className="text-[#91c561]">0 KB hours</span>
+              &nbsp; Free until end of 2024
+            </p>
+          </div>
+        </div>
+        <div className="mt-3 flex flex-row">
+          <span className="w-1/5">Size</span>
+          <span className="w-4/5 text-gray-500">{bytes} bytes</span>
+        </div>
+        <div className="mt-3 flex flex-row">
+          <span className="w-1/5">Last active</span>
+          <span className="w-4/5 text-gray-500">{lastActive}</span>
+        </div>
+        <div className="mt-3 flex flex-row">
+          <span className="w-1/5">Expiration policy</span>
+          <span className="w-4/5 text-gray-500">{expirationPolicy}</span>
+        </div>
+        <div className="mt-3 flex flex-row">
+          <span className="w-1/5">Expires</span>
+          <span className="w-4/5 text-gray-500">{expires}</span>
+        </div>
+        <div className="mt-3 flex flex-row">
+          <span className="w-1/5">Created At</span>
+          <span className="w-4/5 text-gray-500">{createdAt?.toString()}</span>
+        </div>
+      </div>
+
+      <div className="mt-10 flex flex-col">
+        <div>
+          <b>Files attached</b>
+        </div>
+        <div className="flex flex-col divide-y">
+          <div className="mt-2 flex flex-row">
+            <div className="w-2/3">File</div>
+            <div className="w-1/3">Uploaded</div>
+          </div>
+          <div>
+            {filesAttached.map((file, index) => (
+              <div key={index} className="my-2 flex h-5 flex-row">
+                <div className="ml-4 flex w-2/3 flex-row content-center">
+                  <div className="content-center">{file.filename}</div>
+                </div>
+                <div className="flex w-1/3 flex-row">
+                  <div className="content-center">{file.createdAt?.toString()}</div>
+                  <Button
+                    className="my-0 ml-3 h-min bg-transparent p-0 text-[#666666] hover:bg-slate-200"
+                    onClick={() => removeFile(file._id)}
+                  >
+                    <NewTrashIcon className="m-0 p-0" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-10 flex flex-col">
+        <div>
+          <b>Used by</b>
+        </div>
+        <div className="flex flex-col divide-y">
+          <div className="mt-2 flex flex-row">
+            <div className="w-1/3">Resource</div>
+            <div className="w-2/3">ID</div>
+          </div>
+          <div>
+            {assistants.map((assistant, index) => (
+              <div key={index} className="flex flex-row">
+                <div className="w-1/3 content-center">{assistant.resource}</div>
+                <div className="flex w-2/3 flex-row">
+                  <div className="content-center">{assistant.id}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      {open && <UploadFileModal open={open} onOpenChange={setOpen} />}
+    </div>
+  );
+}

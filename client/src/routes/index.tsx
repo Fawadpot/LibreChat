@@ -14,6 +14,8 @@ import ChatRoute from './ChatRoute';
 import Search from './Search';
 import Root from './Root';
 import FileDashboardView from '~/components/Files/FileDashboardView';
+import FilesListView from '~/components/Files/FilesListView';
+import VectorStoreView from '~/components/Files/VectorStoreView';
 
 const AuthLayout = () => (
   <AuthContextProvider>
@@ -61,6 +63,14 @@ export const router = createBrowserRouter([
       {
         path: 'file-dashboard',
         element: <FileDashboardView />,
+      },
+      {
+        path: 'files',
+        element: <FilesListView />,
+      },
+      {
+        path: 'vector-stores',
+        element: <VectorStoreView />,
       },
       {
         path: '/',

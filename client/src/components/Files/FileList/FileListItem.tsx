@@ -1,38 +1,33 @@
+import type { TFile } from 'librechat-data-provider';
 import React from 'react';
-import { TrashIcon } from '~/components/svg';
-
-type File = {
-  name: string;
-  description: string;
-  size: number;
-  createdAt: string;
-  id: string;
-};
+import { NewTrashIcon } from '~/components/svg';
+import { Button } from '~/components/ui';
 
 type FileListItemProps = {
-  file: File;
-  deleteFile: (id: string) => void;
+  file: TFile;
+  deleteFile: (id: string | undefined) => void;
+  width?: string;
 };
 
-const FileListItem: React.FC<FileListItemProps> = ({ file, deleteFile }) => {
+export default function FileListItem({ file, deleteFile, width = '400px' }: FileListItemProps) {
   return (
-    <div className="grid grid-cols-3 gap-4">
-      <div>
-        <strong>{file.name}</strong>
-        <p className="text-gray-500">{file.description}</p>
+    <div className="w-100 my-3 mr-2 flex cursor-pointer flex-row rounded-md border border-0 bg-white p-4 transition duration-300 ease-in-out hover:bg-slate-200">
+      <div className="flex w-1/2 flex-col justify-around align-middle">
+        <strong>{file.filename}</strong>
+        <p className="text-sm text-gray-500">{file.object}</p>
       </div>
-      <div>
-        <p>{file.size}MB</p>
-        <p>{file.createdAt}</p>
+      <div className="w-2/6 text-gray-500">
+        <p>({file.bytes / 1000}KB)</p>
+        <p className="text-sm">{file.createdAt?.toString()}</p>
       </div>
-      <div>
-        <button className="text-gray-500">...</button>
-        <button onClick={() => deleteFile(file.id)}>
-          <TrashIcon className="text-grey-100 h-4 w-4" />
-        </button>
+      <div className="flex w-1/6 justify-around">
+        <Button
+          className="my-0 ml-3 bg-transparent p-0 text-[#666666] hover:bg-slate-200"
+          onClick={() => deleteFile(file._id)}
+        >
+          <NewTrashIcon className="m-0 p-0" />
+        </Button>
       </div>
     </div>
   );
-};
-
-export default FileListItem;
+}

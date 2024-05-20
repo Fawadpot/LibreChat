@@ -1,23 +1,15 @@
 import React from 'react';
 import VectorStoreListItem from './VectorStoreListItem';
-
-type VectorStore = {
-  name: string;
-  description: string;
-  size: number;
-  filesCount: number;
-  createdAt: string;
-  id: string;
-};
+import { TVectorStore } from '~/common';
 
 type VectorStoreListProps = {
-  vectorStores: VectorStore[];
-  deleteVectorStore: (id: string) => void;
+  vectorStores: TVectorStore[];
+  deleteVectorStore: (id: string | undefined) => void;
 };
 
-const VectorStoreList: React.FC<VectorStoreListProps> = ({ vectorStores, deleteVectorStore }) => {
+export default function VectorStoreList({ vectorStores, deleteVectorStore }: VectorStoreListProps) {
   return (
-    <div>
+    <div className="py-2">
       {vectorStores.map((vectorStore, index) => (
         <VectorStoreListItem
           key={index}
@@ -27,6 +19,4 @@ const VectorStoreList: React.FC<VectorStoreListProps> = ({ vectorStores, deleteV
       ))}
     </div>
   );
-};
-
-export default VectorStoreList;
+}
