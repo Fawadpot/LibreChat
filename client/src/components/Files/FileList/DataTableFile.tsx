@@ -34,6 +34,8 @@ import {
 import { useDeleteFilesFromTable } from '~/hooks/Files';
 import { NewTrashIcon, Spinner } from '~/components/svg';
 import useLocalize from '~/hooks/useLocalize';
+import ActionButton from '../ActionButton';
+import UploadFileButton from './UploadFileButton';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -83,63 +85,82 @@ export default function DataTableFile<TData, TValue>({
 
   return (
     <>
-      <div className="flex items-center gap-4 bg-white py-4">
-        <Button
-          variant="ghost"
-          onClick={() => {
-            setIsDeleting(true);
-            const filesToDelete = table
-              .getFilteredSelectedRowModel()
-              .rows.map((row) => row.original);
-            deleteFiles({ files: filesToDelete as TFile[] });
-            setRowSelection({});
-          }}
-          className="ml-1 gap-2 dark:hover:bg-gray-750/25 sm:ml-0"
-          disabled={!table.getFilteredSelectedRowModel().rows.length || isDeleting}
-        >
-          {isDeleting ? (
-            <Spinner className="h-4 w-4" />
-          ) : (
-            <NewTrashIcon className="h-4 w-4 text-red-400" />
-          )}
-          {localize('com_ui_delete')}
-        </Button>
-        <Input
-          placeholder={localize('com_files_filter')}
-          value={(table.getColumn('filename')?.getFilterValue() as string) ?? ''}
-          onChange={(event) => table.getColumn('filename')?.setFilterValue(event.target.value)}
-          className="max-w-sm dark:border-gray-500"
-        />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              <ListFilter className="h-4 w-4" />
+      <div className="mt-2 flex flex-col items-start">
+        <h2 className="text-lg">
+          <strong>Files</strong>
+        </h2>
+        <div className="mt-3 flex w-full flex-row justify-between">
+          <div className="flex flex-row gap-x-3">
+            <ActionButton
+              onClick={() => {
+                console.log('click');
+              }}
+            />
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setIsDeleting(true);
+                const filesToDelete = table
+                  .getFilteredSelectedRowModel()
+                  .rows.map((row) => row.original);
+                deleteFiles({ files: filesToDelete as TFile[] });
+                setRowSelection({});
+              }}
+              className="ml-1 gap-2 dark:hover:bg-gray-750/25 sm:ml-0"
+              disabled={!table.getFilteredSelectedRowModel().rows.length || isDeleting}
+            >
+              {isDeleting ? (
+                <Spinner className="h-4 w-4" />
+              ) : (
+                <NewTrashIcon className="h-4 w-4 text-red-400" />
+              )}
+              {localize('com_ui_delete')}
             </Button>
-          </DropdownMenuTrigger>
-          {/* Filter Menu */}
-          <DropdownMenuContent
-            align="end"
-            className="z-[1001] dark:border-gray-700 dark:bg-gray-750"
-          >
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="cursor-pointer capitalize dark:text-white dark:hover:bg-gray-800"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                  >
-                    {localize(contextMap[column.id])}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </div>
+          <div className="flex flex-row gap-x-3">
+            {' '}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="ml-auto">
+                  <ListFilter className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="z-[1001] dark:border-gray-700 dark:bg-gray-750"
+              >
+                {table
+                  .getAllColumns()
+                  .filter((column) => column.getCanHide())
+                  .map((column) => {
+                    return (
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        className="cursor-pointer capitalize dark:text-white dark:hover:bg-gray-800"
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                      >
+                        {localize(contextMap[column.id])}
+                      </DropdownMenuCheckboxItem>
+                    );
+                  })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Input
+              placeholder={localize('com_files_filter')}
+              value={(table.getColumn('filename')?.getFilterValue() as string) ?? ''}
+              onChange={(event) => table.getColumn('filename')?.setFilterValue(event.target.value)}
+              className="max-w-sm dark:border-gray-500"
+            />
+            <UploadFileButton
+              onClick={() => {
+                console.log('click');
+              }}
+            />
+          </div>
+        </div>
       </div>
-      <div className="relative max-h-[25rem] min-h-0 overflow-y-auto rounded-md border border-black/10 pb-4 dark:border-white/10 sm:min-h-[28rem]">
+      <div className="relative mt-3 max-h-[25rem] min-h-0 overflow-y-auto rounded-md border border-black/10 pb-4 dark:border-white/10 sm:min-h-[28rem]">
         <Table className="w-full min-w-[600px] border-separate border-spacing-0">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -150,6 +171,11 @@ export default function DataTableFile<TData, TValue>({
                     style.maxWidth = '25%';
                     style.width = '25%';
                     style.minWidth = '150px';
+                  }
+                  if (header.id === 'icon') {
+                    style.width = '25px';
+                    style.maxWidth = '25px';
+                    style.minWidth = '35px';
                   }
                   if (header.id === 'vectorStores') {
                     style.maxWidth = '50%';

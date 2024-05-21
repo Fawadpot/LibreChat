@@ -5,6 +5,7 @@ import { CheckMark, NewTrashIcon } from '~/components/svg';
 import { Button } from '~/components/ui';
 import DeleteIconButton from '../DeleteIconButton';
 import VectorStoreButton from '../VectorStore/VectorStoreButton';
+import { CircleIcon, Clock3Icon, InfoIcon } from 'lucide-react';
 
 type FilePreviewProps = {
   file: TFile;
@@ -48,11 +49,17 @@ export default function FilePreview({
 
       <div className="mt-3 flex flex-col">
         <div className="flex flex-row">
-          <span className="w-1/5">File ID</span>
+          <span className="flex w-1/5 flex-row items-center">
+            <InfoIcon className="size-4 text-gray-500" />
+            &nbsp; File ID
+          </span>
           <span className="w-4/5 text-gray-500">{_id}</span>
         </div>
         <div className="mt-3 flex flex-row">
-          <span className="w-1/5">Status</span>
+          <span className="flex w-1/5 flex-row items-center">
+            <CircleIcon className="m-0 size-4 p-0 text-gray-500" />
+            &nbsp; Status
+          </span>
           <div className="w-4/5">
             <span className="flex w-20 flex-row items-center justify-evenly rounded-full bg-[#f2f8ec] p-1 text-[#91c561]">
               <CheckMark className="m-0 p-0" />
@@ -61,15 +68,24 @@ export default function FilePreview({
           </div>
         </div>
         <div className="mt-3 flex flex-row">
-          <span className="w-1/5">Purpose</span>
+          <span className="flex w-1/5 flex-row items-center">
+            <Clock3Icon className="m-0 size-4 p-0 text-gray-500" />
+            &nbsp;Purpose
+          </span>
           <span className="w-4/5 text-gray-500">{message}</span>
         </div>
         <div className="mt-3 flex flex-row">
-          <span className="w-1/5">Size</span>
+          <span className="flex w-1/5 flex-row items-center">
+            <Clock3Icon className="m-0 size-4 p-0 text-gray-500" />
+            &nbsp; Size
+          </span>
           <span className="w-4/5 text-gray-500">{bytes}</span>
         </div>
         <div className="mt-3 flex flex-row">
-          <span className="w-1/5">Created At</span>
+          <span className="flex w-1/5 flex-row items-center">
+            <Clock3Icon className="m-0 size-4 p-0 text-gray-500" />
+            &nbsp; Created At
+          </span>
           <span className="w-4/5 text-gray-500">{createdAt?.toString()}</span>
         </div>
       </div>
@@ -85,12 +101,12 @@ export default function FilePreview({
           </div>
           <div>
             {vectorStoresAttached.map((vectors, index) => (
-              <div key={index} className="my-2 flex flex-row">
+              <div key={index} className="mt-2 flex flex-row">
                 <div className="ml-4 w-2/3 content-center">{vectors.name}</div>
                 <div className="flex w-1/3 flex-row">
                   <div className="content-center">{vectors.created_at.toString()}</div>
                   <Button
-                    className="my-0 ml-3 bg-transparent p-0 text-[#666666] hover:bg-slate-200"
+                    className="m-0 ml-3 h-full bg-transparent p-0 text-[#666666] hover:bg-slate-200"
                     onClick={removeFromVectorStore}
                   >
                     <NewTrashIcon className="m-0 p-0" />
@@ -110,12 +126,12 @@ export default function FilePreview({
           </div>
           <div>
             {threads.map((thread, index) => (
-              <div key={index} className="flex flex-row">
+              <div key={index} className=" mt-2 flex flex-row">
                 <div className="ml-4 w-2/3 content-center">ID: {thread.id}</div>
                 <div className="flex w-1/3 flex-row">
                   <div className="content-center">{thread.createdAt}</div>
                   <Button
-                    className="my-0 ml-3 bg-transparent p-0 text-[#666666] hover:bg-slate-200"
+                    className="m-0 ml-3 h-full bg-transparent p-0 text-[#666666] hover:bg-slate-200"
                     onClick={removeFromThread}
                   >
                     <NewTrashIcon className="m-0 p-0" />

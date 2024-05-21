@@ -2,10 +2,11 @@ import React from 'react';
 import VectorStoreList from './VectorStoreList';
 import { TVectorStore } from '~/common';
 import VectorStoreButton from './VectorStoreButton';
-import { Input } from '~/components/ui';
+import { Button, Input } from '~/components/ui';
 import FilesSectionSelector from '../FilesSectionSelector';
 import ActionButton from '../ActionButton';
 import DeleteIconButton from '../DeleteIconButton';
+import { ListFilter } from 'lucide-react';
 
 const fakeVectorStores: TVectorStore[] = [
   {
@@ -213,16 +214,19 @@ export default function VectorStoreSidePanel() {
   };
 
   return (
-    <div className="ml-3 flex flex-col">
-      <div className="h-[10vh]">
+    <div className="flex flex-col">
+      <div className="flex h-[10vh] flex-col">
         <h2 className="text-lg">
           <strong>Vector Stores</strong>
         </h2>
-        <div className="flex flex-row justify-between p-2">
-          <div className="w-1/3">
-            <Input type="text" placeholder="Filter by title, content..." />
+        <div className="mr-3 mt-2 flex flex-row justify-between">
+          <div className="flex w-1/2 flex-row">
+            <Button variant="ghost" className="m-0 mr-2 p-0">
+              <ListFilter className="h-4 w-4" />
+            </Button>
+            <Input type="text" placeholder="Filter by title, content..." className="w-full" />
           </div>
-          <div className="w-1/3">
+          <div className="flex w-1/3 flex-row justify-end">
             <VectorStoreButton
               onClick={() => {
                 console.log('Add Vector Store');
@@ -231,7 +235,7 @@ export default function VectorStoreSidePanel() {
           </div>
         </div>
       </div>
-      <div className="h-[90vh] w-full overflow-y-auto">
+      <div className="mr-2 mt-2 h-[90vh] w-full overflow-y-auto">
         <VectorStoreList vectorStores={fakeVectorStores} deleteVectorStore={deleteVectorStore} />
       </div>
     </div>

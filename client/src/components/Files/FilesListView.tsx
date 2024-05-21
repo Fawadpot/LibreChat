@@ -37,10 +37,10 @@ const vectorStoresAttached: TVectorStore[] = [
 export default function FilesListView() {
   return (
     <div className="flex w-full flex-row divide-x bg-[#f9f9f9] p-7">
-      <div className="w-1/3">
+      <div className="mr-2 w-2/5">
         <FileSidePanel />
       </div>
-      <div className="w-2/3">
+      <div className="h-[95vh] w-3/5 overflow-y-auto">
         <FilePreview
           file={file}
           threads={threads}
