@@ -9,7 +9,7 @@ type VectorStoreListProps = {
 
 export default function VectorStoreList({ vectorStores, deleteVectorStore }: VectorStoreListProps) {
   return (
-    <div className="py-2">
+    <div>
       {vectorStores.map((vectorStore, index) => (
         <VectorStoreListItem
           key={index}

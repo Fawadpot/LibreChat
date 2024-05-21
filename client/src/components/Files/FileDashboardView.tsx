@@ -74,12 +74,12 @@ files.forEach((file) => {
 
 const FileDashboardView = () => {
   return (
-    <div className="flex h-screen flex-row bg-[#f9f9f9]">
-      <div className="w-1/3">
+    <div className="flex h-screen flex-row divide-x bg-[#f9f9f9]">
+      <div className="ml-8 mt-10 w-1/3">
         <VectorStoreSidePanel />
       </div>
-      <div className="w-2/3">
-        <div className="overflow-x-auto bg-white p-0 sm:p-6 sm:pt-4">
+      <div className="mr-2 mt-6 w-2/3">
+        <div className="m-2 overflow-x-auto">
           <DataTableFile columns={fileTableColumns} data={files} />
           <div className="mt-5 sm:mt-4" />
         </div>

@@ -11,14 +11,13 @@ type FileListProps = {
 
 export default function FileList({ files, deleteFile, attachedVectorStores }: FileListProps) {
   return (
-    <div className=" h-screen overflow-y-auto py-2">
+    <div className="h-[85vh] overflow-y-auto">
       {files.map((file) => (
         // <FileListItem key={file._id} file={file} deleteFile={deleteFile} width="100%" />
         <FileListItem2
           key={file._id}
           file={file}
           deleteFile={deleteFile}
-          width="100%"
           attachedVectorStores={attachedVectorStores}
         />
       ))}

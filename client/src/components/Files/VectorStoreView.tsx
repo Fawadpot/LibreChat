@@ -2,6 +2,8 @@ import React from 'react';
 import VectorStoreSidePanel from './VectorStore/VectorStoreSidePanel';
 import VectorStorePreview from './VectorStore/VectorStorePreview';
 import { TFile } from 'librechat-data-provider/dist/types';
+import FilesSectionSelector from './FilesSectionSelector';
+import { Button } from '../ui';
 
 const vectorStore = {
   id: 'vs_NeHK4JidLKJ2qo23dKLLK',
@@ -88,22 +90,30 @@ const assistants = [
 
 export default function VectorStoreView() {
   return (
-    <div className="flex flex-row divide-x bg-[#f9f9f9]">
-      <div className="w-1/3">
-        <VectorStoreSidePanel />
+    <div className="bg-[#f9f9f9]  p-7">
+      <div className="flex w-full flex-row justify-between">
+        <FilesSectionSelector />
+        <Button variant={'outline'} size={'sm'}>
+          Go back
+        </Button>
       </div>
-      <div className="w-2/3">
-        <VectorStorePreview
-          vectorStore={vectorStore}
-          filesAttached={filesAttached}
-          assistants={assistants}
-          removeFile={() => {
-            console.log('removeFile');
-          }}
-          deleteVectorStore={() => {
-            console.log('deleteVectorStore');
-          }}
-        />
+      <div className="mt-2 flex flex-row divide-x">
+        <div className="w-1/3">
+          <VectorStoreSidePanel />
+        </div>
+        <div className="w-2/3">
+          <VectorStorePreview
+            vectorStore={vectorStore}
+            filesAttached={filesAttached}
+            assistants={assistants}
+            removeFile={() => {
+              console.log('removeFile');
+            }}
+            deleteVectorStore={() => {
+              console.log('deleteVectorStore');
+            }}
+          />
+        </div>
       </div>
     </div>
   );
