@@ -1,6 +1,7 @@
 import type { TFile } from 'librechat-data-provider';
 import { FileIcon, PlusIcon } from 'lucide-react';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { DotsIcon, NewTrashIcon } from '~/components/svg';
 import { Button } from '~/components/ui';
 
@@ -15,8 +16,15 @@ export default function FileListItem2({
   deleteFile,
   attachedVectorStores,
 }: FileListItemProps) {
+  const navigate = useNavigate();
+
   return (
-    <div className="w-100 mt-2 flex h-fit cursor-pointer flex-row rounded-md border border-0 bg-white p-4 transition duration-300 ease-in-out hover:bg-slate-200">
+    <div
+      onClick={() => {
+        navigate('file_id_abcdef');
+      }}
+      className="w-100 mt-2 flex h-fit cursor-pointer flex-row rounded-md border border-0 bg-white p-4 transition duration-300 ease-in-out hover:bg-slate-200"
+    >
       <div className="w-1/12 content-center">
         <FileIcon className="m-0 size-5 p-0" />
       </div>

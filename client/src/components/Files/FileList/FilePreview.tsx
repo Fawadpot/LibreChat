@@ -1,33 +1,55 @@
 import { TFile } from 'librechat-data-provider/dist/types';
-import React from 'react';
+import React, { useState } from 'react';
 import { TThread, TVectorStore } from '~/common';
 import { CheckMark, NewTrashIcon } from '~/components/svg';
 import { Button } from '~/components/ui';
 import DeleteIconButton from '../DeleteIconButton';
 import VectorStoreButton from '../VectorStore/VectorStoreButton';
 import { CircleIcon, Clock3Icon, InfoIcon } from 'lucide-react';
+import { useParams } from 'react-router-dom';
 
-type FilePreviewProps = {
-  file: TFile;
-  threads: TThread[];
-  vectorStoresAttached: TVectorStore[];
-  removeFromVectorStore: () => void;
-  removeFromThread: () => void;
+const tempFile: TFile = {
+  filename: 'File1.jpg',
+  object: 'file',
+  bytes: 10000,
+  createdAt: '2022-01-01T10:00:00',
+  _id: '1',
+  type: 'image',
+  usage: 12,
+  user: 'abc',
+  file_id: 'file_id',
+  embedded: true,
+  filepath: 'filepath',
 };
 
-export default function FilePreview({
-  file: { _id, filename, object, bytes, message, createdAt },
-  threads,
-  vectorStoresAttached,
-  removeFromVectorStore,
-  removeFromThread,
-}: FilePreviewProps) {
+const tempThreads: TThread[] = [
+  { id: 'thead_id', createdAt: '2022-01-01T10:00:00' },
+  { id: 'thead_id', createdAt: '2022-01-01T10:00:00' },
+  { id: 'thead_id', createdAt: '2022-01-01T10:00:00' },
+  { id: 'thead_id', createdAt: '2022-01-01T10:00:00' },
+  { id: 'thead_id', createdAt: '2022-01-01T10:00:00' },
+  { id: 'thead_id', createdAt: '2022-01-01T10:00:00' },
+  { id: 'thead_id', createdAt: '2022-01-01T10:00:00' },
+];
+
+const tempVectorStoresAttached: TVectorStore[] = [
+  { name: 'vector 1', created_at: '2022-01-01T10:00:00', _id: 'id', object: 'vector_store' },
+  { name: 'vector 1', created_at: '2022-01-01T10:00:00', _id: 'id', object: 'vector_store' },
+  { name: 'vector 1', created_at: '2022-01-01T10:00:00', _id: 'id', object: 'vector_store' },
+];
+
+export default function FilePreview() {
+  const [file, setFile] = useState(tempFile);
+  const [threads, setThreads] = useState(tempThreads);
+  const [vectorStoresAttached, setVectorStoresAttached] = useState(tempVectorStoresAttached);
+  const params = useParams();
+
   return (
     <div className="m-3 bg-white p-10">
       <div className="flex flex-row justify-between">
         <div className="flex flex-col">
           <b>FILE</b>
-          <b className="text-2xl">{filename}</b>
+          <b className="text-2xl">{file.filename}</b>
         </div>
         <div className="flex flex-row">
           <div>
@@ -53,7 +75,7 @@ export default function FilePreview({
             <InfoIcon className="size-4 text-gray-500" />
             &nbsp; File ID
           </span>
-          <span className="w-4/5 text-gray-500">{_id}</span>
+          <span className="w-4/5 text-gray-500">{file._id}</span>
         </div>
         <div className="mt-3 flex flex-row">
           <span className="flex w-1/5 flex-row items-center">
@@ -63,7 +85,7 @@ export default function FilePreview({
           <div className="w-4/5">
             <span className="flex w-20 flex-row items-center justify-evenly rounded-full bg-[#f2f8ec] p-1 text-[#91c561]">
               <CheckMark className="m-0 p-0" />
-              <div>{object}</div>
+              <div>{file.object}</div>
             </span>
           </div>
         </div>
@@ -72,21 +94,21 @@ export default function FilePreview({
             <Clock3Icon className="m-0 size-4 p-0 text-gray-500" />
             &nbsp;Purpose
           </span>
-          <span className="w-4/5 text-gray-500">{message}</span>
+          <span className="w-4/5 text-gray-500">{file.message}</span>
         </div>
         <div className="mt-3 flex flex-row">
           <span className="flex w-1/5 flex-row items-center">
             <Clock3Icon className="m-0 size-4 p-0 text-gray-500" />
             &nbsp; Size
           </span>
-          <span className="w-4/5 text-gray-500">{bytes}</span>
+          <span className="w-4/5 text-gray-500">{file.bytes}</span>
         </div>
         <div className="mt-3 flex flex-row">
           <span className="flex w-1/5 flex-row items-center">
             <Clock3Icon className="m-0 size-4 p-0 text-gray-500" />
             &nbsp; Created At
           </span>
-          <span className="w-4/5 text-gray-500">{createdAt?.toString()}</span>
+          <span className="w-4/5 text-gray-500">{file.createdAt?.toString()}</span>
         </div>
       </div>
 
@@ -107,7 +129,9 @@ export default function FilePreview({
                   <div className="content-center">{vectors.created_at.toString()}</div>
                   <Button
                     className="m-0 ml-3 h-full bg-transparent p-0 text-[#666666] hover:bg-slate-200"
-                    onClick={removeFromVectorStore}
+                    onClick={() => {
+                      console.log('Remove from vector store');
+                    }}
                   >
                     <NewTrashIcon className="m-0 p-0" />
                   </Button>
@@ -132,7 +156,9 @@ export default function FilePreview({
                   <div className="content-center">{thread.createdAt}</div>
                   <Button
                     className="m-0 ml-3 h-full bg-transparent p-0 text-[#666666] hover:bg-slate-200"
-                    onClick={removeFromThread}
+                    onClick={() => {
+                      console.log('Remove from thread');
+                    }}
                   >
                     <NewTrashIcon className="m-0 p-0" />
                   </Button>

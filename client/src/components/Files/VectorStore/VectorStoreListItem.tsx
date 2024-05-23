@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { TVectorStore } from '~/common';
 import { DotsIcon, NewTrashIcon, TrashIcon } from '~/components/svg';
 import { Button } from '~/components/ui';
@@ -12,8 +13,14 @@ export default function VectorStoreListItem({
   vectorStore,
   deleteVectorStore,
 }: VectorStoreListItemProps) {
+  const navigate = useNavigate();
   return (
-    <div className="w-100 mt-2 flex cursor-pointer flex-row justify-around rounded-md border border-0 bg-white p-4 transition duration-300 ease-in-out hover:bg-slate-200">
+    <div
+      onClick={() => {
+        navigate('vs_id_abcdef');
+      }}
+      className="w-100 mt-2 flex cursor-pointer flex-row justify-around rounded-md border border-0 bg-white p-4 transition duration-300 ease-in-out hover:bg-slate-200"
+    >
       <div className="flex w-1/2 flex-col justify-around align-middle">
         <strong>{vectorStore.name}</strong>
         <p className="text-sm text-gray-500">{vectorStore.object}</p>
