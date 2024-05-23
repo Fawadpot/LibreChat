@@ -215,12 +215,12 @@ export default function VectorStoreSidePanel() {
 
   return (
     <div className="flex flex-col">
-      <div className="flex h-[10vh] flex-col">
+      <div className="m-4 flex h-[10vh] flex-col">
         <h2 className="text-lg">
           <strong>Vector Stores</strong>
         </h2>
         <div className="mr-3 mt-2 flex flex-row justify-between">
-          <div className="flex w-1/2 flex-row">
+          <div className="flex w-full flex-row md:w-2/3 lg:w-1/3">
             <Button variant="ghost" className="m-0 mr-2 p-0">
               <ListFilter className="h-4 w-4" />
             </Button>

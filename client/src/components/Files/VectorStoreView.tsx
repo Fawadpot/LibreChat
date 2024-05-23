@@ -1,18 +1,24 @@
 import React from 'react';
 import VectorStoreSidePanel from './VectorStore/VectorStoreSidePanel';
-import VectorStorePreview from './VectorStore/VectorStorePreview';
-import { TFile } from 'librechat-data-provider/dist/types';
 import FilesSectionSelector from './FilesSectionSelector';
 import { Button } from '../ui';
-import { Outlet, useParams } from 'react-router-dom';
+import { Outlet, useNavigate, useParams } from 'react-router-dom';
 
 export default function VectorStoreView() {
   const params = useParams();
+  const navigate = useNavigate();
   return (
     <div className="bg-[#f9f9f9] p-0 lg:p-7">
       <div className="flex w-full flex-row justify-between">
         <FilesSectionSelector />
-        <Button className="block lg:hidden" variant={'outline'} size={'sm'}>
+        <Button
+          className="block lg:hidden"
+          variant={'outline'}
+          size={'sm'}
+          onClick={() => {
+            navigate('/vector-stores');
+          }}
+        >
           Go back
         </Button>
       </div>

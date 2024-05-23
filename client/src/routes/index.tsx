@@ -20,6 +20,7 @@ import FilePreview from '~/components/Files/FileList/FilePreview';
 import EmptyFilePreview from '~/components/Files/FileList/EmptyFilePreview';
 import EmptyVectorStorePreview from '~/components/Files/VectorStore/EmptyVectorStorePreview';
 import VectorStorePreview from '~/components/Files/VectorStore/VectorStorePreview';
+import DataTableFilePreview from '~/components/Files/FileList/DataTableFilePreview';
 
 const AuthLayout = () => (
   <AuthContextProvider>
@@ -65,8 +66,18 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        path: 'file-dashboard',
+        path: 'file-dashboard/*',
         element: <FileDashboardView />,
+        children: [
+          {
+            index: true,
+            element: <EmptyVectorStorePreview />,
+          },
+          {
+            path: ':vectorStoreId',
+            element: <DataTableFilePreview />,
+          },
+        ],
       },
       {
         path: 'files/*',

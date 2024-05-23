@@ -11,7 +11,7 @@ export default function VectorStoreButton({ onClick }: VectorStoreButtonProps) {
     <div className="w-40">
       <Button className="w-full bg-black p-0 text-white" onClick={onClick}>
         <PlusIcon className="h-4 w-4 font-bold" />
-        &nbsp; Add Vector Store
+        &nbsp; <span className="text-nowrap">Add Vector Store</span>
       </Button>
     </div>
   );
