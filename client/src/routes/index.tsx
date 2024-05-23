@@ -14,6 +14,10 @@ import Root from './Root';
 import FileDashboardView from '~/components/Files/FileDashboardView';
 import FilesListView from '~/components/Files/FilesListView';
 import VectorStoreView from '~/components/Files/VectorStoreView';
+import FilePreview from '~/components/Files/FileList/FilePreview';
+import EmptyFilePreview from '~/components/Files/FileList/EmptyFilePreview';
+import EmptyVectorStorePreview from '~/components/Files/VectorStore/EmptyVectorStorePreview';
+import VectorStorePreview from '~/components/Files/VectorStore/VectorStorePreview';
 
 const AuthLayout = () => (
   <AuthContextProvider>
@@ -51,12 +55,32 @@ export const router = createBrowserRouter([
         element: <FileDashboardView />,
       },
       {
-        path: 'files',
+        path: 'files/*',
         element: <FilesListView />,
+        children: [
+          {
+            index: true,
+            element: <EmptyFilePreview />,
+          },
+          {
+            path: ':fileId',
+            element: <FilePreview />,
+          },
+        ],
       },
       {
-        path: 'vector-stores',
+        path: 'vector-stores/*',
         element: <VectorStoreView />,
+        children: [
+          {
+            index: true,
+            element: <EmptyVectorStorePreview />,
+          },
+          {
+            path: ':vectorStoreId',
+            element: <VectorStorePreview />,
+          },
+        ],
       },
       {
         path: '/',

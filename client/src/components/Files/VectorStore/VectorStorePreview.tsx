@@ -6,32 +6,104 @@ import { TFile } from 'librechat-data-provider/dist/types';
 import UploadFileButton from '../FileList/UploadFileButton';
 import UploadFileModal from '../FileList/UploadFileModal';
 import { BarChart4Icon, Clock3, FileClock, FileIcon, InfoIcon, PlusIcon } from 'lucide-react';
+import { useParams } from 'react-router-dom';
 
-type VectorStorePreviewProps = {
-  vectorStore;
-  filesAttached: TFile[];
-  assistants: { resource: string; id: string }[];
-  removeFile: (id: string | undefined) => void;
-  deleteVectorStore: () => void;
+const tempVectorStore = {
+  _id: 'vs_NeHK4JidLKJ2qo23dKLLK',
+  name: 'Vector Store 1',
+  usageThisMonth: '1,000,000',
+  bytes: 1000000,
+  lastActive: '2022-01-01T10:00:00',
+  expirationPolicy: 'Never',
+  expires: 'Never',
+  createdAt: '2022-01-01T10:00:00',
 };
+const tempFilesAttached: TFile[] = [
+  {
+    filename: 'File1.jpg',
+    object: 'file',
+    bytes: 10000,
+    createdAt: '2022-01-01T10:00:00',
+    _id: '1',
+    type: 'image',
+    usage: 12,
+    user: 'abc',
+    file_id: 'file_id',
+    embedded: true,
+    filepath: 'filepath',
+  },
+  {
+    filename: 'File1.jpg',
+    object: 'file',
+    bytes: 10000,
+    createdAt: '2022-01-01T10:00:00',
+    _id: '1',
+    type: 'image',
+    usage: 12,
+    user: 'abc',
+    file_id: 'file_id',
+    embedded: true,
+    filepath: 'filepath',
+  },
+  {
+    filename: 'File1.jpg',
+    object: 'file',
+    bytes: 10000,
+    createdAt: '2022-01-01T10:00:00',
+    _id: '1',
+    type: 'image',
+    usage: 12,
+    user: 'abc',
+    file_id: 'file_id',
+    embedded: true,
+    filepath: 'filepath',
+  },
+  {
+    filename: 'File1.jpg',
+    object: 'file',
+    bytes: 10000,
+    createdAt: '2022-01-01T10:00:00',
+    _id: '1',
+    type: 'image',
+    usage: 12,
+    user: 'abc',
+    file_id: 'file_id',
+    embedded: true,
+    filepath: 'filepath',
+  },
+];
+const tempAssistants = [
+  {
+    id: 'Lorum Ipsum',
+    resource: 'Lorum Ipsum',
+  },
+  {
+    id: 'Lorum Ipsum',
+    resource: 'Lorum Ipsum',
+  },
+  {
+    id: 'Lorum Ipsum',
+    resource: 'Lorum Ipsum',
+  },
+  {
+    id: 'Lorum Ipsum',
+    resource: 'Lorum Ipsum',
+  },
+];
 
-export default function VectorStorePreview({
-  vectorStore,
-  filesAttached,
-  assistants,
-  removeFile,
-  deleteVectorStore,
-}: VectorStorePreviewProps) {
+export default function VectorStorePreview() {
   const [open, setOpen] = useState(false);
-  const { _id, name, usageThisMonth, bytes, lastActive, expirationPolicy, expires, createdAt } =
-    vectorStore;
+  const [vectorStore, setVectorStore] = useState(tempVectorStore);
+  const [filesAttached, setFilesAttached] = useState(tempFilesAttached);
+  const [assistants, setAssistants] = useState(tempAssistants);
+  const params = useParams();
 
   return (
-    <div className="m-3 bg-white p-10">
+    <div className="m-3 bg-white p-2 lg:p-10">
       <div className="flex flex-row justify-between">
         <div className="flex flex-col">
           <b>VECTOR STORE</b>
-          <b className="text-2xl">{name}</b>
+          <b className="text-2xl">{vectorStore.name}</b>
         </div>
         <div className="flex flex-row gap-x-3">
           <div>
@@ -57,7 +129,7 @@ export default function VectorStorePreview({
             <InfoIcon className="size-4 text-gray-500" />
             &nbsp; ID
           </span>
-          <span className="w-4/5 text-gray-500">{_id}</span>
+          <span className="w-4/5 text-gray-500">{vectorStore._id}</span>
         </div>
         <div className="mt-3 flex flex-row">
           <span className="flex w-1/5 flex-row items-center">
@@ -76,35 +148,35 @@ export default function VectorStorePreview({
             <InfoIcon className="size-4 text-gray-500" />
             &nbsp;Size
           </span>
-          <span className="w-4/5 text-gray-500">{bytes} bytes</span>
+          <span className="w-4/5 text-gray-500">{vectorStore.bytes} bytes</span>
         </div>
         <div className="mt-3 flex flex-row">
           <span className="flex w-1/5 flex-row items-center">
             <Clock3 className="size-4 text-gray-500" />
             &nbsp;Last active
           </span>
-          <span className="w-4/5 text-gray-500">{lastActive}</span>
+          <span className="w-4/5 text-gray-500">{vectorStore.lastActive}</span>
         </div>
         <div className="mt-3 flex flex-row">
           <span className="flex w-1/5 flex-row items-center">
             <InfoIcon className="size-4 text-gray-500" />
             &nbsp;Expiration policy
           </span>
-          <span className="w-4/5 text-gray-500">{expirationPolicy}</span>
+          <span className="w-4/5 text-gray-500">{vectorStore.expirationPolicy}</span>
         </div>
         <div className="mt-3 flex flex-row">
           <span className="flex w-1/5 flex-row items-center">
             <FileClock className="size-4 text-gray-500" />
             &nbsp;Expires
           </span>
-          <span className="w-4/5 text-gray-500">{expires}</span>
+          <span className="w-4/5 text-gray-500">{vectorStore.expires}</span>
         </div>
         <div className="mt-3 flex flex-row">
           <span className="flex w-1/5 flex-row items-center">
             <Clock3 className="size-4 text-gray-500" />
             &nbsp;Created At
           </span>
-          <span className="w-4/5 text-gray-500">{createdAt?.toString()}</span>
+          <span className="w-4/5 text-gray-500">{vectorStore.createdAt?.toString()}</span>
         </div>
       </div>
 
@@ -128,7 +200,7 @@ export default function VectorStorePreview({
                   <div className="content-center">{file.createdAt?.toString()}</div>
                   <Button
                     className="my-0 ml-3 h-min bg-transparent p-0 text-[#666666] hover:bg-slate-200"
-                    onClick={() => removeFile(file._id)}
+                    onClick={() => console.log('click')}
                   >
                     <NewTrashIcon className="m-0 p-0" />
                   </Button>
