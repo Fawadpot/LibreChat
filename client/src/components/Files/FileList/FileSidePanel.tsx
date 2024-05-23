@@ -151,10 +151,10 @@ export default function FileSidePanel() {
   return (
     <div>
       <div className="w-30">
-        <h2 className="text-lg">
+        <h2 className="m-3 text-lg md:m-0">
           <strong>Files</strong>
         </h2>
-        <div className="mt-2 flex flex-row justify-between">
+        <div className="m-3 mt-2 flex flex-row justify-between md:m-0">
           <div className="flex flex-row">
             <Button variant="ghost" className="m-0 mr-2 p-0">
               <ListFilter className="h-4 w-4" />

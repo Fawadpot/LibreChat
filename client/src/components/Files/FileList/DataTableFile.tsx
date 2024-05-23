@@ -89,8 +89,8 @@ export default function DataTableFile<TData, TValue>({
         <h2 className="text-lg">
           <strong>Files</strong>
         </h2>
-        <div className="mt-3 flex w-full flex-row justify-between">
-          <div className="flex flex-row gap-x-3">
+        <div className="mt-3 flex w-full flex-col-reverse justify-between md:flex-row">
+          <div className="mt-3 flex w-full flex-row justify-center gap-x-3 md:m-0 md:justify-start">
             <ActionButton
               onClick={() => {
                 console.log('click');
@@ -117,7 +117,7 @@ export default function DataTableFile<TData, TValue>({
               {localize('com_ui_delete')}
             </Button>
           </div>
-          <div className="flex flex-row gap-x-3">
+          <div className="flex w-full flex-row gap-x-3">
             {' '}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
