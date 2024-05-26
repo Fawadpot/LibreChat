@@ -21,6 +21,7 @@ import EmptyFilePreview from '~/components/Files/FileList/EmptyFilePreview';
 import EmptyVectorStorePreview from '~/components/Files/VectorStore/EmptyVectorStorePreview';
 import VectorStorePreview from '~/components/Files/VectorStore/VectorStorePreview';
 import DataTableFilePreview from '~/components/Files/FileList/DataTableFilePreview';
+import DashboardRoute from './DashboardRoute';
 
 const AuthLayout = () => (
   <AuthContextProvider>
@@ -66,47 +67,53 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        path: 'file-dashboard/*',
-        element: <FileDashboardView />,
+        path: 'd/*',
+        element: <DashboardRoute />,
         children: [
           {
-            index: true,
-            element: <EmptyVectorStorePreview />,
+            element: <FileDashboardView />,
+            children: [
+              {
+                index: true,
+                element: <EmptyVectorStorePreview />,
+              },
+              {
+                path: ':vectorStoreId',
+                element: <DataTableFilePreview />,
+              },
+            ],
           },
           {
-            path: ':vectorStoreId',
-            element: <DataTableFilePreview />,
+            path: 'files/*',
+            element: <FilesListView />,
+            children: [
+              {
+                index: true,
+                element: <EmptyFilePreview />,
+              },
+              {
+                path: ':fileId',
+                element: <FilePreview />,
+              },
+            ],
+          },
+          {
+            path: 'vector-stores/*',
+            element: <VectorStoreView />,
+            children: [
+              {
+                index: true,
+                element: <EmptyVectorStorePreview />,
+              },
+              {
+                path: ':vectorStoreId',
+                element: <VectorStorePreview />,
+              },
+            ],
           },
         ],
       },
-      {
-        path: 'files/*',
-        element: <FilesListView />,
-        children: [
-          {
-            index: true,
-            element: <EmptyFilePreview />,
-          },
-          {
-            path: ':fileId',
-            element: <FilePreview />,
-          },
-        ],
-      },
-      {
-        path: 'vector-stores/*',
-        element: <VectorStoreView />,
-        children: [
-          {
-            index: true,
-            element: <EmptyVectorStorePreview />,
-          },
-          {
-            path: ':vectorStoreId',
-            element: <VectorStorePreview />,
-          },
-        ],
-      },
+
       {
         path: '/',
         element: <Root />,

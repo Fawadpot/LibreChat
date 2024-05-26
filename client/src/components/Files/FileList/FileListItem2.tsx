@@ -60,7 +60,7 @@ export default function FileListItem2({
           })}
         </div>
       </div>
-      <div className="flex w-2/12 flex-col items-center justify-evenly md:flex-row">
+      <div className="mr-0 flex w-2/12 flex-col items-center justify-evenly sm:mr-4 md:flex-row">
         <Button className="w-min content-center bg-transparent text-gray-500 hover:bg-slate-200">
           <DotsIcon className="text-grey-100" />
         </Button>

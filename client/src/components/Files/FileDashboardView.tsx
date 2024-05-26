@@ -8,21 +8,21 @@ const FileDashboardView = () => {
   const navigate = useNavigate();
   return (
     <div className="bg-[#f9f9f9] p-0 lg:p-7">
-      <div className="flex w-full flex-row justify-between">
+      <div className="ml-3 mt-3 flex flex-row justify-between">
         {params?.vectorStoreId && (
           <Button
             className="block lg:hidden"
             variant={'outline'}
             size={'sm'}
             onClick={() => {
-              navigate('/file-dashboard');
+              navigate('/d');
             }}
           >
             Go back
           </Button>
         )}
       </div>
-      <div className="flex h-screen flex-row divide-x bg-[#f9f9f9]">
+      <div className="flex h-screen max-w-full flex-row divide-x bg-[#f9f9f9]">
         <div className={`w-full lg:w-1/3 ${params.vectorStoreId ? 'hidden lg:block' : ''}`}>
           <VectorStoreSidePanel />
         </div>

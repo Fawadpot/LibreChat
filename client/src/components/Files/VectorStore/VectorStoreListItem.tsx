@@ -31,12 +31,12 @@ export default function VectorStoreListItem({
         </p>
         <p className="text-sm">{vectorStore.created_at.toString()}</p>
       </div>
-      <div className="flex w-1/6 justify-around">
-        <Button className="m-0 w-min content-center bg-transparent p-0 text-gray-500 hover:bg-slate-200">
+      <div className="flex w-1/6 flex-col justify-around sm:flex-row">
+        <Button className="m-0 w-full content-center bg-transparent p-0 text-gray-500 hover:bg-slate-200 sm:w-min">
           <DotsIcon className="text-grey-100 m-0 p-0" />
         </Button>
         <Button
-          className="m-0 bg-transparent p-0 text-[#666666] hover:bg-slate-200"
+          className="m-0 w-full bg-transparent p-0 text-[#666666] hover:bg-slate-200 sm:w-fit"
           onClick={() => deleteVectorStore(vectorStore._id)}
         >
           <NewTrashIcon className="m-0 p-0" />

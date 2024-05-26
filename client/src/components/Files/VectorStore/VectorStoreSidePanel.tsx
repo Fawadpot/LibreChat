@@ -7,6 +7,7 @@ import FilesSectionSelector from '../FilesSectionSelector';
 import ActionButton from '../ActionButton';
 import DeleteIconButton from '../DeleteIconButton';
 import { ListFilter } from 'lucide-react';
+import { useLocalize } from '~/hooks';
 
 const fakeVectorStores: TVectorStore[] = [
   {
@@ -208,6 +209,7 @@ const fakeVectorStores: TVectorStore[] = [
 ];
 
 export default function VectorStoreSidePanel() {
+  const localize = useLocalize();
   const deleteVectorStore = (id: string | undefined) => {
     // Define delete functionality here
     console.log(`Deleting VectorStore with id: ${id}`);
@@ -215,18 +217,25 @@ export default function VectorStoreSidePanel() {
 
   return (
     <div className="flex flex-col">
-      <div className="m-4 flex h-[10vh] flex-col">
+      <div className="m-3 flex max-h-[10vh] flex-col">
         <h2 className="text-lg">
           <strong>Vector Stores</strong>
         </h2>
-        <div className="mr-3 mt-2 flex flex-row justify-between">
-          <div className="flex w-full flex-row md:w-2/3 lg:w-1/3">
+        <div className="m-1 mt-2 flex w-full flex-row justify-between gap-x-2 lg:m-0">
+          <div className="flex w-2/3 flex-row">
             <Button variant="ghost" className="m-0 mr-2 p-0">
               <ListFilter className="h-4 w-4" />
             </Button>
-            <Input type="text" placeholder="Filter by title, content..." className="w-full" />
+            <Input
+              placeholder={localize('com_files_filter')}
+              value={''}
+              onChange={() => {
+                console.log('changed');
+              }}
+              className="max-w-sm dark:border-gray-500"
+            />
           </div>
-          <div className="flex w-1/3 flex-row justify-end">
+          <div className="w-1/3">
             <VectorStoreButton
               onClick={() => {
                 console.log('Add Vector Store');
@@ -235,7 +244,7 @@ export default function VectorStoreSidePanel() {
           </div>
         </div>
       </div>
-      <div className="mr-2 mt-2 h-[90vh] w-full overflow-y-auto">
+      <div className="mr-2 mt-2 max-h-[80vh] w-full overflow-y-auto">
         <VectorStoreList vectorStores={fakeVectorStores} deleteVectorStore={deleteVectorStore} />
       </div>
     </div>
