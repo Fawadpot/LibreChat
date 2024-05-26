@@ -149,40 +149,38 @@ export default function FileSidePanel() {
   };
 
   return (
-    <div>
-      <div className="w-30">
-        <h2 className="m-3 text-lg md:m-0">
-          <strong>Files</strong>
-        </h2>
-        <div className="m-3 mt-2 flex flex-row justify-between md:m-0">
-          <div className="flex flex-row">
-            <Button variant="ghost" className="m-0 mr-2 p-0">
-              <ListFilter className="h-4 w-4" />
-            </Button>
-            <Input
-              placeholder={localize('com_files_filter')}
-              value={''}
-              onChange={() => {
-                console.log('changed');
-              }}
-              className="max-w-sm dark:border-gray-500"
-            />
-          </div>
-          <div className="w-1/3">
-            <UploadFileButton
-              onClick={() => {
-                console.log('Upload');
-              }}
-            />
-          </div>
-        </div>
-        <div className="mt-3">
-          <FileList
-            files={fakeFiles as TFile[]}
-            deleteFile={deleteFile}
-            attachedVectorStores={attachedVectorStores}
+    <div className="w-30">
+      <h2 className="m-3 text-lg">
+        <strong>Files</strong>
+      </h2>
+      <div className="m-3 mt-2 flex w-full flex-row justify-between gap-x-2 lg:m-0">
+        <div className="flex w-2/3 flex-row">
+          <Button variant="ghost" className="m-0 mr-2 p-0">
+            <ListFilter className="h-4 w-4" />
+          </Button>
+          <Input
+            placeholder={localize('com_files_filter')}
+            value={''}
+            onChange={() => {
+              console.log('changed');
+            }}
+            className="max-w-sm dark:border-gray-500"
           />
         </div>
+        <div className="w-1/3">
+          <UploadFileButton
+            onClick={() => {
+              console.log('Upload');
+            }}
+          />
+        </div>
+      </div>
+      <div className="mt-3">
+        <FileList
+          files={fakeFiles as TFile[]}
+          deleteFile={deleteFile}
+          attachedVectorStores={attachedVectorStores}
+        />
       </div>
     </div>
   );

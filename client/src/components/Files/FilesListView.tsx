@@ -17,7 +17,7 @@ export default function FilesListView() {
             variant={'outline'}
             size={'sm'}
             onClick={() => {
-              navigate('/files');
+              navigate('/d/files');
             }}
           >
             Go back
@@ -33,7 +33,7 @@ export default function FilesListView() {
           <FileSidePanel />
         </div>
         <div
-          className={`h-[95vh] w-full overflow-y-auto xl:w-2/3 ${
+          className={`h-[85vh] w-full overflow-y-auto xl:w-2/3 ${
             params.fileId ? 'lg:w-1/2' : 'hidden md:w-1/2 lg:block'
           }`}
         >
