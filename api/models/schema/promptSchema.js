@@ -1,20 +1,26 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const promptGroupSchema = new Schema({
-  name: {
-    type: String,
-    required: true,
+const promptGroupSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+    numberOfGenerations: {
+      type: Number,
+      default: 0,
+    },
   },
-  isActive: {
-    type: Boolean,
-    default: true,
+  {
+    timestamps: true,
   },
-  numberOfGenerations: {
-    type: Number,
-    default: 0,
-  },
-});
+);
 
 const PromptGroup = mongoose.model('PromptGroup', promptGroupSchema);
 
