@@ -1,5 +1,4 @@
 const express = require('express');
-const { ObjectId } = require('mongodb');
 const router = express.Router();
 const {
   getPromptGroups,
@@ -55,7 +54,7 @@ router.post('/', requireJwtAuth, async (req, res) => {
   );
 });
 
-router.patch('/prompt-group/:groupId', requireJwtAuth, async (req, res) => {
+router.patch('/prompt-groups/:groupId', requireJwtAuth, async (req, res) => {
   const { groupId } = req.params;
   const { name, isActive } = req.body;
   res.status(200).send(await updatePromptGroup({ _id: groupId }, { name, isActive }));
@@ -70,11 +69,7 @@ router.get('/:promptId', requireJwtAuth, async (req, res) => {
 router.get('/', requireJwtAuth, async (req, res) => {
   const author = req.user.id;
   const { groupId, version, type, tags, labels } = req.query;
-  res
-    .status(200)
-    .send(
-      await getPrompts({ groupId: new ObjectId(groupId), version, type, tags, labels, author }),
-    );
+  res.status(200).send(await getPrompts({ groupId, version, type, tags, labels, author }));
 });
 
 router.delete('/:promptId', requireJwtAuth, async (req, res) => {

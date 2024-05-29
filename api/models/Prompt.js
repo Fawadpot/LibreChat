@@ -18,24 +18,19 @@ module.exports = {
     try {
       labels.push('latest');
 
-      // Check if the groupId exists
       let promptGroupId = new ObjectId(groupId);
       let versionNumber = 1;
 
       if (!groupId) {
-        // If groupId does not exist, create a new PromptGroup
         const newPromptGroup = await PromptGroup.create({ name, isActive });
         promptGroupId = newPromptGroup._id;
       } else {
-        // If groupId exists, remove the "latest" label from all other prompts in the group
         await Prompt.updateMany({ groupId: promptGroupId }, { $pull: { labels: 'latest' } });
 
-        // Calculate the version number for the new prompt
         const promptCount = await Prompt.countDocuments({ groupId: promptGroupId });
         versionNumber = promptCount + 1;
       }
 
-      // Create a new prompt
       const newPrompt = await Prompt.create({
         prompt,
         groupId: promptGroupId,
@@ -55,11 +50,33 @@ module.exports = {
     }
   },
   getPrompts: async (filter) => {
-    if (filter.groupId) {
-      filter.groupId = new ObjectId(filter.groupId);
-    }
     try {
-      return await Prompt.find(filter).lean();
+      if (filter.groupId) {
+        filter.groupId = new ObjectId(filter.groupId);
+      }
+
+      if (filter.author) {
+        filter.author = new ObjectId(filter.author);
+      }
+
+      const cleanedFilter = {};
+
+      for (const key in filter) {
+        const value = filter[key];
+        if (value !== undefined && value !== null) {
+          // Handle tags and labels as arrays with $all operator
+          if (key === 'tags' || key === 'labels') {
+            if (Array.isArray(value) && value.length > 0) {
+              cleanedFilter[key] = { $all: value };
+            }
+          } else {
+            cleanedFilter[key] = value;
+          }
+        }
+      }
+
+      const result = await Prompt.find(cleanedFilter).lean();
+      return result;
     } catch (error) {
       logger.error('Error getting prompts', error);
       return { prompt: 'Error getting prompts' };
@@ -95,11 +112,18 @@ module.exports = {
       const { pageNumber, pageSize } = filter;
       delete filter.pageNumber;
       delete filter.pageSize;
-      return await PromptGroup.find(filter)
-        .sort({ updatedAt: -1 })
+      const promptGroups = await PromptGroup.find(filter)
+        .sort({ createdAt: 1 })
         .skip((pageNumber - 1) * pageSize)
         .limit(pageSize)
         .lean();
+      const totalPromptGroups = await PromptGroup.countDocuments(filter);
+      return {
+        promptGroups,
+        totalPages: Math.ceil(totalPromptGroups / pageSize),
+        totalPromptGroups: totalPromptGroups,
+        currentPage: +pageNumber,
+      };
     } catch (error) {
       logger.error('Error getting prompt groups', error);
       return { prompt: 'Error getting prompt groups' };
@@ -111,12 +135,28 @@ module.exports = {
       if (!prompt) {
         throw new Error('Prompt not found');
       }
-      const groupId = new ObjectId(prompt.groupId);
+
+      const groupId = prompt.groupId;
+      const hadLatestLabel = prompt.labels.includes('latest');
 
       await Prompt.deleteOne({ _id: promptId });
 
-      const remainingPrompts = await Prompt.countDocuments({ groupId });
-      if (remainingPrompts === 0) {
+      const remainingPrompts = await Prompt.find({ groupId }).sort({ createdAt: 1 });
+
+      for (let i = 0; i < remainingPrompts.length; i++) {
+        remainingPrompts[i].version = i + 1;
+        await remainingPrompts[i].save();
+      }
+
+      if (hadLatestLabel && remainingPrompts.length > 0) {
+        const highestVersionPrompt = remainingPrompts[remainingPrompts.length - 1];
+        if (!highestVersionPrompt.labels.includes('latest')) {
+          highestVersionPrompt.labels.push('latest');
+          await highestVersionPrompt.save();
+        }
+      }
+
+      if (remainingPrompts.length === 0) {
         await PromptGroup.deleteOne({ _id: groupId });
       }
 
@@ -128,10 +168,16 @@ module.exports = {
   },
   updatePromptGroup: async (filter, data) => {
     try {
-      return await PromptGroup.updateOne(filter, data);
+      const response = await PromptGroup.updateOne(filter, data);
+
+      if (response.matchedCount === 0) {
+        return { promptGroup: 'Prompt group not found' };
+      }
+
+      return { promptGroup: 'Prompt group updated successfully' };
     } catch (error) {
       logger.error('Error updating prompt group', error);
-      return { prompt: 'Error updating prompt group' };
+      return { promptGroup: 'Error updating prompt group' };
     }
   },
 };
