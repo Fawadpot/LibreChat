@@ -54,6 +54,7 @@ export const search = (q: string, pageNumber: string) =>
 export const searchEnabled = () => '/api/search/enable';
 
 export const presets = () => '/api/presets';
+export const prompts = () => '/api/prompts';
 
 export const deletePreset = () => '/api/presets/delete';
 

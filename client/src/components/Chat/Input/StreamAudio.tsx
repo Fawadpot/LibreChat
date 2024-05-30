@@ -89,6 +89,7 @@ export default function StreamAudio({ index = 0 }) {
         }
 
         console.log('Fetching audio...', navigator.userAgent);
+        /* raw fetch request example */
         const response = await fetch('/api/files/tts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },

@@ -27,6 +27,7 @@ export enum QueryKeys {
   assistantDocs = 'assistantDocs',
   fileDownload = 'fileDownload',
   voices = 'voices',
+  prompts = 'prompts',
 }
 
 export enum MutationKeys {
@@ -41,4 +42,6 @@ export enum MutationKeys {
   assistantAvatarUpload = 'assistantAvatarUpload',
   updateAction = 'updateAction',
   deleteAction = 'deleteAction',
+  updatePrompt = 'updatePrompt',
+  deletePrompt = 'deletePrompt',
 }

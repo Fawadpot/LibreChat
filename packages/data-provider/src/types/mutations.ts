@@ -9,6 +9,7 @@ import {
   Action,
 } from './assistants';
 
+/* Generic type for Mutations, see examples of its usage below */
 export type MutationOptions<
   Response,
   Request,
