@@ -107,6 +107,14 @@ module.exports = {
       return { prompt: 'Error getting prompt groups' };
     }
   },
+  getPromptGroup: async (filter) => {
+    try {
+      return await PromptGroup.findOne(filter).lean();
+    } catch (error) {
+      logger.error('Error getting prompt group', error);
+      return { prompt: 'Error getting prompt group' };
+    }
+  },
   getPromptGroups: async (filter) => {
     try {
       const { pageNumber, pageSize } = filter;

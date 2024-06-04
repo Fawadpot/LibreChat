@@ -918,3 +918,86 @@ export const useDeleteAction = (
     },
   });
 };
+
+export const useUpdatePromptGroup = (options?) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ _id, payload }: { _id: string; payload: object }) =>
+      dataService.updatePromptGroup(_id, payload),
+
+    onMutate: async (variables) => {
+      options?.onMutate?.(variables);
+    },
+    onError: (error, variables, context) => {
+      options?.onError?.(error, variables, context);
+    },
+    onSuccess: (response, variables, context) => {
+      queryClient.setQueryData([QueryKeys.promptGroup, variables?._id], response);
+      // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+      queryClient.setQueryData([QueryKeys.promptGroups], (oldData: any) => {
+        return oldData?.map((group: object) => {
+          if (group?.['_id'] === variables?._id) {
+            return response;
+          }
+          return group;
+        });
+      });
+      options?.onSuccess?.(response, variables, context);
+    },
+  });
+};
+
+export const useSavePrompt = (options?) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ payload }: { payload: object }) => dataService.savePrompt(payload),
+
+    onMutate: async (variables) => {
+      if (options?.onMutate) {
+        await options.onMutate(variables);
+      }
+    },
+    onError: (error, variables, context) => {
+      if (options?.onError) {
+        options.onError(error, variables, context);
+      }
+    },
+    onSuccess: (response, variables, context) => {
+      // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+      queryClient.setQueryData([QueryKeys.prompts], (oldData: any) => {
+        return [...(oldData || []), response];
+      });
+      if (options?.onSuccess) {
+        options.onSuccess(response, variables, context);
+      }
+    },
+  });
+};
+
+export const useDeletePrompt = (options?) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ _id }: { _id: string }) => dataService.deletePrompt(_id),
+
+    onMutate: async (variables) => {
+      if (options?.onMutate) {
+        await options.onMutate(variables);
+      }
+    },
+    onError: (error, variables, context) => {
+      if (options?.onError) {
+        options.onError(error, variables, context);
+      }
+    },
+    onSuccess: (response, variables, context) => {
+      // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+      queryClient.setQueryData([QueryKeys.prompts], (oldData: any) => {
+        // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+        return oldData ? oldData.filter((prompt: any) => prompt._id !== variables._id) : [];
+      });
+      if (options?.onSuccess) {
+        options.onSuccess(response, variables, context);
+      }
+    },
+  });
+};

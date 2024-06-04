@@ -85,6 +85,8 @@ export const plugins = () => '/api/plugins';
 
 export const config = () => '/api/config';
 
+export const prompts = () => '/api/prompts';
+
 export const assistants = ({
   path,
   options,
@@ -130,3 +132,31 @@ export const textToSpeech = () => `${files()}/tts`;
 export const textToSpeechManual = () => `${textToSpeech()}/manual`;
 
 export const textToSpeechVoices = () => `${textToSpeech()}/voices`;
+
+export const getPromptGroup = (_id: string) => `${prompts()}/prompt-groups/${_id}`;
+
+export const getPromptGroupsWithFilters = (filter: object) => {
+  let url = `${prompts()}/prompt-groups`;
+  if (Object.keys(filter).length > 0) {
+    const queryParams = new URLSearchParams(filter as Record<string, string>).toString();
+    url += `?${queryParams}`;
+  }
+  return url;
+};
+
+export const getPromptsWithFilters = (filter: object) => {
+  let url = prompts();
+  if (Object.keys(filter).length > 0) {
+    const queryParams = new URLSearchParams(filter as Record<string, string>).toString();
+    url += `?${queryParams}`;
+  }
+  return url;
+};
+
+export const getPrompt = (_id: string) => `${prompts()}/${_id}`;
+
+export const postPrompt = prompts;
+
+export const updatePrompt = getPromptGroup;
+
+export const deletePrompt = getPrompt;

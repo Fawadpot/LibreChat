@@ -22,6 +22,9 @@ import EmptyVectorStorePreview from '~/components/Files/VectorStore/EmptyVectorS
 import VectorStorePreview from '~/components/Files/VectorStore/VectorStorePreview';
 import DataTableFilePreview from '~/components/Files/FileList/DataTableFilePreview';
 import DashboardRoute from './DashboardRoute';
+import PromptsView from '~/components/Prompts/PromptsView';
+import EmptyPromptPreview from '~/components/Prompts/EmptyPromptPreview';
+import PromptPreview from '~/components/Prompts/PromptPreview';
 
 const AuthLayout = () => (
   <AuthContextProvider>
@@ -110,6 +113,32 @@ export const router = createBrowserRouter([
                 element: <VectorStorePreview />,
               },
             ],
+          },
+          {
+            path: 'prompts/*',
+            element: <PromptsView />,
+            children: [
+              {
+                index: true,
+                element: <EmptyPromptPreview />,
+              },
+              //   {
+              //     path: 'new',
+              //     element: <CreateEditPrompt />,
+              //   },
+              {
+                path: ':promptId',
+                element: <PromptPreview />,
+              },
+              //   {
+              //     path: ':promptId/edit',
+              //     element: <CreateEditPrompt />,
+              //   },
+            ],
+          },
+          {
+            path: '*',
+            element: <Navigate to="/d/files" replace={true} />,
           },
         ],
       },

@@ -27,6 +27,10 @@ export enum QueryKeys {
   assistantDocs = 'assistantDocs',
   fileDownload = 'fileDownload',
   voices = 'voices',
+  prompts = 'prompts',
+  prompt = 'prompt',
+  promptGroups = 'promptGroups',
+  promptGroup = 'promptGroup',
 }
 
 export enum MutationKeys {

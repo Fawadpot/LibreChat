@@ -7,9 +7,14 @@ const {
   getPrompts,
   getPrompt,
   deletePrompt,
+  getPromptGroup,
 } = require('../../models/Prompt');
 const { requireJwtAuth } = require('../middleware');
 
+router.get('/prompt-groups/:groupId', requireJwtAuth, async (req, res) => {
+  let groupId = req.params.groupId;
+  res.status(200).send(await getPromptGroup({ _id: groupId }));
+});
 router.get('/prompt-groups', requireJwtAuth, async (req, res) => {
   let pageNumber = req.query.pageNumber || 1;
   pageNumber = parseInt(pageNumber, 10);

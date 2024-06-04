@@ -463,3 +463,31 @@ export function archiveConversation(
 export function genTitle(payload: m.TGenTitleRequest): Promise<m.TGenTitleResponse> {
   return request.post(endpoints.genTitle(), payload);
 }
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
+export function getPrompt(id: string): Promise<any> {
+  return request.get(endpoints.getPrompt(id));
+}
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
+export function getPrompts(filter: object): Promise<any> {
+  return request.get(endpoints.getPromptsWithFilters(filter));
+}
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
+export function getPromptGroups(filter: object): Promise<any> {
+  return request.get(endpoints.getPromptGroupsWithFilters(filter));
+}
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
+export function getPromptGroup(id: string): Promise<any> {
+  return request.get(endpoints.getPromptGroup(id));
+}
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
+export function savePrompt(payload: object): Promise<any> {
+  return request.post(endpoints.postPrompt(), payload);
+}
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
+export function updatePromptGroup(id: string, payload: object): Promise<any> {
+  return request.patch(endpoints.updatePrompt(id), payload);
+}
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
+export function deletePrompt(id: string): Promise<any> {
+  return request.delete(endpoints.deletePrompt(id));
+}

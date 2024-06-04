@@ -422,3 +422,40 @@ export const useFileDownload = (userId?: string, file_id?: string): QueryObserve
 export const useVoicesQuery = (): UseQueryResult<t.VoiceResponse> => {
   return useQuery([QueryKeys.voices], () => dataService.getVoices());
 };
+
+export const useGetPromptGroup = (id: string, config?) => {
+  return useQuery([QueryKeys.promptGroup, id], () => dataService.getPromptGroup(id), {
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+    retry: false,
+    ...config,
+    enabled: config?.enabled !== undefined ? config?.enabled : true,
+  });
+};
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
+export const useGetPrompts = (filter: object, config?): QueryObserverResult<any> => {
+  return useQuery(
+    [QueryKeys.prompts, JSON.stringify(filter)],
+    () => dataService.getPrompts(filter),
+    {
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+      retry: false,
+      ...config,
+      enabled: config?.enabled !== undefined ? config?.enabled : true,
+    },
+  );
+};
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
+export const useGetPrompt = (id: string, config?): QueryObserverResult<any> => {
+  return useQuery([QueryKeys.prompt], () => dataService.getPrompt(id), {
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+    retry: false,
+    ...config,
+    enabled: config?.enabled !== undefined ? config?.enabled : true,
+  });
+};
