@@ -109,3 +109,16 @@ export type UpdateSharedLinkOptions = MutationOptions<
   Partial<types.TSharedLink>
 >;
 export type DeleteSharedLinkOptions = MutationOptions<types.TSharedLink, { shareId: string }>;
+
+export type UpdatePromptGroupVariables = {
+  _id: string;
+  payload: types.TUpdatePromptGroupRequest;
+};
+
+export type SavePromptVariables = {
+  payload: object;
+};
+
+export type DeletePromptVariables = {
+  _id: string;
+};

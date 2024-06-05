@@ -4,7 +4,9 @@ import {
   defaultAssistantsVersion,
 } from 'librechat-data-provider';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationResult } from '@tanstack/react-query';
+import { dataService, MutationKeys, QueryKeys, defaultOrderQuery } from 'librechat-data-provider';
+import { useSetRecoilState } from 'recoil';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
 import type t from 'librechat-data-provider';
 import {
   addConversation,
@@ -14,8 +16,6 @@ import {
   deleteSharedLink,
   addSharedLink,
 } from '~/utils';
-import { dataService, MutationKeys, QueryKeys, defaultOrderQuery } from 'librechat-data-provider';
-import { useSetRecoilState } from 'recoil';
 import store from '~/store';
 import { normalizeData } from '~/utils/collection';
 import { useConversationsInfiniteQuery, useSharedLinksInfiniteQuery } from './queries';
@@ -919,12 +919,12 @@ export const useDeleteAction = (
   });
 };
 
-export const useUpdatePromptGroup = (options?) => {
+export const useUpdatePromptGroup = (
+  options?: UseMutationOptions<unknown, unknown, t.UpdatePromptGroupVariables>,
+) => {
   const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ _id, payload }: { _id: string; payload: object }) =>
-      dataService.updatePromptGroup(_id, payload),
-
+  return useMutation<unknown, unknown, t.UpdatePromptGroupVariables>({
+    mutationFn: ({ _id, payload }) => dataService.updatePromptGroup(_id, payload),
     onMutate: async (variables) => {
       options?.onMutate?.(variables);
     },
@@ -947,11 +947,12 @@ export const useUpdatePromptGroup = (options?) => {
   });
 };
 
-export const useSavePrompt = (options?) => {
+export const useSavePrompt = (
+  options?: UseMutationOptions<unknown, unknown, t.TSavePromptRequest>,
+) => {
   const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ payload }: { payload: object }) => dataService.savePrompt(payload),
-
+  return useMutation<unknown, unknown, t.TSavePromptRequest>({
+    mutationFn: (payload) => dataService.savePrompt(payload),
     onMutate: async (variables) => {
       if (options?.onMutate) {
         await options.onMutate(variables);
@@ -974,11 +975,12 @@ export const useSavePrompt = (options?) => {
   });
 };
 
-export const useDeletePrompt = (options?) => {
+export const useDeletePrompt = (
+  options?: UseMutationOptions<unknown, unknown, t.DeletePromptVariables>,
+) => {
   const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ _id }: { _id: string }) => dataService.deletePrompt(_id),
-
+  return useMutation<unknown, unknown, t.DeletePromptVariables>({
+    mutationFn: ({ _id }) => dataService.deletePrompt(_id),
     onMutate: async (variables) => {
       if (options?.onMutate) {
         await options.onMutate(variables);
@@ -992,8 +994,7 @@ export const useDeletePrompt = (options?) => {
     onSuccess: (response, variables, context) => {
       // eslint-disable-next-line  @typescript-eslint/no-explicit-any
       queryClient.setQueryData([QueryKeys.prompts], (oldData: any) => {
-        // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-        return oldData ? oldData.filter((prompt: any) => prompt._id !== variables._id) : [];
+        return oldData ? oldData.filter((prompt) => prompt._id !== variables._id) : [];
       });
       if (options?.onSuccess) {
         options.onSuccess(response, variables, context);

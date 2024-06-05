@@ -42,16 +42,16 @@ router.get('/prompt-groups', requireJwtAuth, async (req, res) => {
 });
 
 router.post('/', requireJwtAuth, async (req, res) => {
-  const { prompt, groupId, type, tags, name, isActive, config, labels } = req.body;
+  const { prompt, groupId, type, categories, name, isActive, config, tags } = req.body;
   res.status(200).send(
     await savePrompt({
       prompt,
       groupId,
       type,
-      tags,
+      categories,
       name,
       isActive,
-      labels,
+      tags,
       config,
       author: req.user.id,
       authorName: req.user.name,
@@ -73,8 +73,8 @@ router.get('/:promptId', requireJwtAuth, async (req, res) => {
 
 router.get('/', requireJwtAuth, async (req, res) => {
   const author = req.user.id;
-  const { groupId, version, type, tags, labels } = req.query;
-  res.status(200).send(await getPrompts({ groupId, version, type, tags, labels, author }));
+  const { groupId, version, type, tags, categories } = req.query;
+  res.status(200).send(await getPrompts({ groupId, version, type, tags, categories, author }));
 });
 
 router.delete('/:promptId', requireJwtAuth, async (req, res) => {

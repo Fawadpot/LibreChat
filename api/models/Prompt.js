@@ -1,5 +1,5 @@
-const { logger } = require('~/config');
 const { ObjectId } = require('mongodb');
+const { logger } = require('~/config');
 const { Prompt, PromptGroup } = require('./schema/promptSchema');
 
 module.exports = {
@@ -7,16 +7,16 @@ module.exports = {
     prompt,
     groupId,
     type,
-    tags,
+    categories,
     name,
     isActive,
     config,
-    labels,
+    tags = [],
     author,
     authorName,
   }) => {
     try {
-      labels.push('latest');
+      tags.push('latest');
 
       let promptGroupId = new ObjectId(groupId);
       let versionNumber = 1;
@@ -25,7 +25,7 @@ module.exports = {
         const newPromptGroup = await PromptGroup.create({ name, isActive });
         promptGroupId = newPromptGroup._id;
       } else {
-        await Prompt.updateMany({ groupId: promptGroupId }, { $pull: { labels: 'latest' } });
+        await Prompt.updateMany({ groupId: promptGroupId }, { $pull: { tags: 'latest' } });
 
         const promptCount = await Prompt.countDocuments({ groupId: promptGroupId });
         versionNumber = promptCount + 1;
@@ -35,9 +35,9 @@ module.exports = {
         prompt,
         groupId: promptGroupId,
         type,
-        tags,
+        categories,
         config,
-        labels,
+        tags,
         version: versionNumber,
         author,
         authorName,
@@ -64,8 +64,8 @@ module.exports = {
       for (const key in filter) {
         const value = filter[key];
         if (value !== undefined && value !== null) {
-          // Handle tags and labels as arrays with $all operator
-          if (key === 'tags' || key === 'labels') {
+          // Handle tags and categories as arrays with $all operator
+          if (key === 'tags' || key === 'categories') {
             if (Array.isArray(value) && value.length > 0) {
               cleanedFilter[key] = { $all: value };
             }
@@ -145,7 +145,7 @@ module.exports = {
       }
 
       const groupId = prompt.groupId;
-      const hadLatestLabel = prompt.labels.includes('latest');
+      const hadLatestLabel = prompt.tags.includes('latest');
 
       await Prompt.deleteOne({ _id: promptId });
 
@@ -158,8 +158,8 @@ module.exports = {
 
       if (hadLatestLabel && remainingPrompts.length > 0) {
         const highestVersionPrompt = remainingPrompts[remainingPrompts.length - 1];
-        if (!highestVersionPrompt.labels.includes('latest')) {
-          highestVersionPrompt.labels.push('latest');
+        if (!highestVersionPrompt.tags.includes('latest')) {
+          highestVersionPrompt.tags.push('latest');
           await highestVersionPrompt.save();
         }
       }

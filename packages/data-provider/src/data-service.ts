@@ -1,3 +1,4 @@
+import type { AxiosResponse } from 'axios';
 import * as f from './types/files';
 import * as q from './types/queries';
 import * as m from './types/mutations';
@@ -6,7 +7,6 @@ import * as t from './types';
 import * as s from './schemas';
 import request from './request';
 import * as endpoints from './api-endpoints';
-import type { AxiosResponse } from 'axios';
 
 export function abortRequestWithMessage(
   endpoint: string,
@@ -463,31 +463,36 @@ export function archiveConversation(
 export function genTitle(payload: m.TGenTitleRequest): Promise<m.TGenTitleResponse> {
   return request.post(endpoints.genTitle(), payload);
 }
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-export function getPrompt(id: string): Promise<any> {
+
+export function getPrompt(id: string): Promise<t.TPrompt> {
   return request.get(endpoints.getPrompt(id));
 }
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-export function getPrompts(filter: object): Promise<any> {
+
+export function getPrompts(filter: t.TPromptsWithFilterRequest): Promise<t.TPrompt[]> {
   return request.get(endpoints.getPromptsWithFilters(filter));
 }
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-export function getPromptGroups(filter: object): Promise<any> {
+
+export function getPromptGroups(
+  filter: t.TPromptGroupsWithFilterRequest,
+): Promise<t.TPromptGroup[]> {
   return request.get(endpoints.getPromptGroupsWithFilters(filter));
 }
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-export function getPromptGroup(id: string): Promise<any> {
+
+export function getPromptGroup(id: string): Promise<t.TPromptGroup> {
   return request.get(endpoints.getPromptGroup(id));
 }
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-export function savePrompt(payload: object): Promise<any> {
+
+export function savePrompt(payload: t.TSavePromptRequest): Promise<t.TPrompt> {
   return request.post(endpoints.postPrompt(), payload);
 }
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-export function updatePromptGroup(id: string, payload: object): Promise<any> {
+
+export function updatePromptGroup(
+  id: string,
+  payload: t.TUpdatePromptGroupRequest,
+): Promise<t.TUpdatePromptGroupResponse> {
   return request.patch(endpoints.updatePrompt(id), payload);
 }
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-export function deletePrompt(id: string): Promise<any> {
+
+export function deletePrompt(id: string): Promise<t.TDeletePromptResponse> {
   return request.delete(endpoints.deletePrompt(id));
 }

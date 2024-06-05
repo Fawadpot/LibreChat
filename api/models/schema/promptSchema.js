@@ -67,7 +67,7 @@ const promptSchema = new Schema(
       type: [String],
       default: [],
     },
-    labels: {
+    categories: {
       type: [String],
       default: [],
     },

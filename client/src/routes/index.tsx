@@ -7,12 +7,6 @@ import {
   ApiErrorWatcher,
 } from '~/components/Auth';
 import { AuthContextProvider } from '~/hooks/AuthContext';
-import StartupLayout from './Layouts/Startup';
-import LoginLayout from './Layouts/Login';
-import ShareRoute from './ShareRoute';
-import ChatRoute from './ChatRoute';
-import Search from './Search';
-import Root from './Root';
 import FileDashboardView from '~/components/Files/FileDashboardView';
 import FilesListView from '~/components/Files/FilesListView';
 import VectorStoreView from '~/components/Files/VectorStoreView';
@@ -21,10 +15,17 @@ import EmptyFilePreview from '~/components/Files/FileList/EmptyFilePreview';
 import EmptyVectorStorePreview from '~/components/Files/VectorStore/EmptyVectorStorePreview';
 import VectorStorePreview from '~/components/Files/VectorStore/VectorStorePreview';
 import DataTableFilePreview from '~/components/Files/FileList/DataTableFilePreview';
-import DashboardRoute from './DashboardRoute';
 import PromptsView from '~/components/Prompts/PromptsView';
 import EmptyPromptPreview from '~/components/Prompts/EmptyPromptPreview';
 import PromptPreview from '~/components/Prompts/PromptPreview';
+import CreatePrompt from '~/components/Prompts/CreatePrompt';
+import DashboardRoute from './DashboardRoute';
+import Root from './Root';
+import Search from './Search';
+import ChatRoute from './ChatRoute';
+import ShareRoute from './ShareRoute';
+import LoginLayout from './Layouts/Login';
+import StartupLayout from './Layouts/Startup';
 
 const AuthLayout = () => (
   <AuthContextProvider>
@@ -122,10 +123,10 @@ export const router = createBrowserRouter([
                 index: true,
                 element: <EmptyPromptPreview />,
               },
-              //   {
-              //     path: 'new',
-              //     element: <CreateEditPrompt />,
-              //   },
+              {
+                path: 'new',
+                element: <CreatePrompt />,
+              },
               {
                 path: ':promptId',
                 element: <PromptPreview />,

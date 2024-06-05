@@ -337,3 +337,67 @@ export type TImportJobStatus = {
    */
   failReason?: string;
 };
+
+export type TPrompt = {
+  _id?: string;
+  groupId: string;
+  version: number;
+  projectId: string;
+  prompt: string;
+  tags: string[];
+  config: object;
+  categories: string[];
+  type: 'text' | 'chat';
+  createdAt: string;
+  updatedAt: string;
+  author: string;
+  authorName: string;
+};
+
+export type TPromptGroup = {
+  name: string;
+  isActive: boolean;
+  numberOfGenerations: number;
+  _id?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type TPromptsWithFilterRequest = {
+  projectId?: string;
+  groupId?: string;
+  tags?: string[];
+  version?: number;
+};
+
+export type TPromptGroupsWithFilterRequest = {
+  pageNumber: number;
+  pageSize: number;
+  name?: string;
+  isActive?: boolean;
+};
+
+export type TSavePromptRequest = {
+  name: string;
+  categories: string[];
+  prompt: string;
+  type: 'text' | 'chat';
+  config: object;
+  projectId: string;
+  groupId: string;
+  isActive: boolean;
+  tags: string[];
+};
+
+export type TUpdatePromptGroupRequest = {
+  name: string;
+  isActive: boolean;
+};
+
+export type TUpdatePromptGroupResponse = {
+  promptGroup: string;
+};
+
+export type TDeletePromptResponse = {
+  message: string;
+};

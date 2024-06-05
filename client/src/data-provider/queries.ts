@@ -423,19 +423,29 @@ export const useVoicesQuery = (): UseQueryResult<t.VoiceResponse> => {
   return useQuery([QueryKeys.voices], () => dataService.getVoices());
 };
 
-export const useGetPromptGroup = (id: string, config?) => {
-  return useQuery([QueryKeys.promptGroup, id], () => dataService.getPromptGroup(id), {
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    refetchOnMount: false,
-    retry: false,
-    ...config,
-    enabled: config?.enabled !== undefined ? config?.enabled : true,
-  });
+export const useGetPromptGroup = (
+  id: string,
+  config?: UseQueryOptions<t.TPromptGroup>,
+): QueryObserverResult<t.TPromptGroup> => {
+  return useQuery<t.TPromptGroup>(
+    [QueryKeys.promptGroup, id],
+    () => dataService.getPromptGroup(id),
+    {
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+      retry: false,
+      ...config,
+      enabled: config?.enabled !== undefined ? config?.enabled : true,
+    },
+  );
 };
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-export const useGetPrompts = (filter: object, config?): QueryObserverResult<any> => {
-  return useQuery(
+
+export const useGetPrompts = (
+  filter: t.TPromptsWithFilterRequest,
+  config?: UseQueryOptions<t.TPrompt[]>,
+): QueryObserverResult<t.TPrompt[]> => {
+  return useQuery<t.TPrompt[]>(
     [QueryKeys.prompts, JSON.stringify(filter)],
     () => dataService.getPrompts(filter),
     {
@@ -448,9 +458,12 @@ export const useGetPrompts = (filter: object, config?): QueryObserverResult<any>
     },
   );
 };
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-export const useGetPrompt = (id: string, config?): QueryObserverResult<any> => {
-  return useQuery([QueryKeys.prompt], () => dataService.getPrompt(id), {
+
+export const useGetPrompt = (
+  id: string,
+  config?: UseQueryOptions<t.TPrompt>,
+): QueryObserverResult<t.TPrompt> => {
+  return useQuery<t.TPrompt>([QueryKeys.prompt, id], () => dataService.getPrompt(id), {
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     refetchOnMount: false,
@@ -458,4 +471,22 @@ export const useGetPrompt = (id: string, config?): QueryObserverResult<any> => {
     ...config,
     enabled: config?.enabled !== undefined ? config?.enabled : true,
   });
+};
+
+export const useGetPromptGroups = (
+  filter: t.TPromptGroupsWithFilterRequest,
+  config?: UseQueryOptions<t.TPromptGroup[]>,
+): QueryObserverResult<t.TPromptGroup[]> => {
+  return useQuery<t.TPromptGroup[]>(
+    [QueryKeys.promptGroups, JSON.stringify(filter)],
+    () => dataService.getPromptGroups(filter),
+    {
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+      retry: false,
+      ...config,
+      enabled: config?.enabled !== undefined ? config?.enabled : true,
+    },
+  );
 };

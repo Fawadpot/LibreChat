@@ -1,14 +1,14 @@
 // PromptComponent.tsx
-import { EditIcon, TrashIcon } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import { TrashIcon } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import { Share2Icon } from 'lucide-react';
+import { useGetPromptGroup, useGetPrompts } from '~/data-provider';
+import { useUpdatePromptGroup } from '~/data-provider/mutations';
 import { Button, Input } from '../ui';
 import { TPrompt, TPromptGroup } from './PromptTypes';
-import { useParams } from 'react-router-dom';
-import { useGetPromptGroup, useGetPrompts } from '~/data-provider';
 import PromptName from './PromptName';
-import { Share2Icon } from 'lucide-react';
 import PromptEditor from './PromptEditor';
-import { useUpdatePromptGroup } from '~/data-provider/mutations';
 
 function extractUniqueVariables(input: string): string[] {
   const regex = /{{(.*?)}}/g;
@@ -47,18 +47,15 @@ function formatDateTime(dateTimeString) {
 
 const PromptPreview = () => {
   const params = useParams();
-  const { data: groupResp } = useGetPromptGroup(params.promptId || '');
-  const { data: prompts } = useGetPrompts(
-    { groupId: params.promptId },
-    { enabled: !!params.promptId },
-  );
+  const promptGroup = useGetPromptGroup(params.promptId || '');
+  const prompts = useGetPrompts({ groupId: params.promptId }, { enabled: !!params.promptId });
   const [group, setGroup] = useState<TPromptGroup | null>(null);
   const [selectedPrompt, setSelectedPrompt] = useState<TPrompt | null>(null);
   const [variables, setVariables] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [categoryInput, setCategoryInput] = useState<string>('');
 
-  const { mutate: updateGroup } = useUpdatePromptGroup();
+  const updateGroup = useUpdatePromptGroup();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCategoryInput(e.target.value);
@@ -72,17 +69,17 @@ const PromptPreview = () => {
   };
 
   useEffect(() => {
-    if (prompts && prompts.length > 0) {
-      setSelectedPrompt(prompts[0]);
-      setVariables(extractUniqueVariables(prompts[0].prompt));
+    if (prompts?.data && prompts?.data?.length > 0) {
+      setSelectedPrompt(prompts.data[0]);
+      setVariables(extractUniqueVariables(prompts.data[0].prompt));
     }
-  }, [prompts]);
+  }, [prompts?.data]);
 
   useEffect(() => {
-    if (groupResp) {
-      setGroup(groupResp);
+    if (promptGroup) {
+      setGroup(promptGroup?.data);
     }
-  }, [groupResp]);
+  }, [promptGroup?.data]);
 
   useEffect(() => {
     if (selectedPrompt) {
@@ -97,15 +94,17 @@ const PromptPreview = () => {
           name={group?.name}
           onSave={(value) => {
             setGroup((prev) => prev && { ...prev, name: value });
-            updateGroup({ _id: group?._id || '', payload: { name: value } });
+            updateGroup.mutate({ _id: group?._id || '', payload: { name: value } });
           }}
         />
         <div className="flex flex-row gap-x-2">
-          {prompts?.includes(selectedPrompt) ? null : (
-            <Button variant={'default'} size={'sm'}>
+          {prompts?.data?.includes(selectedPrompt) ||
+          prompts?.isLoading ||
+          promptGroup?.isLoading ? null : (
+              <Button variant={'default'} size={'sm'}>
               Update Prompt
-            </Button>
-          )}
+              </Button>
+            )}
           <Button variant={'default'} size={'sm'}>
             <Share2Icon className="cursor-pointer" />
           </Button>
@@ -166,11 +165,11 @@ const PromptPreview = () => {
           </div>
         </div>
         {/* Right Section */}
-        {prompts?.length > 0 && (
+        {prompts?.data?.length > 0 && (
           <div className="w-full p-4 md:w-1/3">
             <h2 className="mb-4 text-base font-semibold">Versions</h2>
             <ul>
-              {prompts?.map((prompt, index) => (
+              {prompts?.data?.map((prompt, index) => (
                 <li
                   key={index}
                   className={`mb-4 cursor-pointer rounded-lg border p-4 ${
@@ -182,7 +181,7 @@ const PromptPreview = () => {
                   }}
                 >
                   <p className="font-bold">Version: {prompt.version}</p>
-                  <p className="italic">Tags: {prompt.labels.join(', ')}</p>
+                  <p className="italic">Tags: {prompt.tags.join(', ')}</p>
                   <p className="text-xs text-gray-600">{formatDateTime(prompt.createdAt)}</p>
                   <p className="text-xs text-gray-600">by {prompt.authorName}</p>
                 </li>
