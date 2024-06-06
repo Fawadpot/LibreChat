@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { TSavePromptRequest } from 'librechat-data-provider';
 import { useSavePrompt } from '~/data-provider';
 import PromptEditor from './PromptEditor';
 import { Button, Input } from '../ui';
-import { TSavePromptRequest } from 'librechat-data-provider';
 
 export default function CreatePrompt() {
   const navigate = useNavigate();
@@ -55,6 +55,7 @@ export default function CreatePrompt() {
       </div>
       <div className="w-full">
         <PromptEditor
+          permanentEditMode={true}
           type={prompt?.type || ''}
           prompt={prompt?.prompt || ''}
           onSave={(value) => {
@@ -69,9 +70,7 @@ export default function CreatePrompt() {
           onChange={handleInputChange}
           onKeyPress={handleKeyPress}
         />
-        <h3 className="rounded-t-lg border border-gray-300 px-4 text-base font-semibold">
-          Labels
-        </h3>
+        <h3 className="rounded-t-lg border border-gray-300 px-4 text-base font-semibold">Labels</h3>
         <div className="mb-4 flex w-full flex-row flex-wrap rounded-b-lg border border-gray-300 p-4">
           {prompt?.labels?.length ? (
             prompt?.labels?.map((label, index) => (

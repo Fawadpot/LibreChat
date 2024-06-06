@@ -6,7 +6,7 @@ import { cn } from '~/utils';
 interface RenameButtonProps {
   renaming: boolean;
   renameHandler: (e: MouseEvent<HTMLButtonElement>) => void;
-  onRename: (e: MouseEvent<HTMLButtonElement>) => void;
+  onRename?: (e: MouseEvent<HTMLButtonElement>) => void;
   appendLabel?: boolean;
   className?: string;
 }

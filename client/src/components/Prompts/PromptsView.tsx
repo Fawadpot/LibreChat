@@ -1,11 +1,12 @@
+import { useState } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import { ListFilter } from 'lucide-react';
 import { useGetPromptGroups } from '~/data-provider';
 import { Button, Input } from '../ui';
 import PromptSidePanel from './PromptSidePanel';
-import { ListFilter } from 'lucide-react';
 
 export default function PromptsView() {
-  const [queryState, setQueryState] = useState({ pageSize: 10, pageNumber: 1, name: "" });
+  const [queryState, setQueryState] = useState({ pageSize: 10, pageNumber: 1, name: '' });
   const groupsQuery = useGetPromptGroups(queryState);
   const params = useParams();
   const navigate = useNavigate();
@@ -53,17 +54,21 @@ export default function PromptsView() {
           {groupsQuery?.isLoading ? null : (
             <PromptSidePanel prompts={groupsQuery?.data?.promptGroups} />
           )}
-          <div className="flex justify-between">
+          <div className="mx-2 mt-2 flex justify-between">
             <Button
               variant={'outline'}
-              onClick={() => setQueryState((prev) => ({ ...prev, pageNumber: prev.pageNumber - 1 }))}
+              onClick={() =>
+                setQueryState((prev) => ({ ...prev, pageNumber: prev.pageNumber - 1 }))
+              }
               disabled={queryState.pageNumber === 1}
             >
               Prev
             </Button>
             <Button
               variant={'outline'}
-              onClick={() => setQueryState((prev) => ({ ...prev, pageNumber: prev.pageNumber + 1 }))}
+              onClick={() =>
+                setQueryState((prev) => ({ ...prev, pageNumber: prev.pageNumber + 1 }))
+              }
               disabled={queryState.pageNumber === groupsQuery?.data?.totalPages}
             >
               Next
@@ -71,7 +76,7 @@ export default function PromptsView() {
           </div>
         </div>
         <div
-          className={`h-[85vh] w-full overflow-y-auto xl:w-2/3 ${
+          className={`h-[90vh] w-full overflow-y-auto xl:w-2/3 ${
             params.promptId || params['*'] === 'new' ? 'lg:w-3/5' : 'hidden md:w-3/5 lg:block'
           }`}
         >
