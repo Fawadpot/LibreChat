@@ -7,7 +7,7 @@ module.exports = {
     prompt,
     groupId,
     type,
-    categories,
+    labels,
     name,
     isActive,
     config,
@@ -18,15 +18,16 @@ module.exports = {
     try {
       tags.push('latest');
 
-      let promptGroupId = new ObjectId(groupId);
+      let promptGroupId;
       let versionNumber = 1;
 
       if (!groupId) {
         const newPromptGroup = await PromptGroup.create({ name, isActive });
         promptGroupId = newPromptGroup._id;
+        tags.push('production');
       } else {
+        promptGroupId = new ObjectId(groupId);
         await Prompt.updateMany({ groupId: promptGroupId }, { $pull: { tags: 'latest' } });
-
         const promptCount = await Prompt.countDocuments({ groupId: promptGroupId });
         versionNumber = promptCount + 1;
       }
@@ -35,7 +36,7 @@ module.exports = {
         prompt,
         groupId: promptGroupId,
         type,
-        categories,
+        labels,
         config,
         tags,
         version: versionNumber,
@@ -43,7 +44,7 @@ module.exports = {
         authorName,
       });
 
-      return newPrompt;
+      return {prompt: newPrompt};
     } catch (error) {
       logger.error('Error saving prompt', error);
       return { prompt: 'Error saving prompt' };
@@ -64,8 +65,8 @@ module.exports = {
       for (const key in filter) {
         const value = filter[key];
         if (value !== undefined && value !== null) {
-          // Handle tags and categories as arrays with $all operator
-          if (key === 'tags' || key === 'categories') {
+          // Handle tags and labels as arrays with $all operator
+          if (key === 'tags' || key === 'labels') {
             if (Array.isArray(value) && value.length > 0) {
               cleanedFilter[key] = { $all: value };
             }
@@ -75,7 +76,7 @@ module.exports = {
         }
       }
 
-      const result = await Prompt.find(cleanedFilter).lean();
+      const result = await Prompt.find(cleanedFilter).sort({ version: -1 }).lean();
       return result;
     } catch (error) {
       logger.error('Error getting prompts', error);
@@ -120,16 +121,21 @@ module.exports = {
       const { pageNumber, pageSize } = filter;
       delete filter.pageNumber;
       delete filter.pageSize;
-      const promptGroups = await PromptGroup.find(filter)
-        .sort({ createdAt: 1 })
+      const query = {};
+      if(filter.name)
+      {
+        query.name = new RegExp(filter.name, 'i');
+      } 
+      const promptGroups = await PromptGroup.find(query)
+        .sort({ createdAt: -1 })
         .skip((pageNumber - 1) * pageSize)
         .limit(pageSize)
         .lean();
-      const totalPromptGroups = await PromptGroup.countDocuments(filter);
+      const totalPromptGroups = await PromptGroup.countDocuments(query);
       return {
         promptGroups,
-        totalPages: Math.ceil(totalPromptGroups / pageSize),
-        totalPromptGroups: totalPromptGroups,
+        totalPages: +Math.ceil(totalPromptGroups / pageSize),
+        totalPromptGroups: +totalPromptGroups,
         currentPage: +pageNumber,
       };
     } catch (error) {
@@ -145,7 +151,7 @@ module.exports = {
       }
 
       const groupId = prompt.groupId;
-      const hadLatestLabel = prompt.tags.includes('latest');
+      const hadLatestTags = prompt.tags.includes('latest');
 
       await Prompt.deleteOne({ _id: promptId });
 
@@ -156,7 +162,7 @@ module.exports = {
         await remainingPrompts[i].save();
       }
 
-      if (hadLatestLabel && remainingPrompts.length > 0) {
+      if (hadLatestTags && remainingPrompts.length > 0) {
         const highestVersionPrompt = remainingPrompts[remainingPrompts.length - 1];
         if (!highestVersionPrompt.tags.includes('latest')) {
           highestVersionPrompt.tags.push('latest');
@@ -188,4 +194,59 @@ module.exports = {
       return { promptGroup: 'Error updating prompt group' };
     }
   },
+  makePromptProduction: async (promptId) => {
+    try {
+      const prompt = await Prompt.findOne({ _id: promptId });
+      if (!prompt) {
+        throw new Error('Prompt not found');
+      }
+
+      if(!prompt.tags.includes('production')){
+        prompt.tags.push('production');
+      }
+
+      const remainingPrompts = await Prompt.find({ groupId: prompt.groupId }).sort({ createdAt: 1 });
+
+      for (let i = 0; i < remainingPrompts.length; i++) {
+        if(remainingPrompts[i].tags.includes('production')){
+          remainingPrompts[i].tags = remainingPrompts[i].tags.filter(tag => tag !== 'production');
+          await remainingPrompts[i].save();
+        }
+      }
+
+      await prompt.save();
+
+      return { message: 'Prompt production made successfully' };
+    } catch (error) {
+      logger.error('Error making prompt production', error);
+      return { prompt: 'Error making prompt production' };
+    }
+  },
+  updatePromptLabels: async (_id, labels) => {
+    try {
+      const response = await Prompt.updateOne({ _id }, { $set: { labels } });
+      if (response.matchedCount === 0) {
+        return { message: 'Prompt not found' };
+      }
+      return { message: 'Prompt labels updated successfully' };
+    } catch (error) {
+      logger.error('Error updating prompt labels', error);
+      return { prompt: 'Error updating prompt labels' };
+    }
+  },
+  deletePromptGroup: async (_id) => {
+    try {
+      const response = await PromptGroup.deleteOne({ _id });
+
+      if (response.deletedCount === 0) {
+        return { promptGroup: 'Prompt group not found' };
+      }
+
+      await Prompt.deleteMany({ groupId: new ObjectId(_id) });
+      return { promptGroup: 'Prompt group deleted successfully' };
+    } catch (error) {
+      logger.error('Error deleting prompt group', error);
+      return { promptGroup: 'Error deleting prompt group' };
+    }
+  }
 };

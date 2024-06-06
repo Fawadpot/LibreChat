@@ -1,19 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { useGetPromptGroups } from '~/data-provider';
-import { Button } from '../ui';
+import { Button, Input } from '../ui';
 import PromptSidePanel from './PromptSidePanel';
+import { ListFilter } from 'lucide-react';
 
 export default function PromptsView() {
+  const [queryState, setQueryState] = useState({ pageSize: 10, pageNumber: 1, name: "" });
+  const groupsQuery = useGetPromptGroups(queryState);
   const params = useParams();
   const navigate = useNavigate();
-
-  const groups = useGetPromptGroups({ pageSize: 10, pageNumber: 1 });
-  const [groupsList, setGroupsList] = useState([]);
-
-  useEffect(() => {
-    setGroupsList(groups?.data?.promptGroups || []);
-  }, [groups?.data]);
 
   return (
     <div className="w-full bg-[#f9f9f9] p-0 lg:p-7">
@@ -39,7 +35,41 @@ export default function PromptsView() {
               : 'md:w-full'
           }`}
         >
-          {!groups?.data ? null : <PromptSidePanel prompts={groupsList} />}
+          <h2 className="m-3 text-center text-lg lg:text-left">
+            <strong>Prompts</strong>
+          </h2>
+          <div className="flex w-2/3 flex-row justify-start gap-x-2 pr-2">
+            <Button variant="ghost" className="m-0 mr-2 p-0">
+              <ListFilter className="h-4 w-4" />
+            </Button>
+            <Input
+              placeholder={'Filter prompts...'}
+              value={queryState.name}
+              onChange={(e) => {
+                setQueryState((prev) => ({ ...prev, name: e.target.value }));
+              }}
+              className="max-w-sm dark:border-gray-500"
+            />
+          </div>
+          {groupsQuery?.isLoading ? null : (
+            <PromptSidePanel prompts={groupsQuery?.data?.promptGroups} />
+          )}
+          <div className="flex justify-between">
+            <Button
+              variant={'outline'}
+              onClick={() => setQueryState((prev) => ({ ...prev, pageNumber: prev.pageNumber - 1 }))}
+              disabled={queryState.pageNumber === 1}
+            >
+              Prev
+            </Button>
+            <Button
+              variant={'outline'}
+              onClick={() => setQueryState((prev) => ({ ...prev, pageNumber: prev.pageNumber + 1 }))}
+              disabled={queryState.pageNumber === groupsQuery?.data?.totalPages}
+            >
+              Next
+            </Button>
+          </div>
         </div>
         <div
           className={`h-[85vh] w-full overflow-y-auto xl:w-2/3 ${

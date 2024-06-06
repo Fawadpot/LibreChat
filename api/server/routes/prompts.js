@@ -8,6 +8,9 @@ const {
   getPrompt,
   deletePrompt,
   getPromptGroup,
+  makePromptProduction,
+  deletePromptGroup,
+  updatePromptLabels,
 } = require('../../models/Prompt');
 const { requireJwtAuth } = require('../middleware');
 
@@ -42,13 +45,13 @@ router.get('/prompt-groups', requireJwtAuth, async (req, res) => {
 });
 
 router.post('/', requireJwtAuth, async (req, res) => {
-  const { prompt, groupId, type, categories, name, isActive, config, tags } = req.body;
+  const { prompt, groupId, type, labels, name, isActive, config, tags } = req.body;
   res.status(200).send(
     await savePrompt({
       prompt,
       groupId,
       type,
-      categories,
+      labels,
       name,
       isActive,
       tags,
@@ -61,8 +64,19 @@ router.post('/', requireJwtAuth, async (req, res) => {
 
 router.patch('/prompt-groups/:groupId', requireJwtAuth, async (req, res) => {
   const { groupId } = req.params;
-  const { name, isActive } = req.body;
+  const { name, isActive = false } = req.body;
   res.status(200).send(await updatePromptGroup({ _id: groupId }, { name, isActive }));
+});
+
+router.patch('/:promptId/tags/production', requireJwtAuth, async (req, res) => {
+  const { promptId } = req.params;
+  res.status(200).send(await makePromptProduction(promptId));
+});
+
+router.patch('/:promptId/labels', requireJwtAuth, async (req, res) => {
+  const { promptId } = req.params;
+  const { labels } = req.body;
+  res.status(200).send(await updatePromptLabels(promptId, labels));
 });
 
 router.get('/:promptId', requireJwtAuth, async (req, res) => {
@@ -73,14 +87,19 @@ router.get('/:promptId', requireJwtAuth, async (req, res) => {
 
 router.get('/', requireJwtAuth, async (req, res) => {
   const author = req.user.id;
-  const { groupId, version, type, tags, categories } = req.query;
-  res.status(200).send(await getPrompts({ groupId, version, type, tags, categories, author }));
+  const { groupId, version, type, tags, labels } = req.query;
+  res.status(200).send(await getPrompts({ groupId, version, type, tags, labels, author }));
 });
 
 router.delete('/:promptId', requireJwtAuth, async (req, res) => {
   const { promptId } = req.params;
   const author = req.user.id;
   res.status(200).send(await deletePrompt({ promptId, author }));
+});
+
+router.delete('/prompt-groups/:groupId', requireJwtAuth, async (req, res) => {
+  const { groupId } = req.params;
+  res.status(200).send(await deletePromptGroup(groupId));
 });
 
 module.exports = router;

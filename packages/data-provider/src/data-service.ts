@@ -464,7 +464,7 @@ export function genTitle(payload: m.TGenTitleRequest): Promise<m.TGenTitleRespon
   return request.post(endpoints.genTitle(), payload);
 }
 
-export function getPrompt(id: string): Promise<t.TPrompt> {
+export function getPrompt(id: string): Promise<{prompt:t.TPrompt}> {
   return request.get(endpoints.getPrompt(id));
 }
 
@@ -474,7 +474,7 @@ export function getPrompts(filter: t.TPromptsWithFilterRequest): Promise<t.TProm
 
 export function getPromptGroups(
   filter: t.TPromptGroupsWithFilterRequest,
-): Promise<t.TPromptGroup[]> {
+): Promise<t.TPromptGroupsWithFilterResponse> {
   return request.get(endpoints.getPromptGroupsWithFilters(filter));
 }
 
@@ -482,17 +482,30 @@ export function getPromptGroup(id: string): Promise<t.TPromptGroup> {
   return request.get(endpoints.getPromptGroup(id));
 }
 
-export function savePrompt(payload: t.TSavePromptRequest): Promise<t.TPrompt> {
+export function savePrompt(payload: t.TSavePromptRequest): Promise<t.TSavePromptResponse> {
   return request.post(endpoints.postPrompt(), payload);
 }
 
 export function updatePromptGroup(
-  id: string,
-  payload: t.TUpdatePromptGroupRequest,
+  variables: t.TUpdatePromptGroupVariables
 ): Promise<t.TUpdatePromptGroupResponse> {
-  return request.patch(endpoints.updatePrompt(id), payload);
+  return request.patch(endpoints.updatePromptGroup(variables.id), variables.payload);
 }
 
 export function deletePrompt(id: string): Promise<t.TDeletePromptResponse> {
   return request.delete(endpoints.deletePrompt(id));
+}
+
+export function makePromptProduction(id: string): Promise<t.TMakePromptProductionResponse> {
+  return request.patch(endpoints.updatePromptTag(id));
+}
+
+export function updatePromptLabels(
+  variables: t.TUpdatePromptLabelsRequest,
+): Promise<t.TUpdatePromptLabelsResponse> {
+  return request.patch(endpoints.updatePromptLabels(variables.id), variables.payload);
+}
+
+export function deletePromptGroup(id: string): Promise<t.TDeletePromptGroupResponse> {
+  return request.delete(endpoints.deletePromptGroup(id));
 }

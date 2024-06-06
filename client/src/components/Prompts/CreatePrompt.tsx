@@ -3,24 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useSavePrompt } from '~/data-provider';
 import PromptEditor from './PromptEditor';
 import { Button, Input } from '../ui';
-
-type CreatePrompt = {
-  name: string;
-  categories: Array<string>;
-  prompt: string;
-  type: 'text' | 'chat';
-  isActive: boolean;
-  config: object;
-  projectId: string;
-  groupId: string;
-  tags: string[];
-};
+import { TSavePromptRequest } from 'librechat-data-provider';
 
 export default function CreatePrompt() {
   const navigate = useNavigate();
-  const [prompt, setPrompt] = useState<CreatePrompt>({
+  const [prompt, setPrompt] = useState<TSavePromptRequest>({
     name: '',
-    categories: [],
+    labels: [],
     prompt: '',
     type: 'text',
     isActive: true,
@@ -32,7 +21,7 @@ export default function CreatePrompt() {
   const [categoryInput, setCategoryInput] = useState<string>('');
   const savePrompt = useSavePrompt({
     onSuccess: (response) => {
-      navigate(`/d/prompts/${response._id}`);
+      navigate(`/d/prompts/${response.prompt.groupId}`, { replace: true });
     },
   });
 
@@ -44,7 +33,7 @@ export default function CreatePrompt() {
     if (e.key === 'Enter' && categoryInput.trim()) {
       setPrompt((prevPrompt) => ({
         ...prevPrompt,
-        categories: [...(prevPrompt?.categories || []), categoryInput.trim()],
+        labels: [...(prevPrompt?.labels || []), categoryInput.trim()],
       }));
       setCategoryInput('');
     }
@@ -75,23 +64,23 @@ export default function CreatePrompt() {
         <Input
           type="text"
           className="mb-4"
-          placeholder="+ Add Categories"
+          placeholder="+ Add Labels"
           value={categoryInput}
           onChange={handleInputChange}
           onKeyPress={handleKeyPress}
         />
         <h3 className="rounded-t-lg border border-gray-300 px-4 text-base font-semibold">
-          Categories
+          Labels
         </h3>
         <div className="mb-4 flex w-full flex-row flex-wrap rounded-b-lg border border-gray-300 p-4">
-          {prompt?.categories?.length ? (
-            prompt?.categories?.map((category, index) => (
+          {prompt?.labels?.length ? (
+            prompt?.labels?.map((label, index) => (
               <label className="mb-1 mr-1 rounded-full border px-2" key={index}>
-                {category}
+                {label}
               </label>
             ))
           ) : (
-            <label className="rounded-full border px-2">No Categories</label>
+            <label className="rounded-full border px-2">No Labels</label>
           )}
         </div>
         <Button

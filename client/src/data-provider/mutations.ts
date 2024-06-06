@@ -213,8 +213,8 @@ export const useUpdateSharedLinkMutation = (
           // If the shared link is public, add it to the shared links cache list.
           vars.isPublic
             ? // Even if the SharedLink data exists in the database, it is not registered in the cache when isPublic is false.
-          // Therefore, when isPublic is true, use addSharedLink instead of updateSharedLink.
-            addSharedLink(sharedLink, _data)
+              // Therefore, when isPublic is true, use addSharedLink instead of updateSharedLink.
+              addSharedLink(sharedLink, _data)
             : deleteSharedLink(sharedLink, _data.shareId),
           'sharedLinks',
           sharedLink.pages[0].pageSize as number,
@@ -920,11 +920,17 @@ export const useDeleteAction = (
 };
 
 export const useUpdatePromptGroup = (
-  options?: UseMutationOptions<unknown, unknown, t.UpdatePromptGroupVariables>,
-) => {
+  options?: t.UpdatePromptGroupOptions,
+): UseMutationResult<
+  t.TUpdatePromptGroupResponse, 
+  unknown, 
+  t.TUpdatePromptGroupVariables, 
+  unknown 
+> => {
   const queryClient = useQueryClient();
-  return useMutation<unknown, unknown, t.UpdatePromptGroupVariables>({
-    mutationFn: ({ _id, payload }) => dataService.updatePromptGroup(_id, payload),
+  return useMutation({
+    mutationFn: (variables: t.TUpdatePromptGroupVariables) =>
+      dataService.updatePromptGroup(variables),
     onMutate: async (variables) => {
       options?.onMutate?.(variables);
     },
@@ -932,27 +938,46 @@ export const useUpdatePromptGroup = (
       options?.onError?.(error, variables, context);
     },
     onSuccess: (response, variables, context) => {
-      queryClient.setQueryData([QueryKeys.promptGroup, variables?._id], response);
-      // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-      queryClient.setQueryData([QueryKeys.promptGroups], (oldData: any) => {
-        return oldData?.map((group: object) => {
-          if (group?.['_id'] === variables?._id) {
-            return response;
-          }
-          return group;
-        });
-      });
+      queryClient.setQueryData(
+        [QueryKeys.promptGroup, variables?.id],
+        (oldData: t.TPromptGroup) => {
+          return {
+            ...oldData,
+            ...variables.payload,
+          };
+        },
+      );
+      queryClient.setQueryData(
+        [QueryKeys.promptGroups],
+        (oldData: t.TPromptGroupsWithFilterResponse) => {
+          const newPromptGroups = oldData?.promptGroups?.map((group: object) => {
+            if (group?.['_id'] === variables?.id) {
+              return { ...group, ...variables.payload };
+            }
+            return group;
+          });
+          return {
+            ...oldData,
+            promptGroups: newPromptGroups,
+          };
+        },
+      );
       options?.onSuccess?.(response, variables, context);
     },
   });
 };
 
 export const useSavePrompt = (
-  options?: UseMutationOptions<unknown, unknown, t.TSavePromptRequest>,
-) => {
+  options?: t.SavePromptOptions,
+): UseMutationResult<
+t.TSavePromptResponse, 
+unknown, 
+t.TSavePromptRequest, 
+unknown 
+>  => {
   const queryClient = useQueryClient();
-  return useMutation<unknown, unknown, t.TSavePromptRequest>({
-    mutationFn: (payload) => dataService.savePrompt(payload),
+  return useMutation({
+    mutationFn: (payload:t.TSavePromptRequest) => dataService.savePrompt(payload),
     onMutate: async (variables) => {
       if (options?.onMutate) {
         await options.onMutate(variables);
@@ -964,10 +989,18 @@ export const useSavePrompt = (
       }
     },
     onSuccess: (response, variables, context) => {
-      // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-      queryClient.setQueryData([QueryKeys.prompts], (oldData: any) => {
-        return [...(oldData || []), response];
-      });
+      if(response?.prompt.version > 1) {
+        queryClient.setQueryData(
+          [QueryKeys.prompts],
+          (oldData: t.TPrompt[]) => {
+            return [ response.prompt,...oldData ]
+          },
+        );
+        queryClient.invalidateQueries([QueryKeys.prompts]);
+      }
+      else{
+        queryClient.invalidateQueries([QueryKeys.promptGroups]);
+      }
       if (options?.onSuccess) {
         options.onSuccess(response, variables, context);
       }
@@ -1001,4 +1034,79 @@ export const useDeletePrompt = (
       }
     },
   });
+};
+
+export const useDeletePromptGroup = (
+  options?: t.DeletePromptGroupOptions,
+): UseMutationResult<t.TDeletePromptGroupResponse,unknown, t.TDeletePromptGroupRequest, unknown> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (variables:t.TDeletePromptGroupRequest) => dataService.deletePromptGroup(variables.id),
+    onMutate: async (variables) => {
+      if (options?.onMutate) {
+        await options.onMutate(variables);
+      }
+    },
+    onError: (error, variables, context) => {
+      if (options?.onError) {
+        options.onError(error, variables, context);
+      }
+    },
+    onSuccess: (response, variables, context) => {
+      queryClient.invalidateQueries([QueryKeys.promptGroups]);
+      if (options?.onSuccess) {
+        options.onSuccess(response, variables, context);
+      }
+    },
+  });
+};
+
+export const useUpdatePromptLabels = (
+  options?: t.UpdatePromptLabelOptions,
+): UseMutationResult<t.TUpdatePromptLabelsResponse,unknown, t.TUpdatePromptLabelsRequest, unknown> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (variables:t.TUpdatePromptLabelsRequest) => dataService.updatePromptLabels(variables),
+    onMutate: async (variables) => {
+      if (options?.onMutate) {
+        await options.onMutate(variables);
+      }
+    },
+    onError: (error, variables, context) => {
+      if (options?.onError) {
+        options.onError(error, variables, context);
+      }
+    },
+    onSuccess: (response, variables, context) => {
+      queryClient.invalidateQueries([QueryKeys.prompts]);
+      if (options?.onSuccess) {
+        options.onSuccess(response, variables, context);
+      }
+    },
+  })
+}
+
+export const useMakePromptProduction = (
+  options?: t.MakePromptProductionOptions,
+): UseMutationResult<t.TMakePromptProductionResponse,unknown, t.TMakePromptProductionRequest, unknown> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (variables:t.TMakePromptProductionRequest) => dataService.makePromptProduction(variables.id),
+    onMutate: async (variables) => {
+      if (options?.onMutate) {
+        await options.onMutate(variables);
+      }
+    },
+    onError: (error, variables, context) => {
+      if (options?.onError) {
+        options.onError(error, variables, context);
+      }
+    },
+    onSuccess: (response, variables, context) => {
+      queryClient.invalidateQueries([QueryKeys.prompts]);
+      if (options?.onSuccess) {
+        options.onSuccess(response, variables, context);
+      }
+    },
+  })
 };

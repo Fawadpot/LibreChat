@@ -1,14 +1,15 @@
-// PromptComponent.tsx
 import React, { useEffect, useState } from 'react';
 import { TrashIcon } from 'lucide-react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Share2Icon } from 'lucide-react';
 import { useGetPromptGroup, useGetPrompts } from '~/data-provider';
-import { useUpdatePromptGroup } from '~/data-provider/mutations';
+import { useDeletePromptGroup, useMakePromptProduction, useSavePrompt, useUpdatePromptGroup, useUpdatePromptLabels } from '~/data-provider/mutations';
 import { Button, Input } from '../ui';
-import { TPrompt, TPromptGroup } from './PromptTypes';
 import PromptName from './PromptName';
 import PromptEditor from './PromptEditor';
+import { TPrompt, TPromptGroup } from 'librechat-data-provider';
+import { Cross1Icon } from '@radix-ui/react-icons';
+import { Select } from '@radix-ui/react-select';
 
 function extractUniqueVariables(input: string): string[] {
   const regex = /{{(.*?)}}/g;
@@ -47,30 +48,42 @@ function formatDateTime(dateTimeString) {
 
 const PromptPreview = () => {
   const params = useParams();
+  const navigate = useNavigate();
   const promptGroup = useGetPromptGroup(params.promptId || '');
   const prompts = useGetPrompts({ groupId: params.promptId }, { enabled: !!params.promptId });
-  const [group, setGroup] = useState<TPromptGroup | null>(null);
-  const [selectedPrompt, setSelectedPrompt] = useState<TPrompt | null>(null);
+  const [group, setGroup] = useState<TPromptGroup | undefined>();
+  const [selectedPrompt, setSelectedPrompt] = useState<TPrompt | undefined>();
   const [variables, setVariables] = useState<string[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [categoryInput, setCategoryInput] = useState<string>('');
+  const [labels, setLabels] = useState<string[]>([]);
+  const [labelInput, setLabelInput] = useState<string>('');
 
   const updateGroup = useUpdatePromptGroup();
+  const createNewVersion = useSavePrompt();
+  const makePromptProductionMutation = useMakePromptProduction();
+  const updatePromptLabelsMutation = useUpdatePromptLabels();
+  const deletePromptGroupMutation = useDeletePromptGroup({
+    onSuccess: () => {
+      navigate('/d/prompts');
+    }
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCategoryInput(e.target.value);
+    setLabelInput(e.target.value);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && categoryInput.trim()) {
-      setCategories((prevCategories) => [...prevCategories, categoryInput.trim()]);
-      setCategoryInput('');
+    if (e.key === 'Enter' && labelInput.trim()) {
+      const newLabels = [...labels, labelInput.trim()];
+      setLabels((prevLabels) => newLabels);
+      setLabelInput('');
+      updatePromptLabelsMutation.mutate({ id: selectedPrompt?._id || '', payload: {labels: newLabels} });
     }
   };
 
   useEffect(() => {
     if (prompts?.data && prompts?.data?.length > 0) {
       setSelectedPrompt(prompts.data[0]);
+      setLabels(prompts.data[0].labels || []);
       setVariables(extractUniqueVariables(prompts.data[0].prompt));
     }
   }, [prompts?.data]);
@@ -78,6 +91,7 @@ const PromptPreview = () => {
   useEffect(() => {
     if (promptGroup) {
       setGroup(promptGroup?.data);
+      prompts.refetch();
     }
   }, [promptGroup?.data]);
 
@@ -94,24 +108,17 @@ const PromptPreview = () => {
           name={group?.name}
           onSave={(value) => {
             setGroup((prev) => prev && { ...prev, name: value });
-            updateGroup.mutate({ _id: group?._id || '', payload: { name: value } });
+            updateGroup.mutate({ id: group?._id || '', payload: { name: value } });
           }}
         />
         <div className="flex flex-row gap-x-2">
-          {prompts?.data?.includes(selectedPrompt) ||
-          prompts?.isLoading ||
-          promptGroup?.isLoading ? null : (
-              <Button variant={'default'} size={'sm'}>
-              Update Prompt
-              </Button>
-            )}
           <Button variant={'default'} size={'sm'}>
             <Share2Icon className="cursor-pointer" />
           </Button>
-          <Button variant={'default'} size={'sm'}>
+          <Button variant={'default'} size={'sm'} onClick={() => makePromptProductionMutation.mutate({id: selectedPrompt?._id || ''})} disabled={selectedPrompt?.tags.includes('production')}>
             Make it Production
           </Button>
-          <Button variant={'default'} size={'sm'}>
+          <Button variant={'default'} size={'sm'} onClick={() => deletePromptGroupMutation.mutate({id: group?._id || ''})}>
             <TrashIcon className="cursor-pointer" />
           </Button>
         </div>
@@ -124,6 +131,15 @@ const PromptPreview = () => {
             prompt={selectedPrompt?.prompt || ''}
             onSave={(value) => {
               setSelectedPrompt((prev) => prev && { ...prev, prompt: value });
+              const tempPrompt = {
+                prompt: value,
+                type: selectedPrompt?.type,
+                config: selectedPrompt?.config,
+                labels: selectedPrompt?.labels,
+                groupId: selectedPrompt?.groupId,
+              };
+
+              createNewVersion.mutate(tempPrompt);
             }}
           />
           <h3 className="rounded-t-lg border border-gray-300 px-4 text-base font-semibold">
@@ -143,29 +159,35 @@ const PromptPreview = () => {
           <Input
             type="text"
             className="mb-4"
-            placeholder="+ Add Categories"
+            placeholder="+ Add Labels"
             // defaultValue={selectedPrompt?.labels.join(', ')}
-            value={categoryInput}
+            value={labelInput}
             onChange={handleInputChange}
             onKeyPress={handleKeyPress}
           />
           <h3 className="rounded-t-lg border border-gray-300 px-4 text-base font-semibold">
-            Categories
+            Labels
           </h3>
           <div className="mb-4 flex w-full flex-row flex-wrap rounded-b-lg border border-gray-300 p-4">
-            {categories.length ? (
-              categories.map((category, index) => (
-                <label className="mb-1 mr-1 rounded-full border px-2" key={index}>
-                  {category}
+            {labels.length ? (
+              labels.map((label, index) => (
+                <label className="mb-1 mr-1 rounded-full border px-2 flex gap-x-2 items-center" key={index}>
+                  {label}
+                  <Cross1Icon onClick={() => {
+                    const newLabels = labels.filter((l) => l !== label);
+                    setLabels((prev) => newLabels);
+                    updatePromptLabelsMutation.mutate({ id: selectedPrompt?._id || '', payload: { labels: newLabels } });
+                  }}
+                    className='cursor-pointer' />
                 </label>
               ))
             ) : (
-              <label className="rounded-full border px-2">No Categories</label>
+              <label className="rounded-full border px-2">No Labels</label>
             )}
           </div>
         </div>
         {/* Right Section */}
-        {prompts?.data?.length > 0 && (
+        {!!prompts?.data?.length && (
           <div className="w-full p-4 md:w-1/3">
             <h2 className="mb-4 text-base font-semibold">Versions</h2>
             <ul>
@@ -178,6 +200,7 @@ const PromptPreview = () => {
                   onClick={() => {
                     setSelectedPrompt(prompt);
                     setVariables(extractUniqueVariables(prompt.prompt));
+                    setLabels(prompt.labels || []);
                   }}
                 >
                   <p className="font-bold">Version: {prompt.version}</p>

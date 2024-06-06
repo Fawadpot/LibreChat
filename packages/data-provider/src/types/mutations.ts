@@ -110,15 +110,18 @@ export type UpdateSharedLinkOptions = MutationOptions<
 >;
 export type DeleteSharedLinkOptions = MutationOptions<types.TSharedLink, { shareId: string }>;
 
-export type UpdatePromptGroupVariables = {
-  _id: string;
-  payload: types.TUpdatePromptGroupRequest;
-};
+export type UpdatePromptGroupOptions = MutationOptions<types.TUpdatePromptGroupResponse, types.TUpdatePromptGroupVariables>;
 
-export type SavePromptVariables = {
-  payload: object;
-};
+export type SavePromptOptions = MutationOptions<types.TSavePromptResponse, types.TSavePromptRequest>;
 
 export type DeletePromptVariables = {
   _id: string;
 };
+
+export type DeletePromptOptions = MutationOptions<unknown, DeletePromptVariables>;
+
+export type DeletePromptGroupOptions = MutationOptions<types.TDeletePromptGroupResponse,  types.TDeletePromptGroupRequest>;
+
+export type UpdatePromptLabelOptions = MutationOptions<types.TUpdatePromptLabelsResponse, types.TUpdatePromptLabelsRequest>;
+
+export type MakePromptProductionOptions = MutationOptions<types.TMakePromptProductionResponse, types.TMakePromptProductionRequest>;

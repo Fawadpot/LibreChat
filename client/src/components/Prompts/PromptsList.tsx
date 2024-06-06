@@ -1,6 +1,6 @@
 import React from 'react';
 import PromptListItem from './PromptListItem';
-import { TPromptGroup } from './PromptTypes';
+import { TPromptGroup } from 'librechat-data-provider/dist/types';
 
 export default function PromptsList({ prompts }: { prompts: TPromptGroup[] }) {
   return (
