@@ -473,8 +473,10 @@ export const useGetPrompt = (
   });
 };
 
+// update the typing to reflect the backend response
 export const useGetPromptGroups = (
   filter: t.TPromptGroupsWithFilterRequest,
+  /* UseQueryOptions<Response> */
   config?: UseQueryOptions<t.TPromptGroup[]>,
 ): QueryObserverResult<t.TPromptGroup[]> => {
   return useQuery<t.TPromptGroup[]>(

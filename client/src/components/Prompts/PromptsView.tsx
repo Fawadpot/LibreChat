@@ -1,19 +1,20 @@
-import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { useGetPromptGroups } from '~/data-provider';
-import { Button } from '../ui';
 import PromptSidePanel from './PromptSidePanel';
+import { Button } from '../ui';
 
 export default function PromptsView() {
   const params = useParams();
   const navigate = useNavigate();
 
-  const groups = useGetPromptGroups({ pageSize: 10, pageNumber: 1 });
-  const [groupsList, setGroupsList] = useState([]);
+  const groupsQuery = useGetPromptGroups({ pageSize: 10, pageNumber: 1 });
+  // backend is not returning a data property: { data: [] }
+  // The data property is added by useQuery (the base hook) along with other properties
+  // like isLoading, isError, etc.
 
-  useEffect(() => {
-    setGroupsList(groups?.data?.promptGroups || []);
-  }, [groups?.data]);
+  if (groupsQuery.isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="w-full bg-[#f9f9f9] p-0 lg:p-7">
@@ -39,7 +40,8 @@ export default function PromptsView() {
               : 'md:w-full'
           }`}
         >
-          {!groups?.data ? null : <PromptSidePanel prompts={groupsList} />}
+          {/* Typing issue, please fix */}
+          {!groupsQuery?.data?.promptGroups ? null : <PromptSidePanel prompts={groupsQuery?.data?.promptGroups} />}
         </div>
         <div
           className={`h-[85vh] w-full overflow-y-auto xl:w-2/3 ${

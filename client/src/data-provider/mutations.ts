@@ -948,10 +948,12 @@ export const useUpdatePromptGroup = (
 };
 
 export const useSavePrompt = (
-  options?: UseMutationOptions<unknown, unknown, t.TSavePromptRequest>,
+  /* t.MutationOptions<Response, Request> */
+  options?: t.MutationOptions<t.TPrompt, t.TSavePromptRequest>,
 ) => {
   const queryClient = useQueryClient();
-  return useMutation<unknown, unknown, t.TSavePromptRequest>({
+  /* TData aka Response, TError aka API Error type, TVariables aka Request*/
+  return useMutation<t.TPrompt, unknown, t.TSavePromptRequest>({
     mutationFn: (payload) => dataService.savePrompt(payload),
     onMutate: async (variables) => {
       if (options?.onMutate) {
