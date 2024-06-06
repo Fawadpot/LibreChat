@@ -19,7 +19,7 @@ export default function CreatePrompt() {
     tags: [],
   });
   const [categoryInput, setCategoryInput] = useState<string>('');
-  const savePrompt = useSavePrompt({
+  const savePromptMutation = useSavePrompt({
     onSuccess: (response) => {
       navigate(`/d/prompts/${response.prompt.groupId}`, { replace: true });
     },
@@ -86,7 +86,7 @@ export default function CreatePrompt() {
         <Button
           variant={'default'}
           onClick={() => {
-            savePrompt.mutate(prompt);
+            savePromptMutation.mutate(prompt);
           }}
         >
           Create Prompt

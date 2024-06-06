@@ -473,6 +473,7 @@ export const useGetPrompt = (
   });
 };
 
+// update the typing to reflect the backend response
 export const useGetPromptGroups = (
   filter: t.TPromptGroupsWithFilterRequest,
   config?: UseQueryOptions<t.TPromptGroupsWithFilterResponse, unknown>,
