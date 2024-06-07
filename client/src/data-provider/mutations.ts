@@ -213,8 +213,8 @@ export const useUpdateSharedLinkMutation = (
           // If the shared link is public, add it to the shared links cache list.
           vars.isPublic
             ? // Even if the SharedLink data exists in the database, it is not registered in the cache when isPublic is false.
-              // Therefore, when isPublic is true, use addSharedLink instead of updateSharedLink.
-              addSharedLink(sharedLink, _data)
+          // Therefore, when isPublic is true, use addSharedLink instead of updateSharedLink.
+            addSharedLink(sharedLink, _data)
             : deleteSharedLink(sharedLink, _data.shareId),
           'sharedLinks',
           sharedLink.pages[0].pageSize as number,
@@ -922,10 +922,10 @@ export const useDeleteAction = (
 export const useUpdatePromptGroup = (
   options?: t.UpdatePromptGroupOptions,
 ): UseMutationResult<
-  t.TUpdatePromptGroupResponse, 
-  unknown, 
-  t.TUpdatePromptGroupVariables, 
-  unknown 
+  t.TUpdatePromptGroupResponse,
+  unknown,
+  t.TUpdatePromptGroupVariables,
+  unknown
 > => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -947,7 +947,7 @@ export const useUpdatePromptGroup = (
           };
         },
       );
-      queryClient.setQueryData(
+      queryClient.setQueriesData(
         [QueryKeys.promptGroups],
         (oldData: t.TPromptGroupsWithFilterResponse) => {
           const newPromptGroups = oldData?.promptGroups?.map((group: object) => {
@@ -969,15 +969,10 @@ export const useUpdatePromptGroup = (
 
 export const useSavePrompt = (
   options?: t.SavePromptOptions,
-): UseMutationResult<
-t.TSavePromptResponse, 
-unknown, 
-t.TSavePromptRequest, 
-unknown 
->  => {
+): UseMutationResult<t.TSavePromptResponse, unknown, t.TSavePromptRequest, unknown> => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload:t.TSavePromptRequest) => dataService.savePrompt(payload),
+    mutationFn: (payload: t.TSavePromptRequest) => dataService.savePrompt(payload),
     onMutate: async (variables) => {
       if (options?.onMutate) {
         await options.onMutate(variables);
@@ -989,16 +984,12 @@ unknown
       }
     },
     onSuccess: (response, variables, context) => {
-      if(response?.prompt.version > 1) {
-        queryClient.setQueryData(
-          [QueryKeys.prompts],
-          (oldData: t.TPrompt[]) => {
-            return [ response.prompt,...oldData ]
-          },
-        );
+      if (response?.prompt.version > 1) {
+        queryClient.setQueryData([QueryKeys.prompts], (oldData: t.TPrompt[]) => {
+          return [response.prompt, ...oldData];
+        });
         queryClient.invalidateQueries([QueryKeys.prompts]);
-      }
-      else{
+      } else {
         queryClient.invalidateQueries([QueryKeys.promptGroups]);
       }
       if (options?.onSuccess) {
@@ -1038,10 +1029,16 @@ export const useDeletePrompt = (
 
 export const useDeletePromptGroup = (
   options?: t.DeletePromptGroupOptions,
-): UseMutationResult<t.TDeletePromptGroupResponse,unknown, t.TDeletePromptGroupRequest, unknown> => {
+): UseMutationResult<
+  t.TDeletePromptGroupResponse,
+  unknown,
+  t.TDeletePromptGroupRequest,
+  unknown
+> => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (variables:t.TDeletePromptGroupRequest) => dataService.deletePromptGroup(variables.id),
+    mutationFn: (variables: t.TDeletePromptGroupRequest) =>
+      dataService.deletePromptGroup(variables.id),
     onMutate: async (variables) => {
       if (options?.onMutate) {
         await options.onMutate(variables);
@@ -1063,10 +1060,16 @@ export const useDeletePromptGroup = (
 
 export const useUpdatePromptLabels = (
   options?: t.UpdatePromptLabelOptions,
-): UseMutationResult<t.TUpdatePromptLabelsResponse,unknown, t.TUpdatePromptLabelsRequest, unknown> => {
+): UseMutationResult<
+  t.TUpdatePromptLabelsResponse,
+  unknown,
+  t.TUpdatePromptLabelsRequest,
+  unknown
+> => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (variables:t.TUpdatePromptLabelsRequest) => dataService.updatePromptLabels(variables),
+    mutationFn: (variables: t.TUpdatePromptLabelsRequest) =>
+      dataService.updatePromptLabels(variables),
     onMutate: async (variables) => {
       if (options?.onMutate) {
         await options.onMutate(variables);
@@ -1083,15 +1086,21 @@ export const useUpdatePromptLabels = (
         options.onSuccess(response, variables, context);
       }
     },
-  })
-}
+  });
+};
 
 export const useMakePromptProduction = (
   options?: t.MakePromptProductionOptions,
-): UseMutationResult<t.TMakePromptProductionResponse,unknown, t.TMakePromptProductionRequest, unknown> => {
+): UseMutationResult<
+  t.TMakePromptProductionResponse,
+  unknown,
+  t.TMakePromptProductionRequest,
+  unknown
+> => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (variables:t.TMakePromptProductionRequest) => dataService.makePromptProduction(variables.id),
+    mutationFn: (variables: t.TMakePromptProductionRequest) =>
+      dataService.makePromptProduction(variables.id),
     onMutate: async (variables) => {
       if (options?.onMutate) {
         await options.onMutate(variables);
@@ -1108,5 +1117,5 @@ export const useMakePromptProduction = (
         options.onSuccess(response, variables, context);
       }
     },
-  })
+  });
 };

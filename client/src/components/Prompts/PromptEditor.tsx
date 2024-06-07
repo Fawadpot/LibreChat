@@ -7,7 +7,7 @@ type Props = {
   type: string;
   prompt: string;
   onSave: (newPrompt: string) => void;
-  permanentEditMode: boolean;
+  permanentEditMode?: boolean;
 };
 
 const PromptEditor: React.FC<Props> = ({ type, prompt, onSave, permanentEditMode = false }) => {

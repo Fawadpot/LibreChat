@@ -131,10 +131,6 @@ export const router = createBrowserRouter([
                 path: ':promptId',
                 element: <PromptPreview />,
               },
-              //   {
-              //     path: ':promptId/edit',
-              //     element: <CreateEditPrompt />,
-              //   },
             ],
           },
           {

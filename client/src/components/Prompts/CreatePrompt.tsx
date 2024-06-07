@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TSavePromptRequest } from 'librechat-data-provider';
+import { Cross1Icon } from '@radix-ui/react-icons';
 import { useSavePrompt } from '~/data-provider';
 import PromptEditor from './PromptEditor';
 import { Button, Input } from '../ui';
@@ -74,8 +75,18 @@ export default function CreatePrompt() {
         <div className="mb-4 flex w-full flex-row flex-wrap rounded-b-lg border border-gray-300 p-4">
           {prompt?.labels?.length ? (
             prompt?.labels?.map((label, index) => (
-              <label className="mb-1 mr-1 rounded-full border px-2" key={index}>
+              <label
+                className="mb-1 mr-1 flex items-center gap-x-2 rounded-full border px-2"
+                key={index}
+              >
                 {label}
+                <Cross1Icon
+                  onClick={() => {
+                    const newLabels = prompt?.labels.filter((l) => l !== label);
+                    setPrompt((prev) => prev && { ...prev, labels: newLabels });
+                  }}
+                  className="cursor-pointer"
+                />
               </label>
             ))
           ) : (

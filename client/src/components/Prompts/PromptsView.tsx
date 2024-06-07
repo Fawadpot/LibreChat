@@ -38,18 +38,25 @@ export default function PromptsView() {
           <h2 className="m-3 text-center text-lg lg:text-left">
             <strong>Prompts</strong>
           </h2>
-          <div className="flex w-2/3 flex-row justify-start gap-x-2 pr-2">
-            <Button variant="ghost" className="m-0 mr-2 p-0">
-              <ListFilter className="h-4 w-4" />
-            </Button>
-            <Input
-              placeholder={'Filter prompts...'}
-              value={queryState.name}
-              onChange={(e) => {
-                setQueryState((prev) => ({ ...prev, name: e.target.value }));
-              }}
-              className="max-w-sm dark:border-gray-500"
-            />
+          <div className="flex w-full flex-row justify-between">
+            <div className="flex w-2/3 flex-row justify-start gap-x-2 pr-2">
+              <Button variant="ghost" className="m-0 mr-2 p-0">
+                <ListFilter className="h-4 w-4" />
+              </Button>
+              <Input
+                placeholder={'Filter prompts...'}
+                value={queryState.name}
+                onChange={(e) => {
+                  setQueryState((prev) => ({ ...prev, name: e.target.value }));
+                }}
+                className="max-w-sm dark:border-gray-500"
+              />
+            </div>
+            <div className="w-fit">
+              <Button variant="default" className="m-0 mr-2 px-4">
+                Upload CSV
+              </Button>
+            </div>
           </div>
           {groupsQuery?.isLoading ? null : (
             <PromptSidePanel prompts={groupsQuery?.data?.promptGroups} />
