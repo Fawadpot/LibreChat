@@ -16,6 +16,14 @@ const promptGroupSchema = new Schema(
       type: Number,
       default: 0,
     },
+    oneliner: {
+      type: String,
+      default: '',
+    },
+    category: {
+      type: String,
+      default: '',
+    },
   },
   {
     timestamps: true,
