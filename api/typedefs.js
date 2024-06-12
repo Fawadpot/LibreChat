@@ -248,6 +248,31 @@
  * @memberof typedefs
  */
 
+/** Prompts */
+/**
+ * @exports TPrompt
+ * @typedef {import('librechat-data-provider').TPrompt} TPrompt
+ * @memberof typedefs
+ */
+
+/**
+ * @exports TPromptGroup
+ * @typedef {import('librechat-data-provider').TPromptGroup} TPromptGroup
+ * @memberof typedefs
+ */
+
+/**
+ * @exports TUpdatePrompt
+ * @typedef {import('librechat-data-provider').TUpdatePrompt} TUpdatePrompt
+ * @memberof typedefs
+ */
+
+/**
+ * @exports TSavePrompt
+ * @typedef {import('librechat-data-provider').TSavePrompt} TSavePrompt
+ * @memberof typedefs
+ */
+
 /**
  * @exports Assistant
  * @typedef {import('librechat-data-provider').Assistant} Assistant

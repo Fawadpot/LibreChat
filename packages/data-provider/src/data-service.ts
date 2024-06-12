@@ -484,7 +484,7 @@ export function getPromptGroup(id: string): Promise<t.TPromptGroup> {
   return request.get(endpoints.getPromptGroup(id));
 }
 
-export function savePrompt(payload: t.TPrompt): Promise<t.TSavePromptResponse> {
+export function createPrompt(payload: t.TCreatePrompt): Promise<t.TCreatePromptResponse> {
   return request.post(endpoints.postPrompt(), payload);
 }
 

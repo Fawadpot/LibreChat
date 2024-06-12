@@ -2,17 +2,17 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TPromptGroup } from 'librechat-data-provider/dist/types';
 import { useDeletePromptGroup, useUpdatePromptGroup } from '~/data-provider';
-import { NewTrashIcon } from '../svg';
-import { Button, Checkbox, Input } from '../ui';
-import HoverToggle from '../Conversations/HoverToggle';
-import DropDownMenu from '../Conversations/DropDownMenu';
-import { RenameButton } from '../Conversations';
+import DropDownMenu from '~/components/Conversations/DropDownMenu';
+import HoverToggle from '~/components/Conversations/HoverToggle';
+import { RenameButton } from '~/components/Conversations';
+import { NewTrashIcon } from '~/components/svg';
+import { Button, Input } from '~/components/ui';
 
 export default function PromptListItem({ prompt }: { prompt: TPromptGroup }) {
   const navigate = useNavigate();
   const updateGroup = useUpdatePromptGroup();
-  const [popoverActive, setPopoverActive] = useState(false);
   const [nameEditFlag, setNameEditFlag] = useState(false);
+  const [popoverActive, setPopoverActive] = useState(false);
   const [nameInputField, setNameInputField] = useState(prompt.name);
   const deletePromptGroupMutation = useDeletePromptGroup({
     onSuccess: (response, variables) => {
@@ -21,9 +21,10 @@ export default function PromptListItem({ prompt }: { prompt: TPromptGroup }) {
       }
     },
   });
+
   return (
     <div
-      className="w-100 my-3 mr-2 flex cursor-pointer flex-row rounded-md border border-0 bg-white p-4 transition duration-300 ease-in-out hover:bg-slate-200"
+      className="w-100 my-3 mr-2 flex cursor-pointer flex-row rounded-md border-0 bg-white p-4 transition duration-300 ease-in-out hover:bg-slate-200"
       onClick={() => {
         navigate(`/d/prompts/${prompt._id}`, { replace: true });
       }}

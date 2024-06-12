@@ -5,6 +5,9 @@ const Schema = mongoose.Schema;
  * @typedef {Object} MongoPromptGroup
  * @property {ObjectId} [_id] - MongoDB Document ID
  * @property {string} name - The name of the prompt group
+ * @property {ObjectId} author - The author of the prompt group
+ * @property {ObjectId} [projectId=null] - The project ID of the prompt group
+ * @property {string} authorName - The name of the author of the prompt group
  * @property {boolean} [isActive=true] - Whether the prompt group is active
  * @property {number} [numberOfGenerations=0] - Number of generations the prompt group has
  * @property {string} [oneliner=''] - Oneliner description of the prompt group
@@ -37,6 +40,20 @@ const promptGroupSchema = new Schema(
       type: String,
       default: '',
     },
+    projectId: {
+      type: Schema.Types.ObjectId,
+      required: false,
+      default: null,
+    },
+    author: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    authorName: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,
@@ -57,18 +74,9 @@ const promptSchema = new Schema(
       type: Number,
       required: true,
     },
-    projectId: {
-      type: Schema.Types.ObjectId,
-      required: false,
-      default: null,
-    },
     author: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
-    },
-    authorName: {
-      type: String,
       required: true,
     },
     prompt: {
@@ -98,7 +106,6 @@ const promptSchema = new Schema(
   },
 );
 
-// Ensure a combination of groupId and version is unique
 promptSchema.index({ groupId: 1, version: 1 }, { unique: true });
 
 const Prompt = mongoose.model('Prompt', promptSchema);

@@ -932,12 +932,12 @@ export const useUpdatePromptGroup = (
   });
 };
 
-export const useSavePrompt = (
-  options?: t.SavePromptOptions,
-): UseMutationResult<t.TSavePromptResponse, unknown, t.TSavePromptRequest, unknown> => {
+export const useCreatePrompt = (
+  options?: t.CreatePromptOptions,
+): UseMutationResult<t.TCreatePromptResponse, unknown, t.TCreatePrompt, unknown> => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: t.TSavePromptRequest) => dataService.savePrompt(payload),
+    mutationFn: (payload: t.TCreatePrompt) => dataService.createPrompt(payload),
     onMutate: async (variables) => {
       if (options?.onMutate) {
         await options.onMutate(variables);

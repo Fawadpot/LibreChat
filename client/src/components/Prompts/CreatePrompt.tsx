@@ -1,26 +1,23 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TSavePromptRequest } from 'librechat-data-provider';
+import type { TUpdatePrompt } from 'librechat-data-provider';
 import { Cross1Icon } from '@radix-ui/react-icons';
-import { useSavePrompt } from '~/data-provider';
+import { useCreatePrompt } from '~/data-provider';
 import PromptEditor from './PromptEditor';
 import { Button, Input } from '../ui';
 
 export default function CreatePrompt() {
   const navigate = useNavigate();
-  const [prompt, setPrompt] = useState<TSavePromptRequest>({
+  const [prompt, setPrompt] = useState<TUpdatePrompt>({
     name: '',
-    labels: [],
     prompt: '',
     type: 'text',
-    isActive: true,
-    config: {},
-    projectId: '',
     groupId: '',
+    labels: [],
     tags: [],
   });
   const [categoryInput, setCategoryInput] = useState<string>('');
-  const savePromptMutation = useSavePrompt({
+  const createPromptMutation = useCreatePrompt({
     onSuccess: (response) => {
       navigate(`/d/prompts/${response.prompt.groupId}`, { replace: true });
     },
@@ -46,9 +43,6 @@ export default function CreatePrompt() {
         <Input
           type="text"
           value={prompt?.name}
-          onChange={(e) => {
-            setPrompt((prev) => prev && { ...prev, name: e.target.value });
-          }}
           className="mr-2 border border-gray-300 p-2 text-2xl"
           placeholder="Prompt Name"
           defaultValue={''}
@@ -96,7 +90,7 @@ export default function CreatePrompt() {
         <Button
           variant={'default'}
           onClick={() => {
-            savePromptMutation.mutate(prompt);
+            createPromptMutation.mutate(prompt);
           }}
         >
           Create Prompt

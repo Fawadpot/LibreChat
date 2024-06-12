@@ -3,18 +3,12 @@ const { logger } = require('~/config');
 const { Prompt, PromptGroup } = require('./schema/promptSchema');
 
 module.exports = {
-  savePrompt: async ({
-    prompt,
-    groupId,
-    type,
-    labels,
-    name,
-    isActive,
-    config,
-    tags = [],
-    author,
-    authorName,
-  }) => {
+  /**
+   * Save a prompt
+   * @param {TSavePrompt} saveData
+   * @returns {Promise<{ prompt: TPrompt }>}
+   */
+  savePrompt: async ({ name, prompt, type, groupId, labels, tags = [], author, authorName }) => {
     try {
       tags.push('latest');
 
@@ -22,7 +16,7 @@ module.exports = {
       let versionNumber = 1;
 
       if (!groupId) {
-        const newPromptGroup = await PromptGroup.create({ name, isActive });
+        const newPromptGroup = await PromptGroup.create({ name, author, authorName });
         promptGroupId = newPromptGroup._id;
         tags.push('production');
       } else {
@@ -37,11 +31,9 @@ module.exports = {
         groupId: promptGroupId,
         type,
         labels,
-        config,
         tags,
-        version: versionNumber,
         author,
-        authorName,
+        version: versionNumber,
       });
 
       return { prompt: newPrompt };

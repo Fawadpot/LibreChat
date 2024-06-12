@@ -323,29 +323,37 @@ export type TImportResponse = {
 };
 
 export type TPrompt = {
-  _id?: string;
+  prompt: string;
+  type: 'text' | 'chat';
   groupId: string;
   version: number;
-  projectId: string;
-  prompt: string;
   tags: string[];
-  config?: object;
   labels: string[];
-  type: 'text' | 'chat';
+  config?: object;
   createdAt: string;
   updatedAt: string;
   author: string;
-  authorName: string;
+  _id?: string;
 };
 
 export type TPromptGroup = {
   name: string;
-  isActive: boolean;
-  numberOfGenerations: number;
+  isActive?: boolean;
+  numberOfGenerations?: number;
+  oneliner?: string;
+  category?: string;
+  projectId?: string | null;
+  author: string;
+  authorName: string;
+  createdAt?: string;
+  updatedAt?: string;
   _id?: string;
-  createdAt: string;
-  updatedAt: string;
 };
+
+export type TCreatePrompt = Pick<TPrompt, 'prompt' | 'type' | 'groupId' | 'labels' | 'tags'> &
+  Pick<TPromptGroup, 'name'>;
+
+export type TSavePrompt = TCreatePrompt & Pick<TPromptGroup, 'author' | 'authorName'>;
 
 export type TPromptsWithFilterRequest = {
   projectId?: string;
@@ -368,7 +376,7 @@ export type TPromptGroupsWithFilterResponse = {
   currentPage: number;
 };
 
-export type TSavePromptResponse = {
+export type TCreatePromptResponse = {
   prompt: TPrompt;
 };
 

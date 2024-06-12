@@ -1,18 +1,19 @@
 const express = require('express');
-const router = express.Router();
 const {
-  getPromptGroups,
-  updatePromptGroup,
+  getPrompt,
   savePrompt,
   getPrompts,
-  getPrompt,
   deletePrompt,
   getPromptGroup,
-  makePromptProduction,
+  getPromptGroups,
+  updatePromptGroup,
   deletePromptGroup,
   updatePromptLabels,
-} = require('../../models/Prompt');
-const { requireJwtAuth } = require('../middleware');
+  makePromptProduction,
+} = require('~/models/Prompt');
+const { requireJwtAuth } = require('~/server/middleware');
+
+const router = express.Router();
 
 router.get('/prompt-groups/:groupId', requireJwtAuth, async (req, res) => {
   let groupId = req.params.groupId;
@@ -45,17 +46,15 @@ router.get('/prompt-groups', requireJwtAuth, async (req, res) => {
 });
 
 router.post('/', requireJwtAuth, async (req, res) => {
-  const { prompt, groupId, type, labels, name, isActive, config, tags } = req.body;
+  const { name, prompt, groupId, type, labels, tags } = req.body;
   res.status(200).send(
     await savePrompt({
-      prompt,
-      groupId,
-      type,
-      labels,
       name,
-      isActive,
+      prompt,
+      type,
+      groupId,
+      labels,
       tags,
-      config,
       author: req.user.id,
       authorName: req.user.name,
     }),

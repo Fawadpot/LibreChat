@@ -5,7 +5,7 @@ import { Cross1Icon } from '@radix-ui/react-icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { TPrompt, TPromptGroup } from 'librechat-data-provider';
 import {
-  useSavePrompt,
+  useCreatePrompt,
   useDeletePromptGroup,
   useUpdatePromptGroup,
   useUpdatePromptLabels,
@@ -64,7 +64,7 @@ const PromptPreview = () => {
   const [labelInput, setLabelInput] = useState<string>('');
 
   const updateGroupMutation = useUpdatePromptGroup();
-  const createNewVersionMutation = useSavePrompt();
+  const createNewVersionMutation = useCreatePrompt();
   const makePromptProductionMutation = useMakePromptProduction();
   const updatePromptLabelsMutation = useUpdatePromptLabels();
   const deletePromptGroupMutation = useDeletePromptGroup({
