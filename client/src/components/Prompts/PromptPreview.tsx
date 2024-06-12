@@ -11,10 +11,12 @@ import {
   useUpdatePromptLabels,
   useMakePromptProduction,
 } from '~/data-provider/mutations';
-import { useGetPromptGroup, useGetPrompts } from '~/data-provider';
-import { Button, Input } from '~/components/ui';
+import { useGetCategories, useGetPromptGroup, useGetPrompts } from '~/data-provider';
+import { Button, Input, SelectDropDown } from '~/components/ui';
+import type { Option } from '~/common';
 import PromptEditor from './PromptEditor';
 import PromptName from './PromptName';
+import CategoryIcon from './CategoryIcon';
 
 function extractUniqueVariables(input: string): string[] {
   const regex = /{{(.*?)}}/g;
@@ -54,14 +56,19 @@ function formatDateTime(dateTimeString: string) {
 const PromptPreview = () => {
   const params = useParams();
   const navigate = useNavigate();
-  const promptGroupQuery = useGetPromptGroup(params.promptId || '');
-  const promptsQuery = useGetPrompts({ groupId: params.promptId }, { enabled: !!params.promptId });
+
   const [group, setGroup] = useState<TPromptGroup | undefined>();
   const [selectedPrompt, setSelectedPrompt] = useState<TPrompt | undefined>();
   const [selectedPromptIndex, setSelectedPromptIndex] = useState<number>(0);
   const [variables, setVariables] = useState<string[]>([]);
   const [labels, setLabels] = useState<string[]>([]);
   const [labelInput, setLabelInput] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<Option | string>('');
+  const [categories, setCategories] = useState<Option[]>([]);
+
+  const promptGroupQuery = useGetPromptGroup(params.promptId || '');
+  const promptsQuery = useGetPrompts({ groupId: params.promptId }, { enabled: !!params.promptId });
+  const categoriesQuery = useGetCategories();
 
   const updateGroupMutation = useUpdatePromptGroup();
   const createNewVersionMutation = useCreatePrompt();
@@ -98,17 +105,36 @@ const PromptPreview = () => {
   }, [promptsQuery.data, selectedPromptIndex]);
 
   useEffect(() => {
-    if (promptGroupQuery) {
+    if (promptGroupQuery.data) {
       setGroup(promptGroupQuery?.data);
       promptsQuery.refetch();
     }
-  }, [promptGroupQuery, promptGroupQuery?.data, promptsQuery]);
+    if (categoriesQuery.data) {
+      setCategories(
+        categoriesQuery.data.categories.map((category) => ({
+          label: category.label,
+          value: category.value,
+          icon: <CategoryIcon category={category.value} />,
+        })),
+      );
+    }
+    if (promptGroupQuery?.data && categoriesQuery?.data) {
+      const tempCategory: Option | string =
+        categoriesQuery.data?.categories.find(
+          (category) => category.value === promptGroupQuery?.data?.category,
+        ) || '';
+      if (typeof tempCategory !== 'string') {
+        tempCategory.icon = <CategoryIcon category={promptGroupQuery?.data?.category} />;
+      }
+      setSelectedCategory(tempCategory);
+    }
+  }, [promptGroupQuery?.data, categoriesQuery.data]);
 
   useEffect(() => {
     if (selectedPrompt) {
       setVariables(extractUniqueVariables(selectedPrompt.prompt));
     }
-  }, [selectedPrompt, selectedPrompt?.prompt]);
+  }, [selectedPrompt, selectedPrompt?.prompt, promptsQuery.data]);
 
   return (
     <div>
@@ -117,7 +143,16 @@ const PromptPreview = () => {
           name={group?.name}
           onSave={(value) => {
             setGroup((prev) => prev && { ...prev, name: value });
-            updateGroupMutation.mutate({ id: group?._id || '', payload: { name: value } });
+            updateGroupMutation.mutate({
+              id: group?._id || '',
+              payload: {
+                name: value,
+                category:
+                  typeof selectedCategory === 'string'
+                    ? selectedCategory
+                    : '' + selectedCategory.value,
+              },
+            });
           }}
         />
         <div className="flex flex-row gap-x-2">
@@ -185,7 +220,6 @@ const PromptPreview = () => {
             type="text"
             className="mb-4"
             placeholder="+ Add Labels"
-            // defaultValue={selectedPrompt?.labels.join(', ')}
             value={labelInput}
             onChange={handleInputChange}
             onKeyPress={handleKeyPress}
@@ -218,6 +252,21 @@ const PromptPreview = () => {
               <label className="rounded-full border px-2">No Labels</label>
             )}
           </div>
+          <SelectDropDown
+            title="Category"
+            value={selectedCategory}
+            setValue={(value) => {
+              updateGroupMutation.mutate({
+                id: group?._id || '',
+                payload: { name: group?.name || '', category: value },
+              });
+              setSelectedCategory(categories.find((o) => o.value === value) || categories[0]);
+            }}
+            availableValues={categories}
+            showAbove={false}
+            showLabel={true}
+            searchPlaceholder="Search categories..."
+          />
         </div>
         {/* Right Section */}
         {!!promptsQuery?.data?.length && (
@@ -240,7 +289,7 @@ const PromptPreview = () => {
                   <p className="font-bold">Version: {prompt.version}</p>
                   <p className="italic">Tags: {prompt.tags.join(', ')}</p>
                   <p className="text-xs text-gray-600">{formatDateTime(prompt.createdAt)}</p>
-                  <p className="text-xs text-gray-600">by {prompt.authorName}</p>
+                  <p className="text-xs text-gray-600">by {group?.authorName}</p>
                 </li>
               ))}
             </ul>

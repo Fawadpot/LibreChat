@@ -108,6 +108,7 @@ function SelectDropDown({
                     {!showLabel && !emptyTitle && (
                       <span className="text-xs text-gray-700 dark:text-gray-500">{title}:</span>
                     )}
+                    {typeof value === 'string' ? null : value?.icon ?? null}
                     {typeof value !== 'string' && value ? value?.label ?? '' : value ?? ''}
                   </span>
                 </span>
@@ -163,6 +164,7 @@ function SelectDropDown({
 
                     const currentLabel = typeof option === 'string' ? option : option?.label ?? '';
                     const currentValue = typeof option === 'string' ? option : option?.value ?? '';
+                    const currentIcon = typeof option === 'string' ? null : option?.icon ?? null;
                     let activeValue: string | number | null | Option = value;
                     if (typeof activeValue !== 'string') {
                       activeValue = activeValue?.value ?? '';
@@ -185,6 +187,7 @@ function SelectDropDown({
                               iconSide === 'left' ? 'ml-4' : '',
                             )}
                           >
+                            {currentIcon}
                             {currentLabel}
                           </span>
                           {currentValue === activeValue && (

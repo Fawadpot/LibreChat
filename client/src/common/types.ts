@@ -356,6 +356,7 @@ export type IconProps = Pick<TMessage, 'isCreatedByUser' | 'model'> &
 export type Option = Record<string, unknown> & {
   label?: string;
   value: string | number | null;
+  icon?: React.ReactNode;
 };
 
 export type OptionWithIcon = Option & { icon?: React.ReactNode };

@@ -164,8 +164,10 @@ export const updatePromptGroup = getPromptGroup;
 
 export const updatePromptLabels = (_id: string) => `${getPrompt(_id)}/labels`;
 
-export const updatePromptTag = (_id:string)=> `${getPrompt(_id)}/tags/production`;
+export const updatePromptTag = (_id: string) => `${getPrompt(_id)}/tags/production`;
 
 export const deletePromptGroup = getPromptGroup;
 
 export const deletePrompt = getPrompt;
+
+export const getCategories = () => '/api/categories';

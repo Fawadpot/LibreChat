@@ -511,3 +511,7 @@ export function updatePromptLabels(
 export function deletePromptGroup(id: string): Promise<t.TDeletePromptGroupResponse> {
   return request.delete(endpoints.deletePromptGroup(id));
 }
+
+export function getCategories(): Promise<t.TGetCategoriesResponse> {
+  return request.get(endpoints.getCategories());
+}

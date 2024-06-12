@@ -73,8 +73,8 @@ router.post('/', requireJwtAuth, async (req, res) => {
  */
 const patchPromptGroup = async (req, res) => {
   const { groupId } = req.params;
-  const { name, isActive = false } = req.body;
-  res.status(200).send(await updatePromptGroup({ _id: groupId }, { name, isActive }));
+  const { name, isActive = false, category } = req.body;
+  res.status(200).send(await updatePromptGroup({ _id: groupId }, { name, isActive, category }));
 };
 
 router.patch('/prompt-groups/:groupId', requireJwtAuth, patchPromptGroup);
