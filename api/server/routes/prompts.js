@@ -68,8 +68,8 @@ const patchPrompt = async (req, res) => {
       saveData.name = name;
     }
 
-    res.status(200).send();
-    await savePrompt(saveData);
+    const result = await savePrompt(saveData);
+    res.status(200).send(result);
   } catch (error) {
     console.error(error);
     res.status(500).send({ error: 'Error saving prompt' });
