@@ -44,7 +44,7 @@ module.exports = {
         authorName,
       });
 
-      return {prompt: newPrompt};
+      return { prompt: newPrompt };
     } catch (error) {
       logger.error('Error saving prompt', error);
       return { prompt: 'Error saving prompt' };
@@ -122,10 +122,9 @@ module.exports = {
       delete filter.pageNumber;
       delete filter.pageSize;
       const query = {};
-      if(filter.name)
-      {
+      if (filter.name) {
         query.name = new RegExp(filter.name, 'i');
-      } 
+      }
       const promptGroups = await PromptGroup.find(query)
         .sort({ createdAt: -1 })
         .skip((pageNumber - 1) * pageSize)
@@ -201,15 +200,17 @@ module.exports = {
         throw new Error('Prompt not found');
       }
 
-      if(!prompt.tags.includes('production')){
+      if (!prompt.tags.includes('production')) {
         prompt.tags.push('production');
       }
 
-      const remainingPrompts = await Prompt.find({ groupId: prompt.groupId }).sort({ createdAt: 1 });
+      const remainingPrompts = await Prompt.find({ groupId: prompt.groupId }).sort({
+        createdAt: 1,
+      });
 
       for (let i = 0; i < remainingPrompts.length; i++) {
-        if(remainingPrompts[i].tags.includes('production')){
-          remainingPrompts[i].tags = remainingPrompts[i].tags.filter(tag => tag !== 'production');
+        if (remainingPrompts[i].tags.includes('production')) {
+          remainingPrompts[i].tags = remainingPrompts[i].tags.filter((tag) => tag !== 'production');
           await remainingPrompts[i].save();
         }
       }
@@ -248,5 +249,5 @@ module.exports = {
       logger.error('Error deleting prompt group', error);
       return { promptGroup: 'Error deleting prompt group' };
     }
-  }
+  },
 };
