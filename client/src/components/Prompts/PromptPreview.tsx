@@ -1,7 +1,7 @@
 import { format } from 'date-fns';
 import { Share2Icon, Layers3 } from 'lucide-react';
-import { useForm, FormProvider } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useForm, FormProvider, Controller } from 'react-hook-form';
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import type { TCreatePrompt } from 'librechat-data-provider';
 import {
@@ -10,17 +10,38 @@ import {
   useUpdatePromptGroup,
   useMakePromptProduction,
 } from '~/data-provider/mutations';
-import { useGetPromptGroup, useGetPrompts } from '~/data-provider';
-import { Button, Skeleton } from '~/components/ui';
+import { useGetCategories, useGetPromptGroup, useGetPrompts } from '~/data-provider';
+import { Button, Skeleton, SelectDropDown } from '~/components/ui';
 import PromptVariables from './PromptVariables';
 import { TrashIcon } from '~/components/svg';
+import CategoryIcon from './CategoryIcon';
 import PromptEditor from './PromptEditor';
 import PromptName from './PromptName';
 import { cn } from '~/utils';
 
+const loadingCategories = [
+  {
+    label: 'Loading...',
+    value: '',
+  },
+];
+
+const emptyCategory = {
+  label: '-',
+  value: '',
+};
+
 const PromptPreview = () => {
   const params = useParams();
   const navigate = useNavigate();
+  const { data: categories = loadingCategories } = useGetCategories({
+    select: (data) =>
+      data.map((category) => ({
+        label: category.label,
+        value: category.value,
+        icon: <CategoryIcon category={category.value} />,
+      })),
+  });
   const { data: group, isLoading: isLoadingGroup } = useGetPromptGroup(params.promptId || '');
   const { data: prompts = [], isLoading: isLoadingPrompts } = useGetPrompts(
     { groupId: params.promptId ?? '' },
@@ -36,11 +57,20 @@ const PromptPreview = () => {
     defaultValues: {
       prompt: '',
       promptName: group?.name || '',
+      category: group?.category || '',
     },
   });
 
-  const { watch, setValue } = methods;
+  const { watch, setValue, control } = methods;
   const watchedPrompt = watch('prompt');
+  const watchedCategory = watch('category');
+
+  const categoryOption = useMemo(
+    () =>
+      categories.find((category) => category.value === (watchedCategory ?? group?.category)) ??
+      emptyCategory,
+    [watchedCategory, categories, group?.category],
+  );
 
   const createPromptMutation = useCreatePrompt({
     onMutate() {
@@ -49,6 +79,7 @@ const PromptPreview = () => {
     onSuccess() {
       setValue('prompt', '');
       setValue('promptName', group?.name || '');
+      setValue('category', group?.category || '');
     },
   });
   const updateGroupMutation = useUpdatePromptGroup();
@@ -95,7 +126,8 @@ const PromptPreview = () => {
 
   useEffect(() => {
     setValue('prompt', selectedPrompt?.prompt || '');
-  }, [selectedPrompt, setValue]);
+    setValue('category', group?.category || '');
+  }, [selectedPrompt, group?.category, setValue]);
 
   return (
     <FormProvider {...methods}>
@@ -115,23 +147,52 @@ const PromptPreview = () => {
                 }}
               />
             )}
-            <div className="flex flex-row gap-x-2">
+            <div className="flex h-10 flex-row gap-x-2">
+              <Controller
+                name="category"
+                control={control}
+                rules={{ required: true, minLength: 1 }}
+                render={({ field }) => (
+                  <SelectDropDown
+                    title="Category"
+                    value={categoryOption || ''}
+                    setValue={(value) => {
+                      field.onChange(value);
+                      updateGroupMutation.mutate({
+                        id: group?._id || '',
+                        payload: { name: group?.name || '', category: value },
+                      });
+                    }}
+                    availableValues={categories}
+                    showAbove={false}
+                    showLabel={false}
+                    emptyTitle={true}
+                    showOptionIcon={true}
+                    searchPlaceholder="Search categories..."
+                    className="h-10 w-56 cursor-pointer"
+                    currentValueClass="text-md gap-2"
+                    optionsListClass="text-sm"
+                  />
+                )}
+              />
               {!isLoadingGroup && (
                 <>
-                  <Button variant={'default'} size={'sm'}>
+                  <Button variant={'default'} size={'sm'} className="h-10 w-10">
                     <Share2Icon className="cursor-pointer" />
                   </Button>
                   <Button
-                    variant={'default'}
                     size={'sm'}
+                    variant={'default'}
+                    className="h-10"
                     onClick={() => makeProductionMutation.mutate({ id: selectedPrompt?._id || '' })}
                     disabled={selectedPrompt?.isProduction}
                   >
                     Make it Production
                   </Button>
                   <Button
-                    variant={'default'}
                     size={'sm'}
+                    variant={'default'}
+                    className="h-10 w-10"
                     onClick={() => deletePromptGroupMutation.mutate({ id: group?._id || '' })}
                   >
                     <TrashIcon className="icon-lg cursor-pointer" />

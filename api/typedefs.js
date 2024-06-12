@@ -295,6 +295,12 @@
  * @memberof typedefs
  */
 
+/**
+ * @exports TGetCategoriesResponse
+ * @typedef {import('librechat-data-provider').TGetCategoriesResponse } TGetCategoriesResponse
+ * @memberof typedefs
+ */
+
 /** Assistants */
 /**
  * @exports Assistant

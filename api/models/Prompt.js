@@ -11,7 +11,7 @@ module.exports = {
   createPromptGroup: async (saveData) => {
     try {
       const { prompt, group, author, authorName } = saveData;
-      const newPromptGroup = await PromptGroup.create({ name: group.name, author, authorName });
+      const newPromptGroup = await PromptGroup.create({ ...group, author, authorName });
       const groupId = newPromptGroup._id;
 
       const newPrompt = await Prompt.create({

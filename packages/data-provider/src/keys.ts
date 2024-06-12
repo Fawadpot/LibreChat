@@ -31,6 +31,7 @@ export enum QueryKeys {
   prompt = 'prompt',
   promptGroups = 'promptGroups',
   promptGroup = 'promptGroup',
+  categories = 'categories',
 }
 
 export enum MutationKeys {

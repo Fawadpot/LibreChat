@@ -455,12 +455,7 @@ export const useGetPromptGroup = (
 ): QueryObserverResult<t.TPromptGroup> => {
   return useQuery<t.TPromptGroup>(
     [QueryKeys.promptGroup, id],
-    () => {
-      if (!id) {
-        throw new Error('Prompt group ID is required');
-      }
-      return dataService.getPromptGroup(id);
-    },
+    () => dataService.getPromptGroup(id),
     {
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
@@ -479,6 +474,23 @@ export const useGetPrompts = (
   return useQuery<t.TPrompt[]>(
     [QueryKeys.prompts, filter.groupId ?? ''],
     () => dataService.getPrompts(filter),
+    {
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+      retry: false,
+      ...config,
+      enabled: config?.enabled !== undefined ? config?.enabled : true,
+    },
+  );
+};
+
+export const useGetCategories = <TData = t.TGetCategoriesResponse>(
+  config?: UseQueryOptions<t.TGetCategoriesResponse, unknown, TData>,
+): QueryObserverResult<TData> => {
+  return useQuery<t.TGetCategoriesResponse, unknown, TData>(
+    [QueryKeys.categories],
+    () => dataService.getCategories(),
     {
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,

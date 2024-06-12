@@ -75,6 +75,12 @@ export type TUpdateUserPlugins = {
   auth?: unknown;
 };
 
+export type TCategory = {
+  id?: string;
+  value: string;
+  label: string;
+};
+
 export type TError = {
   message: string;
   code?: number;
@@ -389,6 +395,7 @@ export type TCreatePromptResponse = {
 
 export type TUpdatePromptGroupPayload = {
   name: string;
+  category?: string;
 };
 
 export type TUpdatePromptGroupVariables = {
@@ -428,3 +435,5 @@ export type TDeletePromptGroupResponse = {
 export type TDeletePromptGroupRequest = {
   id: string;
 };
+
+export type TGetCategoriesResponse = TCategory[];
