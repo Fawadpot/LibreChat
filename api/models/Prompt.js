@@ -179,6 +179,12 @@ module.exports = {
       return { prompt: 'Error deleting prompt' };
     }
   },
+  /**
+   * Update prompt group
+   * @param {Partial<MongoPromptGroup>} filter - Filter to find prompt group
+   * @param {Partial<MongoPromptGroup>} data - Data to update
+   * @returns {Promise<{promptGroup: string}>}
+   */
   updatePromptGroup: async (filter, data) => {
     try {
       const response = await PromptGroup.updateOne(filter, data);

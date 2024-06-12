@@ -1,6 +1,19 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+/**
+ * @typedef {Object} MongoPromptGroup
+ * @property {ObjectId} [_id] - MongoDB Document ID
+ * @property {string} name - The name of the prompt group
+ * @property {boolean} [isActive=true] - Whether the prompt group is active
+ * @property {number} [numberOfGenerations=0] - Number of generations the prompt group has
+ * @property {string} [oneliner=''] - Oneliner description of the prompt group
+ * @property {string} [category=''] - Category of the prompt group
+ * @property {Date} [createdAt] - Date when the prompt group was created (added by timestamps)
+ * @property {Date} [updatedAt] - Date when the prompt group was last updated (added by timestamps)
+ */
+
+/** @type {MongooseSchema<MongoPromptGroup>} */
 const promptGroupSchema = new Schema(
   {
     name: {

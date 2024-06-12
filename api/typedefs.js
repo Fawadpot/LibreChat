@@ -501,6 +501,12 @@
  */
 
 /**
+ * @exports MongoPromptGroup
+ * @typedef {import('~/models/schema/promptSchema.js').MongoPromptGroup} MongoPromptGroup
+ * @memberof typedefs
+ */
+
+/**
  * @exports uploadImageBuffer
  * @typedef {import('~/server/services/Files/process').uploadImageBuffer} uploadImageBuffer
  * @memberof typedefs
