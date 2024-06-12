@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { TUpdatePrompt } from 'librechat-data-provider';
+import type { TCreatePrompt } from 'librechat-data-provider';
 import { Cross1Icon } from '@radix-ui/react-icons';
 import { useCreatePrompt } from '~/data-provider';
 import PromptEditor from './PromptEditor';
@@ -8,7 +8,7 @@ import { Button, Input } from '../ui';
 
 export default function CreatePrompt() {
   const navigate = useNavigate();
-  const [prompt, setPrompt] = useState<TUpdatePrompt>({
+  const [prompt, setPrompt] = useState<TCreatePrompt>({
     name: '',
     prompt: '',
     type: 'text',
@@ -39,13 +39,13 @@ export default function CreatePrompt() {
 
   return (
     <div className="w-full p-4">
-      <div className="mb-5 flex w-full flex-row items-center text-2xl font-bold md:w-1/2">
+      <div className="flex w-full flex-row items-center text-2xl font-bold md:w-1/2">
         <Input
           type="text"
-          value={prompt?.name}
+          value={prompt?.name ?? ''}
+          onChange={(e) => setPrompt((prev) => prev && { ...prev, name: e.target.value })}
           className="mr-2 border border-gray-300 p-2 text-2xl"
           placeholder="Prompt Name"
-          defaultValue={''}
         />
       </div>
       <div className="w-full">
