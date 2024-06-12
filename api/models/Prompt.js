@@ -8,7 +8,17 @@ module.exports = {
    * @param {TSavePrompt} saveData
    * @returns {Promise<{ prompt: TPrompt }>}
    */
-  savePrompt: async ({ name, prompt, type, groupId, labels, tags = [], author, authorName }) => {
+  savePrompt: async ({
+    name,
+    prompt,
+    type,
+    groupId,
+    labels,
+    tags = [],
+    author,
+    authorName,
+    category,
+  }) => {
     try {
       tags.push('latest');
 
@@ -16,7 +26,7 @@ module.exports = {
       let versionNumber = 1;
 
       if (!groupId) {
-        const newPromptGroup = await PromptGroup.create({ name, author, authorName });
+        const newPromptGroup = await PromptGroup.create({ name, author, authorName, category });
         promptGroupId = newPromptGroup._id;
         tags.push('production');
       } else {

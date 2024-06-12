@@ -46,7 +46,7 @@ router.get('/prompt-groups', requireJwtAuth, async (req, res) => {
 });
 
 router.post('/', requireJwtAuth, async (req, res) => {
-  const { name, prompt, groupId, type, labels, tags } = req.body;
+  const { name, prompt, groupId, type, labels, tags, category } = req.body;
   res.status(200).send(
     await savePrompt({
       name,
@@ -55,6 +55,7 @@ router.post('/', requireJwtAuth, async (req, res) => {
       groupId,
       labels,
       tags,
+      category,
       author: req.user.id,
       authorName: req.user.name,
     }),
