@@ -55,7 +55,10 @@ const PromptPreview = () => {
   const params = useParams();
   const navigate = useNavigate();
   const { data: group } = useGetPromptGroup(params.promptId || '');
-  const promptsQuery = useGetPrompts({ groupId: params.promptId }, { enabled: !!params.promptId });
+  const promptsQuery = useGetPrompts(
+    { groupId: params.promptId ?? '' },
+    { enabled: !!params.promptId },
+  );
   const [selectedPrompt, setSelectedPrompt] = useState<TPrompt | undefined>();
   const [selectedPromptIndex, setSelectedPromptIndex] = useState<number>(0);
   const [variables, setVariables] = useState<string[]>([]);
@@ -89,12 +92,12 @@ const PromptPreview = () => {
   };
 
   useEffect(() => {
-    if (promptsQuery?.data && promptsQuery?.data?.length > 0) {
+    if (params.promptId && promptsQuery?.data && promptsQuery?.data?.length > 0) {
       setSelectedPrompt(promptsQuery.data[selectedPromptIndex]);
       setLabels(promptsQuery.data[selectedPromptIndex].labels || []);
       setVariables(extractUniqueVariables(promptsQuery.data[selectedPromptIndex].prompt));
     }
-  }, [promptsQuery.data, selectedPromptIndex]);
+  }, [params.promptId, promptsQuery.data, selectedPromptIndex]);
 
   useEffect(() => {
     if (selectedPrompt) {

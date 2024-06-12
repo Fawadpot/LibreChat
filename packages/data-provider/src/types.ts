@@ -357,9 +357,9 @@ export type TCreatePrompt = Pick<TPrompt, 'prompt' | 'type' | 'groupId' | 'label
 export type TSavePrompt = TCreatePrompt & Pick<TPromptGroup, 'author' | 'authorName'>;
 
 export type TPromptsWithFilterRequest = {
-  projectId?: string;
-  groupId?: string;
+  groupId: string;
   tags?: string[];
+  projectId?: string;
   version?: number;
 };
 

@@ -136,10 +136,10 @@ export const textToSpeechManual = () => `${textToSpeech()}/manual`;
 
 export const textToSpeechVoices = () => `${textToSpeech()}/voices`;
 
-export const getPromptGroup = (_id: string) => `${prompts()}/prompt-groups/${_id}`;
+export const getPromptGroup = (_id: string) => `${prompts()}/groups/${_id}`;
 
 export const getPromptGroupsWithFilters = (filter: object) => {
-  let url = `${prompts()}/prompt-groups`;
+  let url = `${prompts()}/groups`;
   if (Object.keys(filter).length > 0) {
     const queryParams = new URLSearchParams(filter as Record<string, string>).toString();
     url += `?${queryParams}`;
@@ -164,7 +164,7 @@ export const updatePromptGroup = getPromptGroup;
 
 export const updatePromptLabels = (_id: string) => `${getPrompt(_id)}/labels`;
 
-export const updatePromptTag = (_id:string)=> `${getPrompt(_id)}/tags/production`;
+export const updatePromptTag = (_id: string) => `${getPrompt(_id)}/tags/production`;
 
 export const deletePromptGroup = getPromptGroup;
 

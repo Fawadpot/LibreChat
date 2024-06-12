@@ -40,7 +40,7 @@ export default function PromptListItem({ prompt }: { prompt: TPromptGroup }) {
               onChange={(e) => {
                 setNameInputField(e.target.value);
               }}
-            ></Input>
+            />
             <Button
               className="w-min bg-transparent text-[#666666] hover:bg-slate-200"
               onClick={() => {

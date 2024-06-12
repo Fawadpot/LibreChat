@@ -429,7 +429,12 @@ export const useGetPromptGroup = (
 ): QueryObserverResult<t.TPromptGroup> => {
   return useQuery<t.TPromptGroup>(
     [QueryKeys.promptGroup, id],
-    () =>  dataService.getPromptGroup(id),
+    () => {
+      if (!id) {
+        throw new Error('Prompt group ID is required');
+      }
+      return dataService.getPromptGroup(id);
+    },
     {
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
@@ -446,7 +451,7 @@ export const useGetPrompts = (
   config?: UseQueryOptions<t.TPrompt[]>,
 ): QueryObserverResult<t.TPrompt[]> => {
   return useQuery<t.TPrompt[]>(
-    [QueryKeys.prompts],
+    [QueryKeys.prompts, filter.groupId],
     () => dataService.getPrompts(filter),
     {
       refetchOnWindowFocus: false,
@@ -459,20 +464,6 @@ export const useGetPrompts = (
   );
 };
 
-export const useGetPrompt = (
-  id: string,
-  config?: UseQueryOptions<t.TPrompt>,
-): QueryObserverResult<t.TPrompt> => {
-  return useQuery<t.TPrompt>([QueryKeys.prompt, id], () => dataService.getPrompt(id), {
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    refetchOnMount: false,
-    retry: false,
-    ...config,
-    enabled: config?.enabled !== undefined ? config?.enabled : true,
-  });
-};
-
 // update the typing to reflect the backend response
 export const useGetPromptGroups = (
   filter: t.TPromptGroupsWithFilterRequest,
@@ -481,11 +472,10 @@ export const useGetPromptGroups = (
   return useQuery<t.TPromptGroupsWithFilterResponse, unknown>(
     [QueryKeys.promptGroups, filter.pageNumber, filter.name],
     async () => {
-      if(!filter.name)
-      {
-        delete filter.name
+      if (!filter.name) {
+        delete filter.name;
       }
-      return dataService.getPromptGroups(filter)
+      return dataService.getPromptGroups(filter);
     },
     {
       refetchOnWindowFocus: false,

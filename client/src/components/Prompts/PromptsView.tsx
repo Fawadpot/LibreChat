@@ -2,14 +2,14 @@ import { useState } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { ListFilter } from 'lucide-react';
 import { useGetPromptGroups } from '~/data-provider';
-import { Button, Input } from '../ui';
+import { Button, Input } from '~/components/ui';
 import PromptSidePanel from './PromptSidePanel';
 
 export default function PromptsView() {
-  const [queryState, setQueryState] = useState({ pageSize: 10, pageNumber: 1, name: '' });
-  const groupsQuery = useGetPromptGroups(queryState);
   const params = useParams();
   const navigate = useNavigate();
+  const [queryState, setQueryState] = useState({ pageSize: 10, pageNumber: 1, name: '' });
+  const groupsQuery = useGetPromptGroups(queryState);
 
   return (
     <div className="w-full bg-[#f9f9f9] p-0 lg:p-7">
