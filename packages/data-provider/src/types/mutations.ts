@@ -125,3 +125,16 @@ export type DeletePromptGroupOptions = MutationOptions<types.TDeletePromptGroupR
 export type UpdatePromptLabelOptions = MutationOptions<types.TUpdatePromptLabelsResponse, types.TUpdatePromptLabelsRequest>;
 
 export type MakePromptProductionOptions = MutationOptions<types.TMakePromptProductionResponse, types.TMakePromptProductionRequest>;
+
+/* Auth mutations */
+export type VerifyEmailOptions = MutationOptions<types.VerifyEmailResponse, types.TVerifyEmail>;
+export type ResendVerifcationOptions = MutationOptions<
+  types.VerifyEmailResponse,
+  types.TResendVerificationEmail
+>;
+export type RegistrationOptions = MutationOptions<
+  types.TRegisterUserResponse,
+  types.TRegisterUser,
+  unknown,
+  types.TError
+>;
