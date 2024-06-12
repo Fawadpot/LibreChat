@@ -329,7 +329,7 @@ export type TPrompt = {
   projectId: string;
   prompt: string;
   tags: string[];
-  config: object;
+  config?: object;
   labels: string[];
   type: 'text' | 'chat';
   createdAt: string;
@@ -368,25 +368,13 @@ export type TPromptGroupsWithFilterResponse = {
   currentPage: number;
 };
 
-export type TSavePromptRequest = {
-  name: string;
-  labels: string[];
-  prompt: string;
-  type: 'text' | 'chat';
-  config: object;
-  projectId: string;
-  groupId?: string;
-  isActive: boolean;
-  tags: string[];
-};
-
 export type TSavePromptResponse = {
   prompt: TPrompt;
-}
+};
 
 export type TUpdatePromptGroupPayload = {
-    name: string;
-    isActive?: boolean;
+  name: string;
+  isActive?: boolean;
 };
 
 export type TUpdatePromptGroupVariables = {
@@ -404,11 +392,11 @@ export type TDeletePromptResponse = {
 
 export type TMakePromptProductionResponse = {
   message: string;
-}
+};
 
 export type TMakePromptProductionRequest = {
   id: string;
-}
+};
 
 export type TUpdatePromptLabelsRequest = {
   id: string;
@@ -419,12 +407,12 @@ export type TUpdatePromptLabelsRequest = {
 
 export type TUpdatePromptLabelsResponse = {
   message: string;
-}
+};
 
 export type TDeletePromptGroupResponse = {
   promptGroup: string;
-}
+};
 
 export type TDeletePromptGroupRequest = {
   id: string;
-}
+};

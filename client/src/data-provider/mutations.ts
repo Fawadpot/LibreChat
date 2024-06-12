@@ -901,24 +901,28 @@ export const useUpdatePromptGroup = (
     onSuccess: (response, variables, context) => {
       queryClient.setQueryData(
         [QueryKeys.promptGroup, variables?.id],
-        (oldData: t.TPromptGroup) => {
+        (oldData: t.TPromptGroup | undefined) => {
           return {
-            ...oldData,
+            ...(oldData ?? ({} as t.TPromptGroup)),
             ...variables.payload,
           };
         },
       );
-      queryClient.setQueriesData(
+      queryClient.setQueryData(
         [QueryKeys.promptGroups],
-        (oldData: t.TPromptGroupsWithFilterResponse) => {
-          const newPromptGroups = oldData?.promptGroups?.map((group: object) => {
+        (oldData: t.TPromptGroupsWithFilterResponse | undefined) => {
+          const newPromptGroups = oldData?.promptGroups?.map((group: t.TPromptGroup) => {
             if (group?.['_id'] === variables?.id) {
               return { ...group, ...variables.payload };
             }
             return group;
           });
+
+          if (!newPromptGroups) {
+            return oldData;
+          }
           return {
-            ...oldData,
+            ...(oldData ?? ({} as t.TPromptGroupsWithFilterResponse)),
             promptGroups: newPromptGroups,
           };
         },
@@ -946,8 +950,8 @@ export const useSavePrompt = (
     },
     onSuccess: (response, variables, context) => {
       if (response?.prompt.version > 1) {
-        queryClient.setQueryData([QueryKeys.prompts], (oldData: t.TPrompt[]) => {
-          return [response.prompt, ...oldData];
+        queryClient.setQueryData([QueryKeys.prompts], (oldData: t.TPrompt[] | undefined) => {
+          return [response.prompt, ...(oldData ?? [])];
         });
         queryClient.invalidateQueries([QueryKeys.prompts]);
       } else {
@@ -1078,6 +1082,8 @@ export const useMakePromptProduction = (
         options.onSuccess(response, variables, context);
       }
     },
+  });
+};
 
 /**
  * Hook for verifying email address

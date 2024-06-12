@@ -1,11 +1,10 @@
 import React from 'react';
-import { Button, Input } from '../ui';
-import { ListFilter } from 'lucide-react';
-import PromptsList from './PromptsList';
 import { useNavigate } from 'react-router-dom';
 import { TPromptGroup } from 'librechat-data-provider/dist/types';
+import PromptsList from './PromptsList';
+import { Button } from '../ui';
 
-export default function PromptSidePanel({ prompts }: { prompts: TPromptGroup[] }) {
+export default function PromptSidePanel({ prompts }: { prompts?: TPromptGroup[] }) {
   const navigate = useNavigate();
 
   return (

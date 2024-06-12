@@ -1,25 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TrashIcon } from 'lucide-react';
-import { useNavigate, useParams } from 'react-router-dom';
 import { Share2Icon } from 'lucide-react';
-import { TPrompt, TPromptGroup } from 'librechat-data-provider';
 import { Cross1Icon } from '@radix-ui/react-icons';
-import { useGetPromptGroup, useGetPrompts } from '~/data-provider';
+import { useNavigate, useParams } from 'react-router-dom';
+import type { TPrompt, TPromptGroup } from 'librechat-data-provider';
 import {
-  useDeletePromptGroup,
-  useMakePromptProduction,
   useSavePrompt,
+  useDeletePromptGroup,
   useUpdatePromptGroup,
   useUpdatePromptLabels,
+  useMakePromptProduction,
 } from '~/data-provider/mutations';
-import { Button, Input } from '../ui';
-import PromptName from './PromptName';
+import { useGetPromptGroup, useGetPrompts } from '~/data-provider';
+import { Button, Input } from '~/components/ui';
 import PromptEditor from './PromptEditor';
+import PromptName from './PromptName';
 
 function extractUniqueVariables(input: string): string[] {
   const regex = /{{(.*?)}}/g;
   const variablesSet = new Set<string>();
-  let match;
+  let match: RegExpExecArray | null = null;
 
   while ((match = regex.exec(input)) !== null) {
     variablesSet.add(match[1]);
@@ -28,7 +28,7 @@ function extractUniqueVariables(input: string): string[] {
   return Array.from(variablesSet);
 }
 
-function formatDateTime(dateTimeString) {
+function formatDateTime(dateTimeString: string) {
   const date = new Date(dateTimeString);
 
   const month = date.getMonth() + 1;
@@ -80,7 +80,7 @@ const PromptPreview = () => {
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && labelInput.trim()) {
       const newLabels = [...labels, labelInput.trim()];
-      setLabels((prevLabels) => newLabels);
+      setLabels(newLabels);
       setLabelInput('');
       updatePromptLabelsMutation.mutate({
         id: selectedPrompt?._id || '',
@@ -95,20 +95,20 @@ const PromptPreview = () => {
       setLabels(promptsQuery.data[selectedPromptIndex].labels || []);
       setVariables(extractUniqueVariables(promptsQuery.data[selectedPromptIndex].prompt));
     }
-  }, [promptsQuery?.data]);
+  }, [promptsQuery.data, selectedPromptIndex]);
 
   useEffect(() => {
     if (promptGroupQuery) {
       setGroup(promptGroupQuery?.data);
       promptsQuery.refetch();
     }
-  }, [promptGroupQuery?.data]);
+  }, [promptGroupQuery, promptGroupQuery?.data, promptsQuery]);
 
   useEffect(() => {
     if (selectedPrompt) {
       setVariables(extractUniqueVariables(selectedPrompt.prompt));
     }
-  }, [selectedPrompt?.prompt]);
+  }, [selectedPrompt, selectedPrompt?.prompt]);
 
   return (
     <div>
@@ -149,12 +149,19 @@ const PromptPreview = () => {
             prompt={selectedPrompt?.prompt || ''}
             onSave={(value) => {
               setSelectedPrompt((prev) => prev && { ...prev, prompt: value });
-              const tempPrompt = {
+              const tempPrompt: TPrompt = {
                 prompt: value,
-                type: selectedPrompt?.type,
+                type: selectedPrompt?.type ?? 'text',
                 config: selectedPrompt?.config,
-                labels: selectedPrompt?.labels,
-                groupId: selectedPrompt?.groupId,
+                labels: selectedPrompt?.labels ?? [],
+                groupId: selectedPrompt?.groupId ?? '',
+                projectId: '',
+                createdAt: '',
+                updatedAt: '',
+                authorName: '',
+                author: '',
+                version: 0,
+                tags: [],
               };
 
               createNewVersionMutation.mutate(tempPrompt);
@@ -197,7 +204,7 @@ const PromptPreview = () => {
                   <Cross1Icon
                     onClick={() => {
                       const newLabels = labels.filter((l) => l !== label);
-                      setLabels((prev) => newLabels);
+                      setLabels(newLabels);
                       updatePromptLabelsMutation.mutate({
                         id: selectedPrompt?._id || '',
                         payload: { labels: newLabels },
