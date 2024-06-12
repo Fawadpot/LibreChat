@@ -19,20 +19,34 @@ const PromptName: React.FC<Props> = ({ name, onSave }) => {
     setNewName(e.target.value);
   };
 
-  const handleSaveClick = () => {
-    onSave(newName || '');
+  const saveName = () => {
+    const savedName = newName?.trim();
+    onSave(savedName || '');
     setIsEditing(false);
   };
 
+  const handleSaveClick: React.MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    saveName();
+  };
+
   const handleBlur = () => {
-    setIsEditing(false);
-    setNewName(name);
+    setTimeout(() => {
+      if (document.activeElement !== inputRef.current) {
+        setIsEditing(false);
+        setNewName(name);
+      }
+    }, 200);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
       setIsEditing(false);
       setNewName(name);
+    }
+    if (e.key === 'Enter') {
+      saveName();
     }
   };
 
@@ -70,7 +84,7 @@ const PromptName: React.FC<Props> = ({ name, onSave }) => {
         </div>
       ) : (
         <div className="mb-1 flex items-center md:mb-0">
-          <span className="mr-2 border border-transparent p-2">{name}</span>
+          <span className="mr-2 border border-transparent p-2">{newName}</span>
           <button
             type="button"
             onClick={handleEditClick}

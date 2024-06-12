@@ -262,8 +262,8 @@
  */
 
 /**
- * @exports TUpdatePrompt
- * @typedef {import('librechat-data-provider').TUpdatePrompt} TUpdatePrompt
+ * @exports TCreatePrompt
+ * @typedef {import('librechat-data-provider').TCreatePrompt} TCreatePrompt
  * @memberof typedefs
  */
 

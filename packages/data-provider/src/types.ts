@@ -350,8 +350,9 @@ export type TPromptGroup = {
   _id?: string;
 };
 
-export type TCreatePrompt = Pick<TPrompt, 'prompt' | 'type' | 'groupId' | 'labels' | 'tags'> &
-  Pick<TPromptGroup, 'name'>;
+export type TCreatePrompt = Pick<TPrompt, 'prompt' | 'type' | 'groupId' | 'labels' | 'tags'> & {
+  name?: string;
+};
 
 export type TSavePrompt = TCreatePrompt & Pick<TPromptGroup, 'author' | 'authorName'>;
 

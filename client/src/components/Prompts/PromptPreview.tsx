@@ -3,7 +3,7 @@ import { TrashIcon } from 'lucide-react';
 import { Share2Icon } from 'lucide-react';
 import { Cross1Icon } from '@radix-ui/react-icons';
 import { useNavigate, useParams } from 'react-router-dom';
-import type { TPrompt, TPromptGroup } from 'librechat-data-provider';
+import type { TPrompt, TCreatePrompt } from 'librechat-data-provider';
 import {
   useCreatePrompt,
   useDeletePromptGroup,
@@ -54,14 +54,13 @@ function formatDateTime(dateTimeString: string) {
 const PromptPreview = () => {
   const params = useParams();
   const navigate = useNavigate();
-  const promptGroupQuery = useGetPromptGroup(params.promptId || '');
+  const { data: group } = useGetPromptGroup(params.promptId || '');
   const promptsQuery = useGetPrompts({ groupId: params.promptId }, { enabled: !!params.promptId });
-  const [group, setGroup] = useState<TPromptGroup | undefined>();
   const [selectedPrompt, setSelectedPrompt] = useState<TPrompt | undefined>();
   const [selectedPromptIndex, setSelectedPromptIndex] = useState<number>(0);
   const [variables, setVariables] = useState<string[]>([]);
-  const [labels, setLabels] = useState<string[]>([]);
   const [labelInput, setLabelInput] = useState<string>('');
+  const [labels, setLabels] = useState<string[]>([]);
 
   const updateGroupMutation = useUpdatePromptGroup();
   const createNewVersionMutation = useCreatePrompt();
@@ -98,13 +97,6 @@ const PromptPreview = () => {
   }, [promptsQuery.data, selectedPromptIndex]);
 
   useEffect(() => {
-    if (promptGroupQuery) {
-      setGroup(promptGroupQuery?.data);
-      promptsQuery.refetch();
-    }
-  }, [promptGroupQuery, promptGroupQuery?.data, promptsQuery]);
-
-  useEffect(() => {
     if (selectedPrompt) {
       setVariables(extractUniqueVariables(selectedPrompt.prompt));
     }
@@ -116,7 +108,6 @@ const PromptPreview = () => {
         <PromptName
           name={group?.name}
           onSave={(value) => {
-            setGroup((prev) => prev && { ...prev, name: value });
             updateGroupMutation.mutate({ id: group?._id || '', payload: { name: value } });
           }}
         />
@@ -149,18 +140,11 @@ const PromptPreview = () => {
             prompt={selectedPrompt?.prompt || ''}
             onSave={(value) => {
               setSelectedPrompt((prev) => prev && { ...prev, prompt: value });
-              const tempPrompt: TPrompt = {
+              const tempPrompt: TCreatePrompt = {
                 prompt: value,
                 type: selectedPrompt?.type ?? 'text',
-                config: selectedPrompt?.config,
                 labels: selectedPrompt?.labels ?? [],
                 groupId: selectedPrompt?.groupId ?? '',
-                projectId: '',
-                createdAt: '',
-                updatedAt: '',
-                authorName: '',
-                author: '',
-                version: 0,
                 tags: [],
               };
 
@@ -240,7 +224,9 @@ const PromptPreview = () => {
                   <p className="font-bold">Version: {prompt.version}</p>
                   <p className="italic">Tags: {prompt.tags.join(', ')}</p>
                   <p className="text-xs text-gray-600">{formatDateTime(prompt.createdAt)}</p>
-                  <p className="text-xs text-gray-600">by {prompt.authorName}</p>
+                  {group?.authorName && (
+                    <p className="text-xs text-gray-600">by {group.authorName}</p>
+                  )}
                 </li>
               ))}
             </ul>

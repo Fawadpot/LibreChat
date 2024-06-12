@@ -45,11 +45,16 @@ router.get('/prompt-groups', requireJwtAuth, async (req, res) => {
   res.status(200).send(await getPromptGroups(filter));
 });
 
-router.post('/', requireJwtAuth, async (req, res) => {
-  const { name, prompt, groupId, type, labels, tags } = req.body;
-  res.status(200).send(
-    await savePrompt({
-      name,
+/**
+ * Updates or creates a prompt + promptGroup
+ * @param {object} req
+ * @param {TCreatePrompt} req.body
+ * @param {Express.Response} res
+ */
+const patchPrompt = async (req, res) => {
+  try {
+    const { name, prompt, groupId, type, labels, tags } = req.body;
+    const saveData = {
       prompt,
       type,
       groupId,
@@ -57,9 +62,21 @@ router.post('/', requireJwtAuth, async (req, res) => {
       tags,
       author: req.user.id,
       authorName: req.user.name,
-    }),
-  );
-});
+    };
+
+    if (name) {
+      saveData.name = name;
+    }
+
+    res.status(200).send();
+    await savePrompt(saveData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: 'Error saving prompt' });
+  }
+};
+
+router.post('/', requireJwtAuth, patchPrompt);
 
 /**
  * Updates a prompt group

@@ -15,7 +15,7 @@ module.exports = {
       let promptGroupId;
       let versionNumber = 1;
 
-      if (!groupId) {
+      if (!groupId && name) {
         const newPromptGroup = await PromptGroup.create({ name, author, authorName });
         promptGroupId = newPromptGroup._id;
         tags.push('production');
