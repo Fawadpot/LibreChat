@@ -110,9 +110,12 @@ export type UpdateSharedLinkOptions = MutationOptions<
 >;
 export type DeleteSharedLinkOptions = MutationOptions<types.TSharedLink, { shareId: string }>;
 
-export type UpdatePromptGroupOptions = MutationOptions<types.TUpdatePromptGroupResponse, types.TUpdatePromptGroupVariables>;
+export type UpdatePromptGroupOptions = MutationOptions<
+  types.TUpdatePromptGroupResponse,
+  types.TUpdatePromptGroupVariables
+>;
 
-export type SavePromptOptions = MutationOptions<types.TSavePromptResponse, types.TSavePromptRequest>;
+export type SavePromptOptions = MutationOptions<types.TSavePromptResponse, types.TPrompt>;
 
 export type DeletePromptVariables = {
   _id: string;
@@ -120,11 +123,20 @@ export type DeletePromptVariables = {
 
 export type DeletePromptOptions = MutationOptions<unknown, DeletePromptVariables>;
 
-export type DeletePromptGroupOptions = MutationOptions<types.TDeletePromptGroupResponse,  types.TDeletePromptGroupRequest>;
+export type DeletePromptGroupOptions = MutationOptions<
+  types.TDeletePromptGroupResponse,
+  types.TDeletePromptGroupRequest
+>;
 
-export type UpdatePromptLabelOptions = MutationOptions<types.TUpdatePromptLabelsResponse, types.TUpdatePromptLabelsRequest>;
+export type UpdatePromptLabelOptions = MutationOptions<
+  types.TUpdatePromptLabelsResponse,
+  types.TUpdatePromptLabelsRequest
+>;
 
-export type MakePromptProductionOptions = MutationOptions<types.TMakePromptProductionResponse, types.TMakePromptProductionRequest>;
+export type MakePromptProductionOptions = MutationOptions<
+  types.TMakePromptProductionResponse,
+  types.TMakePromptProductionRequest
+>;
 
 /* Auth mutations */
 export type VerifyEmailOptions = MutationOptions<types.VerifyEmailResponse, types.TVerifyEmail>;
