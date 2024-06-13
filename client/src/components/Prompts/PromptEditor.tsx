@@ -1,71 +1,66 @@
-import React, { useEffect, useState } from 'react';
 import { EditIcon } from 'lucide-react';
-import { Cross1Icon } from '@radix-ui/react-icons';
-import { Button, Textarea } from '../ui';
+import React, { useEffect, useRef, useState } from 'react';
+import { TextareaAutosize } from '~/components/ui';
+import { cn } from '~/utils';
 
 type Props = {
   type: string;
   prompt: string;
   onSave: (newPrompt: string) => void;
-  permanentEditMode?: boolean;
 };
 
-const PromptEditor: React.FC<Props> = ({ type, prompt, onSave, permanentEditMode = false }) => {
-  const [isEditing, setIsEditing] = useState(permanentEditMode);
+const PromptEditor: React.FC<Props> = ({ type, prompt, onSave }) => {
+  const [isEditing, setIsEditing] = useState(false);
   const [newPrompt, setNewPrompt] = useState(prompt);
-
-  const handleEditClick = (input: boolean) => {
-    if (permanentEditMode) {
-      input = true;
-    }
-    setIsEditing(input);
-  };
+  const prevIsEditingRef = useRef(isEditing);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setNewPrompt(e.target.value);
-    if (permanentEditMode) {
-      onSave(e.target.value);
-    }
-  };
-
-  const handleSaveClick = () => {
-    onSave(newPrompt || '');
-    setIsEditing(false);
   };
 
   useEffect(() => {
     setNewPrompt(prompt);
   }, [type, prompt]);
 
+  useEffect(() => {
+    if (prevIsEditingRef.current && !isEditing) {
+      onSave(newPrompt);
+    }
+    prevIsEditingRef.current = isEditing;
+  }, [isEditing, newPrompt, onSave]);
+
   return (
     <div>
-      <h2 className="flex w-full items-center justify-between rounded-t-lg border border-gray-300 pl-4 pr-1 text-base font-semibold">
+      <h2 className="flex items-center justify-between rounded-t-lg border border-gray-300 py-2 pl-4 pr-1 text-base font-semibold">
         {type} prompt
-        {isEditing ? (
-          <Cross1Icon onClick={() => handleEditClick(false)} className="cursor-pointer" />
-        ) : (
-          <EditIcon className="size-4 cursor-pointer" onClick={() => handleEditClick(true)} />
-        )}
+        <EditIcon
+          onClick={() => setIsEditing((prev) => !prev)}
+          className={cn(
+            'icon-lg mr-2 cursor-pointer',
+            isEditing ? '' : 'text-gray-400 hover:text-gray-600',
+          )}
+        />
       </h2>
-      {isEditing ? (
-        <div className="mb-4 rounded-b-lg border border-gray-300 p-4">
-          <Textarea
-            className="mb-2 w-full rounded border border-gray-300 p-2"
+      <div
+        className={cn(
+          'mb-4 min-h-32 rounded-b-lg border border-gray-300 p-4 transition-all duration-150',
+          { 'cursor-pointer hover:bg-gray-100/50': !isEditing },
+        )}
+        onClick={() => !isEditing && setIsEditing(true)}
+      >
+        {isEditing ? (
+          <TextareaAutosize
+            className="w-full rounded border border-gray-300 px-2 py-1"
             value={newPrompt}
             defaultValue={prompt}
             onChange={handleInputChange}
+            onBlur={() => setIsEditing(false)}
+            minRows={3}
           />
-          {permanentEditMode ? null : (
-            <div className="flex w-full justify-end">
-              <Button onClick={handleSaveClick} className="content-end">
-                Save
-              </Button>
-            </div>
-          )}
-        </div>
-      ) : (
-        <p className="mb-4 rounded-b-lg border border-gray-300 p-4">{prompt}</p>
-      )}
+        ) : (
+          <span className="block px-2 py-1">{prompt}</span>
+        )}
+      </div>
     </div>
   );
 };

@@ -929,9 +929,9 @@ export const useCreatePrompt = (
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (payload: t.TCreatePrompt) => dataService.createPrompt(payload),
-    onMutate: async (variables) => {
+    onMutate: (variables) => {
       if (options?.onMutate) {
-        await options.onMutate(variables);
+        options.onMutate(variables);
       }
     },
     onError: (error, variables, context) => {
