@@ -67,11 +67,11 @@ export default function PromptsView() {
                 className="max-w-sm dark:border-gray-500"
               />
             </div>
-            <div className="w-fit">
+            {/* <div className="w-fit">
               <Button variant="default" className="m-0 mr-2 px-4">
                 Upload CSV
               </Button>
-            </div>
+            </div> */}
           </div>
           {!groupsQuery.isLoading && <PromptSidePanel prompts={promptGroups} />}
           <div className="mx-2 mt-2 flex justify-between">
