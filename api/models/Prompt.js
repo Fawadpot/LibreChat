@@ -107,14 +107,11 @@ module.exports = {
    */
   getPromptGroups: async (filter) => {
     try {
-      const { pageNumber, pageSize, name, isActive } = filter;
+      const { pageNumber, pageSize, name } = filter;
 
       const query = {};
       if (name) {
         query.name = new RegExp(name, 'i');
-      }
-      if (isActive !== undefined) {
-        query.isActive = isActive;
       }
 
       const promptGroups = await PromptGroup.find(query)
@@ -188,7 +185,7 @@ module.exports = {
         throw new Error('Prompt group not found');
       }
 
-      return { promptGroup: updatedDoc };
+      return updatedDoc;
     } catch (error) {
       logger.error('Error updating prompt group', error);
       return { message: 'Error updating prompt group' };

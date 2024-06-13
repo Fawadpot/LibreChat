@@ -8,7 +8,6 @@ const Schema = mongoose.Schema;
  * @property {ObjectId} author - The author of the prompt group
  * @property {ObjectId} [projectId=null] - The project ID of the prompt group
  * @property {string} authorName - The name of the author of the prompt group
- * @property {boolean} [isActive=true] - Whether the prompt group is active
  * @property {number} [numberOfGenerations=0] - Number of generations the prompt group has
  * @property {string} [oneliner=''] - Oneliner description of the prompt group
  * @property {string} [category=''] - Category of the prompt group
@@ -23,10 +22,6 @@ const promptGroupSchema = new Schema(
       type: String,
       required: true,
       unique: true,
-    },
-    isActive: {
-      type: Boolean,
-      default: true,
     },
     numberOfGenerations: {
       type: Number,

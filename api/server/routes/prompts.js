@@ -93,16 +93,13 @@ router.post('/', createPrompt);
  * @param {object} req
  * @param {object} req.params - The request parameters
  * @param {string} req.params.groupId - The group ID
- * @param {object} req.body - The request body
- * @param {string} req.body.name - The group name
- * @param {boolean} [req.body.isActive] - Whether the group is active
+ * @param {Partial<TPromptGroup>} req.body - The request body
  * @param {Express.Response} res
  */
 const patchPromptGroup = async (req, res) => {
   try {
     const { groupId } = req.params;
-    const { name, isActive = false } = req.body;
-    const promptGroup = await updatePromptGroup({ _id: groupId }, { name, isActive });
+    const promptGroup = await updatePromptGroup({ _id: groupId }, req.body);
     res.status(200).send(promptGroup);
   } catch (error) {
     console.error(error);

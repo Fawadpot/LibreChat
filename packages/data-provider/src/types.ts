@@ -339,7 +339,6 @@ export type TPrompt = {
 
 export type TPromptGroup = {
   name: string;
-  isActive?: boolean;
   numberOfGenerations?: number;
   oneliner?: string;
   category?: string;
@@ -372,7 +371,6 @@ export type TPromptGroupsWithFilterRequest = {
   after?: string | null;
   order?: 'asc' | 'desc';
   name?: string;
-  isActive?: boolean;
 };
 
 export type PromptGroupListResponse = {
@@ -391,7 +389,6 @@ export type TCreatePromptResponse = {
 
 export type TUpdatePromptGroupPayload = {
   name: string;
-  isActive?: boolean;
 };
 
 export type TUpdatePromptGroupVariables = {

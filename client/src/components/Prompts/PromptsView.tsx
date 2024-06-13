@@ -16,7 +16,6 @@ export default function PromptsView() {
     pageSize,
     pageNumber: pageNumber + '',
     name,
-    isActive: true,
   });
 
   const promptGroups = useMemo(() => {

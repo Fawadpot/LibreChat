@@ -110,7 +110,10 @@ const PromptPreview = () => {
         <PromptName
           name={group?.name}
           onSave={(value) => {
-            updateGroupMutation.mutate({ id: group?._id || '', payload: { name: value } });
+            if (!group) {
+              return console.warn('Group not found');
+            }
+            updateGroupMutation.mutate({ id: group._id || '', payload: { name: value } });
           }}
         />
         <div className="flex flex-row gap-x-2">
