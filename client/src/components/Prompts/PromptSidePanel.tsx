@@ -22,7 +22,7 @@ export default function PromptSidePanel({ prompts }: { prompts?: TPromptGroup[] 
           className="mx-2 w-full px-3"
           onClick={() => navigate('/d/prompts/new')}
         >
-          + Add new Prompt
+          + Create Prompt
         </Button>
       </div>
       <div className="mt-3 flex-grow overflow-y-auto">
