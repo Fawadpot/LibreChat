@@ -1,20 +1,27 @@
 import {
   EToolResources,
   LocalStorageKeys,
+  InfiniteCollections,
   defaultAssistantsVersion,
 } from 'librechat-data-provider';
 import { useSetRecoilState } from 'recoil';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { dataService, MutationKeys, QueryKeys, defaultOrderQuery } from 'librechat-data-provider';
-import type { UseMutationResult } from '@tanstack/react-query';
+import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
 import type t from 'librechat-data-provider';
 import {
+  /* Shared Links */
   addSharedLink,
-  addConversation,
   deleteSharedLink,
+  /* Conversations */
+  addConversation,
   updateConvoFields,
   updateConversation,
   deleteConversation,
+  /* Prompts */
+  addPromptGroup,
+  updatePromptGroup,
+  deletePromptGroup,
 } from '~/utils';
 import { useConversationsInfiniteQuery, useSharedLinksInfiniteQuery } from './queries';
 import { normalizeData } from '~/utils/collection';
@@ -174,7 +181,7 @@ export const useCreateSharedLinkMutation = (
           vars.isPublic
             ? addSharedLink(sharedLink, _data)
             : deleteSharedLink(sharedLink, _data.shareId),
-          'sharedLinks',
+          InfiniteCollections.SHARED_LINKS,
           pageSize,
         );
       });
@@ -216,7 +223,7 @@ export const useUpdateSharedLinkMutation = (
           // Therefore, when isPublic is true, use addSharedLink instead of updateSharedLink.
             addSharedLink(sharedLink, _data)
             : deleteSharedLink(sharedLink, _data.shareId),
-          'sharedLinks',
+          InfiniteCollections.SHARED_LINKS,
           sharedLink.pages[0].pageSize as number,
         );
       });
@@ -254,7 +261,7 @@ export const useDeleteSharedLinkMutation = (
         }
         return normalizeData(
           deleteSharedLink(data, vars.shareId),
-          'sharedLinks',
+          InfiniteCollections.SHARED_LINKS,
           data.pages[0].pageSize as number,
         );
       });
@@ -876,6 +883,178 @@ export const useDeleteAction = (
       );
 
       return options?.onSuccess?.(_data, variables, context);
+    },
+  });
+};
+
+export const useUpdatePromptGroup = (
+  options?: t.UpdatePromptGroupOptions,
+): UseMutationResult<
+  t.TUpdatePromptGroupResponse,
+  unknown,
+  t.TUpdatePromptGroupVariables,
+  unknown
+> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (variables: t.TUpdatePromptGroupVariables) =>
+      dataService.updatePromptGroup(variables),
+    onMutate: async (variables) => {
+      options?.onMutate?.(variables);
+    },
+    onError: (error, variables, context) => {
+      options?.onError?.(error, variables, context);
+    },
+    onSuccess: (response, variables, context) => {
+      queryClient.setQueryData([QueryKeys.promptGroup, variables?.id], response);
+      queryClient.setQueryData<t.PromptGroupListData>([QueryKeys.promptGroups], (data) => {
+        if (!data) {
+          return data;
+        }
+        const pageSize = data.pages[0].pageSize as number;
+        return normalizeData(
+          updatePromptGroup(data, response),
+          InfiniteCollections.PROMPT_GROUPS,
+          pageSize,
+        );
+      });
+      options?.onSuccess?.(response, variables, context);
+    },
+  });
+};
+
+export const useCreatePrompt = (
+  options?: t.CreatePromptOptions,
+): UseMutationResult<t.TCreatePromptResponse, unknown, t.TCreatePrompt, unknown> => {
+  const queryClient = useQueryClient();
+  const { onSuccess, ...rest } = options || {};
+  return useMutation({
+    mutationFn: (payload: t.TCreatePrompt) => dataService.createPrompt(payload),
+    ...rest,
+    onSuccess: (response, variables, context) => {
+      const { prompt, group } = response;
+      queryClient.setQueryData(
+        [QueryKeys.prompts, variables?.prompt?.groupId],
+        (oldData: t.TPrompt[] | undefined) => {
+          return [prompt, ...(oldData ?? [])];
+        },
+      );
+
+      if (group) {
+        queryClient.setQueryData<t.PromptGroupListData>([QueryKeys.promptGroups], (data) => {
+          if (!data) {
+            return data;
+          }
+          const pageSize = data.pages[0].pageSize as number;
+          return normalizeData(
+            addPromptGroup(data, group),
+            InfiniteCollections.PROMPT_GROUPS,
+            pageSize,
+          );
+        });
+      }
+
+      if (onSuccess) {
+        onSuccess(response, variables, context);
+      }
+    },
+  });
+};
+
+export const useDeletePrompt = (
+  options?: UseMutationOptions<unknown, unknown, t.DeletePromptVariables>,
+) => {
+  const queryClient = useQueryClient();
+  const { onSuccess, ...rest } = options || {};
+  return useMutation<unknown, unknown, t.DeletePromptVariables>({
+    mutationFn: ({ _id }) => dataService.deletePrompt(_id),
+    ...rest,
+    onSuccess: (response, variables, context) => {
+      queryClient.setQueryData<t.TPrompt[]>([QueryKeys.prompts], (oldData?: t.TPrompt[]) => {
+        return oldData ? oldData.filter((prompt) => prompt._id !== variables._id) : [];
+      });
+      if (onSuccess) {
+        onSuccess(response, variables, context);
+      }
+    },
+  });
+};
+
+export const useDeletePromptGroup = (
+  options?: t.DeletePromptGroupOptions,
+): UseMutationResult<
+  t.TDeletePromptGroupResponse,
+  unknown,
+  t.TDeletePromptGroupRequest,
+  unknown
+> => {
+  const queryClient = useQueryClient();
+  const { onSuccess, ...rest } = options || {};
+  return useMutation({
+    mutationFn: (variables: t.TDeletePromptGroupRequest) =>
+      dataService.deletePromptGroup(variables.id),
+    ...rest,
+    onSuccess: (response, variables, context) => {
+      queryClient.setQueryData<t.PromptGroupListData>([QueryKeys.promptGroups], (data) => {
+        if (!data) {
+          return data;
+        }
+        const pageSize = data.pages[0].pageSize as number;
+        return normalizeData(
+          deletePromptGroup(data, variables.id),
+          InfiniteCollections.PROMPT_GROUPS,
+          pageSize,
+        );
+      });
+      if (onSuccess) {
+        onSuccess(response, variables, context);
+      }
+    },
+  });
+};
+
+export const useUpdatePromptLabels = (
+  options?: t.UpdatePromptLabelOptions,
+): UseMutationResult<
+  t.TUpdatePromptLabelsResponse,
+  unknown,
+  t.TUpdatePromptLabelsRequest,
+  unknown
+> => {
+  const queryClient = useQueryClient();
+  const { onSuccess, ...rest } = options || {};
+  return useMutation({
+    mutationFn: (variables: t.TUpdatePromptLabelsRequest) =>
+      dataService.updatePromptLabels(variables),
+    ...rest,
+    onSuccess: (response, variables, context) => {
+      queryClient.invalidateQueries([QueryKeys.prompts]);
+      if (onSuccess) {
+        onSuccess(response, variables, context);
+      }
+    },
+  });
+};
+
+export const useMakePromptProduction = (
+  options?: t.MakePromptProductionOptions,
+): UseMutationResult<
+  t.TMakePromptProductionResponse,
+  unknown,
+  t.TMakePromptProductionRequest,
+  unknown
+> => {
+  const queryClient = useQueryClient();
+  const { onSuccess, ...rest } = options || {};
+  return useMutation({
+    mutationFn: (variables: t.TMakePromptProductionRequest) =>
+      dataService.makePromptProduction(variables.id),
+    ...rest,
+    onSuccess: (response, variables, context) => {
+      queryClient.invalidateQueries([QueryKeys.prompts]);
+      if (onSuccess) {
+        onSuccess(response, variables, context);
+      }
     },
   });
 };

@@ -110,6 +110,34 @@ export type UpdateSharedLinkOptions = MutationOptions<
 >;
 export type DeleteSharedLinkOptions = MutationOptions<types.TSharedLink, { shareId: string }>;
 
+export type UpdatePromptGroupOptions = MutationOptions<
+  types.TUpdatePromptGroupResponse,
+  types.TUpdatePromptGroupVariables
+>;
+
+export type CreatePromptOptions = MutationOptions<types.TCreatePromptResponse, types.TCreatePrompt>;
+
+export type DeletePromptVariables = {
+  _id: string;
+};
+
+export type DeletePromptOptions = MutationOptions<unknown, DeletePromptVariables>;
+
+export type DeletePromptGroupOptions = MutationOptions<
+  types.TDeletePromptGroupResponse,
+  types.TDeletePromptGroupRequest
+>;
+
+export type UpdatePromptLabelOptions = MutationOptions<
+  types.TUpdatePromptLabelsResponse,
+  types.TUpdatePromptLabelsRequest
+>;
+
+export type MakePromptProductionOptions = MutationOptions<
+  types.TMakePromptProductionResponse,
+  types.TMakePromptProductionRequest
+>;
+
 /* Auth mutations */
 export type VerifyEmailOptions = MutationOptions<types.VerifyEmailResponse, types.TVerifyEmail>;
 export type ResendVerifcationOptions = MutationOptions<

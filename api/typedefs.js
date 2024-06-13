@@ -248,6 +248,60 @@
  * @memberof typedefs
  */
 
+/** Prompts */
+/**
+ * @exports TPrompt
+ * @typedef {import('librechat-data-provider').TPrompt} TPrompt
+ * @memberof typedefs
+ */
+
+/**
+ * @exports TPromptGroup
+ * @typedef {import('librechat-data-provider').TPromptGroup} TPromptGroup
+ * @memberof typedefs
+ */
+
+/**
+ * @exports TCreatePrompt
+ * @typedef {import('librechat-data-provider').TCreatePrompt} TCreatePrompt
+ * @memberof typedefs
+ */
+
+/**
+ * @exports TCreatePromptRecord
+ * @typedef {import('librechat-data-provider').TCreatePromptRecord} TCreatePromptRecord
+ * @memberof typedefs
+ */
+/**
+ * @exports TCreatePromptResponse
+ * @typedef {import('librechat-data-provider').TCreatePromptResponse} TCreatePromptResponse
+ * @memberof typedefs
+ */
+/**
+ * @exports TUpdatePromptGroupResponse
+ * @typedef {import('librechat-data-provider').TUpdatePromptGroupResponse} TUpdatePromptGroupResponse
+ * @memberof typedefs
+ */
+
+/**
+ * @exports TPromptGroupsWithFilterRequest
+ * @typedef {import('librechat-data-provider').TPromptGroupsWithFilterRequest } TPromptGroupsWithFilterRequest
+ * @memberof typedefs
+ */
+
+/**
+ * @exports PromptGroupListResponse
+ * @typedef {import('librechat-data-provider').PromptGroupListResponse } PromptGroupListResponse
+ * @memberof typedefs
+ */
+
+/**
+ * @exports TGetCategoriesResponse
+ * @typedef {import('librechat-data-provider').TGetCategoriesResponse } TGetCategoriesResponse
+ * @memberof typedefs
+ */
+
+/** Assistants */
 /**
  * @exports Assistant
  * @typedef {import('librechat-data-provider').Assistant} Assistant
@@ -497,6 +551,12 @@
 /**
  * @exports MongoUser
  * @typedef {import('~/models/schema/userSchema.js').MongoUser} MongoUser
+ * @memberof typedefs
+ */
+
+/**
+ * @exports MongoPromptGroup
+ * @typedef {import('~/models/schema/promptSchema.js').MongoPromptGroup} MongoPromptGroup
  * @memberof typedefs
  */
 

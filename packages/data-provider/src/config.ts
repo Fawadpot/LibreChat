@@ -586,6 +586,20 @@ export function validateVisionModel({
 export const imageGenTools = new Set(['dalle', 'dall-e', 'stable-diffusion']);
 
 /**
+ * Enum for collections using infinite queries
+ */
+export enum InfiniteCollections {
+  /**
+   * Collection for Prompt Groups
+   */
+  PROMPT_GROUPS = 'promptGroups',
+  /**
+   * Collection for Shared Links
+   */
+  SHARED_LINKS = 'sharedLinks',
+}
+
+/**
  * Enum for cache keys.
  */
 export enum CacheKeys {

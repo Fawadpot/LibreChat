@@ -1,11 +1,12 @@
 import OpenAI from 'openai';
+import type { InfiniteData } from '@tanstack/react-query';
 import type {
-  TResPlugin,
   TMessage,
-  TConversation,
-  EModelEndpoint,
+  TResPlugin,
   ImageDetail,
   TSharedLink,
+  TConversation,
+  EModelEndpoint,
 } from './schemas';
 import type { TSpecsConfig } from './models';
 export type TOpenAIMessage = OpenAI.Chat.ChatCompletionMessageParam;
@@ -72,6 +73,12 @@ export type TUpdateUserPlugins = {
   pluginKey: string;
   action: string;
   auth?: unknown;
+};
+
+export type TCategory = {
+  id?: string;
+  value: string;
+  label: string;
 };
 
 export type TError = {
@@ -321,3 +328,112 @@ export type TImportResponse = {
    */
   message: string;
 };
+
+/** Prompts */
+
+export type TPrompt = {
+  prompt: string;
+  type: 'text' | 'chat';
+  groupId: string;
+  isProduction?: boolean;
+  config?: object;
+  createdAt: string;
+  updatedAt: string;
+  author: string;
+  _id?: string;
+};
+
+export type TPromptGroup = {
+  name: string;
+  numberOfGenerations?: number;
+  oneliner?: string;
+  category?: string;
+  projectId?: string | null;
+  author: string;
+  authorName: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+  _id?: string;
+};
+
+export type TCreatePrompt = {
+  prompt: Pick<TPrompt, 'prompt' | 'type'> & { groupId?: string };
+  group?: { name: string };
+};
+
+export type TCreatePromptRecord = TCreatePrompt & Pick<TPromptGroup, 'author' | 'authorName'>;
+
+export type TPromptsWithFilterRequest = {
+  groupId: string;
+  tags?: string[];
+  projectId?: string;
+  version?: number;
+};
+
+export type TPromptGroupsWithFilterRequest = {
+  pageNumber: string;
+  pageSize: string | number;
+  before?: string | null;
+  after?: string | null;
+  order?: 'asc' | 'desc';
+  name?: string;
+};
+
+export type PromptGroupListResponse = {
+  promptGroups: TPromptGroup[];
+  pageNumber: string;
+  pageSize: string | number;
+  pages: string | number;
+};
+
+export type PromptGroupListData = InfiniteData<PromptGroupListResponse>;
+
+export type TCreatePromptResponse = {
+  prompt: TPrompt;
+  group?: TPromptGroup;
+};
+
+export type TUpdatePromptGroupPayload = {
+  name: string;
+  category?: string;
+};
+
+export type TUpdatePromptGroupVariables = {
+  id: string;
+  payload: TUpdatePromptGroupPayload;
+};
+
+export type TUpdatePromptGroupResponse = TPromptGroup;
+
+export type TDeletePromptResponse = {
+  message: string;
+};
+
+export type TMakePromptProductionResponse = {
+  message: string;
+};
+
+export type TMakePromptProductionRequest = {
+  id: string;
+};
+
+export type TUpdatePromptLabelsRequest = {
+  id: string;
+  payload: {
+    labels: string[];
+  };
+};
+
+export type TUpdatePromptLabelsResponse = {
+  message: string;
+};
+
+export type TDeletePromptGroupResponse = {
+  promptGroup: string;
+};
+
+export type TDeletePromptGroupRequest = {
+  id: string;
+};
+
+export type TGetCategoriesResponse = TCategory[];
