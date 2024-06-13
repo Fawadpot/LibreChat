@@ -135,7 +135,7 @@ const PromptPreview = () => {
         <div>
           <div className="flex flex-col items-center justify-between px-4 sm:flex-row">
             {isLoadingGroup ? (
-              <Skeleton className="mb-1 flex h-10 w-full flex-row items-center font-bold sm:text-xl md:mb-0 md:h-12 md:text-2xl" />
+              <Skeleton className="mb-1 flex h-10 w-32 flex-row items-center font-bold sm:text-xl md:mb-0 md:h-12 md:text-2xl" />
             ) : (
               <PromptName
                 name={group?.name}
@@ -175,30 +175,32 @@ const PromptPreview = () => {
                   />
                 )}
               />
-              {!isLoadingGroup && (
-                <>
-                  <Button variant={'default'} size={'sm'} className="h-10 w-10">
-                    <Share2Icon className="cursor-pointer" />
-                  </Button>
-                  <Button
-                    size={'sm'}
-                    variant={'default'}
-                    className="h-10"
-                    onClick={() => makeProductionMutation.mutate({ id: selectedPrompt?._id || '' })}
-                    disabled={selectedPrompt?.isProduction}
-                  >
-                    Make it Production
-                  </Button>
-                  <Button
-                    size={'sm'}
-                    variant={'default'}
-                    className="h-10 w-10"
-                    onClick={() => deletePromptGroupMutation.mutate({ id: group?._id || '' })}
-                  >
-                    <TrashIcon className="icon-lg cursor-pointer" />
-                  </Button>
-                </>
-              )}
+              <Button
+                variant={'default'}
+                size={'sm'}
+                className="h-10 w-10"
+                disabled={isLoadingGroup}
+              >
+                <Share2Icon className="cursor-pointer" />
+              </Button>
+              <Button
+                size={'sm'}
+                className="h-10"
+                variant={'default'}
+                onClick={() => makeProductionMutation.mutate({ id: selectedPrompt?._id || '' })}
+                disabled={isLoadingGroup || selectedPrompt?.isProduction}
+              >
+                Make it Production
+              </Button>
+              <Button
+                size={'sm'}
+                variant={'default'}
+                className="h-10 w-10"
+                disabled={isLoadingGroup}
+                onClick={() => deletePromptGroupMutation.mutate({ id: group?._id || '' })}
+              >
+                <TrashIcon className="icon-lg cursor-pointer" />
+              </Button>
             </div>
           </div>
           <div className="flex h-full w-full flex-col md:flex-row">

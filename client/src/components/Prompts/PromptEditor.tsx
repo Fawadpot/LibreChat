@@ -2,6 +2,7 @@ import { EditIcon } from 'lucide-react';
 import React, { useEffect } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { TextareaAutosize } from '~/components/ui';
+import { SaveIcon } from '~/components/svg';
 import { cn } from '~/utils';
 
 type Props = {
@@ -19,17 +20,20 @@ const PromptEditor: React.FC<Props> = ({ type, prompt, name, isEditing, setIsEdi
     setValue(name, prompt);
   }, [prompt, setValue, name]);
 
+  const EditorIcon = isEditing ? SaveIcon : EditIcon;
+
   return (
     <div>
       <h2 className="flex items-center justify-between rounded-t-lg border border-gray-300 py-2 pl-4 text-base font-semibold">
         {type} prompt
-        <EditIcon
-          onClick={() => setIsEditing((prev) => !prev)}
-          className={cn(
-            'icon-lg mr-2 cursor-pointer',
-            isEditing ? '' : 'text-gray-400 hover:text-gray-600',
-          )}
-        />
+        <button type="button" onClick={() => setIsEditing((prev) => !prev)} className="mr-2">
+          <EditorIcon
+            className={cn(
+              'icon-lg',
+              isEditing ? 'p-[0.05rem]' : 'text-gray-400 hover:text-gray-600',
+            )}
+          />
+        </button>
       </h2>
       <div
         className={cn(
@@ -51,7 +55,7 @@ const PromptEditor: React.FC<Props> = ({ type, prompt, name, isEditing, setIsEdi
                 onBlur={() => setIsEditing(false)}
               />
             ) : (
-              <span className="block px-2 py-1">{field.value}</span>
+              <span className="block break-words px-2 py-1">{field.value}</span>
             )
           }
         />
