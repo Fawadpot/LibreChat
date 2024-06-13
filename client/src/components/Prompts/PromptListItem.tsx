@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { TPromptGroup } from 'librechat-data-provider/dist/types';
 import { useDeletePromptGroup, useUpdatePromptGroup } from '~/data-provider';
 import DropDownMenu from '~/components/Conversations/DropDownMenu';
@@ -7,8 +7,10 @@ import HoverToggle from '~/components/Conversations/HoverToggle';
 import { RenameButton } from '~/components/Conversations';
 import { NewTrashIcon } from '~/components/svg';
 import { Button, Input } from '~/components/ui';
+import { cn } from '~/utils';
 
 export default function PromptListItem({ prompt }: { prompt: TPromptGroup }) {
+  const params = useParams();
   const navigate = useNavigate();
   const updateGroup = useUpdatePromptGroup();
   const [nameEditFlag, setNameEditFlag] = useState(false);
@@ -24,7 +26,10 @@ export default function PromptListItem({ prompt }: { prompt: TPromptGroup }) {
 
   return (
     <div
-      className="w-100 mx-2 my-3 flex cursor-pointer flex-row rounded-md border-0 bg-white p-4 transition duration-300 ease-in-out hover:bg-gray-100"
+      className={cn(
+        'w-100 mx-2 my-3 flex cursor-pointer flex-row rounded-md border-0 bg-white p-4 transition-all duration-300 ease-in-out hover:bg-gray-100',
+        params.promptId === prompt._id && 'bg-gray-100/50',
+      )}
       onClick={() => {
         navigate(`/d/prompts/${prompt._id}`, { replace: true });
       }}

@@ -7,9 +7,10 @@ type Props = {
 };
 
 const PromptName: React.FC<Props> = ({ name, onSave }) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const blurTimeoutRef = useRef<NodeJS.Timeout>();
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState(name);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -25,14 +26,13 @@ const PromptName: React.FC<Props> = ({ name, onSave }) => {
     setIsEditing(false);
   };
 
-  const handleSaveClick: React.MouseEventHandler<HTMLButtonElement> = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleSaveClick: React.MouseEventHandler<HTMLButtonElement> = () => {
     saveName();
+    clearTimeout(blurTimeoutRef.current);
   };
 
   const handleBlur = () => {
-    setTimeout(() => {
+    blurTimeoutRef.current = setTimeout(() => {
       if (document.activeElement !== inputRef.current) {
         setIsEditing(false);
         setNewName(name);
