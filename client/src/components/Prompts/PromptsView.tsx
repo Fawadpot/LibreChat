@@ -36,14 +36,15 @@ export default function PromptsView() {
       <div className="flex w-full flex-row justify-between p-2">
         {isDetailView && (
           <Button
-            className="block lg:hidden"
+            className="mx-2 flex gap-2 lg:hidden"
             variant={'outline'}
             size={'sm'}
             onClick={() => {
               navigate('/d/prompts');
             }}
           >
-            Go back
+            <MessageSquareQuote className="h-5 w-5 text-gray-500" />
+            Prompts
           </Button>
         )}
       </div>
