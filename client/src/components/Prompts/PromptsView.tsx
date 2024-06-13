@@ -4,6 +4,7 @@ import { ListFilter } from 'lucide-react';
 import { usePromptGroupsInfiniteQuery } from '~/data-provider';
 import { Button, Input } from '~/components/ui';
 import PromptSidePanel from './PromptSidePanel';
+import { cn } from '~/utils';
 
 export default function PromptsView() {
   const params = useParams();
@@ -31,7 +32,7 @@ export default function PromptsView() {
   const isDetailView = params.promptId || params['*'] === 'new';
 
   return (
-    <div className="h-screen w-full bg-[#f9f9f9] p-0 lg:p-7">
+    <div className="flex h-screen w-full flex-col bg-[#f9f9f9] p-0 lg:p-7">
       <div className="flex w-full flex-row justify-between p-2">
         {isDetailView && (
           <Button
@@ -46,11 +47,12 @@ export default function PromptsView() {
           </Button>
         )}
       </div>
-      <div className="flex w-full flex-row divide-x">
+      <div className="flex w-full flex-grow flex-row divide-x overflow-hidden">
         <div
-          className={`mr-2 w-full lg:w-1/4 xl:w-1/4 ${
-            isDetailView ? 'hidden lg:block' : 'md:w-full'
-          }`}
+          className={cn(
+            'mr-2 flex w-full flex-col overflow-y-auto lg:w-1/4 xl:w-1/4 ',
+            isDetailView ? 'hidden lg:block' : 'md:w-full',
+          )}
         >
           <h2 className="m-3 text-center text-lg lg:text-left">
             <strong>Prompts</strong>
@@ -68,7 +70,9 @@ export default function PromptsView() {
               />
             </div>
           </div>
-          {!groupsQuery.isLoading && <PromptSidePanel prompts={promptGroups} />}
+          <div className="flex-grow overflow-y-auto">
+            {!groupsQuery.isLoading && <PromptSidePanel prompts={promptGroups} />}
+          </div>
           <div className="mx-2 mt-2 flex justify-between">
             <Button
               variant={'outline'}
@@ -87,7 +91,7 @@ export default function PromptsView() {
           </div>
         </div>
         <div
-          className={`h-auto w-full lg:w-3/4 xl:w-3/4 ${
+          className={`w-full overflow-y-auto lg:w-3/4 xl:w-3/4 ${
             isDetailView ? 'block' : 'hidden md:block'
           }`}
         >
