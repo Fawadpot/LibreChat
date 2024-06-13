@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
+import { ListFilter, MessageSquareQuote } from 'lucide-react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
-import { ListFilter } from 'lucide-react';
 import { usePromptGroupsInfiniteQuery } from '~/data-provider';
 import { Button, Input } from '~/components/ui';
 import PromptSidePanel from './PromptSidePanel';
@@ -54,7 +54,8 @@ export default function PromptsView() {
             isDetailView ? 'hidden lg:block' : 'md:w-full',
           )}
         >
-          <h2 className="m-3 text-center text-lg lg:text-left">
+          <h2 className="m-3 flex items-center gap-x-2 text-center text-lg lg:text-left">
+            <MessageSquareQuote className="h-5 w-5 text-gray-500" />
             <strong>Prompts</strong>
           </h2>
           <div className="flex w-full flex-row justify-between">
@@ -91,9 +92,10 @@ export default function PromptsView() {
           </div>
         </div>
         <div
-          className={`w-full overflow-y-auto lg:w-3/4 xl:w-3/4 ${
-            isDetailView ? 'block' : 'hidden md:block'
-          }`}
+          className={cn(
+            'w-full overflow-y-auto lg:w-3/4 xl:w-3/4',
+            isDetailView ? 'block' : 'hidden md:block',
+          )}
         >
           <Outlet />
         </div>
