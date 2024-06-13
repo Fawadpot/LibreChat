@@ -4,6 +4,7 @@ export * from './files';
 export * from './latex';
 export * from './convos';
 export * from './presets';
+export * from './prompts';
 export * from './textarea';
 export * from './messages';
 export * from './languages';
