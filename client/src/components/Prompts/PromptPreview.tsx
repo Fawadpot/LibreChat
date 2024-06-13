@@ -1,6 +1,6 @@
+import { format } from 'date-fns';
 import { useEffect, useState } from 'react';
-import { TrashIcon } from 'lucide-react';
-import { Share2Icon } from 'lucide-react';
+import { TrashIcon, Share2Icon } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { TPrompt, TCreatePrompt } from 'librechat-data-provider';
 import {
@@ -10,7 +10,7 @@ import {
   useMakePromptProduction,
 } from '~/data-provider/mutations';
 import { useGetPromptGroup, useGetPrompts } from '~/data-provider';
-import { extractUniqueVariables, formatDateTime } from '~/utils';
+import { extractUniqueVariables } from '~/utils';
 import PromptEditor from './PromptEditor';
 import { Button } from '~/components/ui';
 import PromptName from './PromptName';
@@ -82,9 +82,9 @@ const PromptPreview = () => {
           </Button>
         </div>
       </div>
-      <div className="flex h-screen w-full flex-col md:flex-row">
+      <div className="flex h-full w-full flex-col md:flex-row">
         {/* Left Section */}
-        <div className="w-full border-r border-gray-300 p-4 md:w-2/3">
+        <div className="flex-1 overflow-y-auto border-r border-gray-300 p-4 md:w-full">
           <PromptEditor
             type={selectedPrompt?.type || ''}
             prompt={selectedPrompt?.prompt || ''}
@@ -116,33 +116,35 @@ const PromptPreview = () => {
           </div>
         </div>
         {/* Right Section */}
-        {!!prompts?.length && (
-          <div className="w-full p-4 md:w-1/3">
-            <h2 className="mb-4 text-base font-semibold">Versions</h2>
-            <ul>
-              {prompts?.map((prompt, index) => (
-                <li
-                  key={index}
-                  className={`mb-4 cursor-pointer rounded-lg border p-4 ${
-                    prompt === selectedPrompt ? 'bg-gray-100' : 'bg-white'
-                  }`}
-                  onClick={() => {
-                    setSelectedPrompt(prompt);
-                    setSelectedPromptIndex(index);
-                    setVariables(extractUniqueVariables(prompt.prompt));
-                  }}
-                >
-                  {/* <p className="font-bold">Version: {prompt.version}</p> */}
-                  {/* <p className="italic">Tags: {prompt.tags.join(', ')}</p> */}
-                  <p className="text-xs text-gray-600">{formatDateTime(prompt.createdAt)}</p>
-                  {group?.authorName && (
-                    <p className="text-xs text-gray-600">by {group.authorName}</p>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        <div className="flex-1 overflow-y-auto p-4 md:max-w-[35%] lg:max-w-[30%] xl:max-w-[25%]">
+          {!!prompts.length && (
+            <>
+              <h2 className="mb-4 text-base font-semibold">Versions</h2>
+              <ul className="flex flex-col gap-3">
+                {prompts.map((prompt, index) => (
+                  <li
+                    key={index}
+                    className={`cursor-pointer rounded-lg border p-4 ${
+                      prompt === selectedPrompt ? 'bg-gray-100' : 'bg-white'
+                    }`}
+                    onClick={() => {
+                      setSelectedPrompt(prompt);
+                      setSelectedPromptIndex(index);
+                      setVariables(extractUniqueVariables(prompt.prompt));
+                    }}
+                  >
+                    <p className="text-xs text-gray-600">
+                      {format(new Date(prompt.createdAt), 'yyyy-MM-dd HH:mm')}
+                    </p>
+                    {group?.authorName && (
+                      <p className="text-xs text-gray-600">by {group.authorName}</p>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

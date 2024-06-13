@@ -28,10 +28,12 @@ export default function PromptsView() {
     }
   };
 
+  const isDetailView = params.promptId || params['*'] === 'new';
+
   return (
     <div className="w-full bg-[#f9f9f9] p-0 lg:p-7">
       <div className="flex w-full flex-row justify-between p-2">
-        {params?.promptId || params['*'] === 'new' ? (
+        {isDetailView && (
           <Button
             className="block lg:hidden"
             variant={'outline'}
@@ -42,14 +44,12 @@ export default function PromptsView() {
           >
             Go back
           </Button>
-        ) : null}
+        )}
       </div>
       <div className="flex w-full flex-row divide-x">
         <div
-          className={`mr-2 w-full xl:w-1/3 ${
-            params.promptId || params['*'] === 'new'
-              ? 'hidden w-2/5 lg:block lg:w-2/5'
-              : 'md:w-full'
+          className={`mr-2 w-full lg:w-1/4 xl:w-1/4 ${
+            isDetailView ? 'hidden lg:block' : 'md:w-full'
           }`}
         >
           <h2 className="m-3 text-center text-lg lg:text-left">
@@ -73,7 +73,7 @@ export default function PromptsView() {
               </Button>
             </div>
           </div>
-          {groupsQuery.isLoading ? null : <PromptSidePanel prompts={promptGroups} />}
+          {!groupsQuery.isLoading && <PromptSidePanel prompts={promptGroups} />}
           <div className="mx-2 mt-2 flex justify-between">
             <Button
               variant={'outline'}
@@ -92,8 +92,8 @@ export default function PromptsView() {
           </div>
         </div>
         <div
-          className={`h-[90vh] w-full overflow-y-auto xl:w-2/3 ${
-            params.promptId || params['*'] === 'new' ? 'lg:w-3/5' : 'hidden md:w-3/5 lg:block'
+          className={`h-auto w-full lg:w-3/4 xl:w-3/4 ${
+            isDetailView ? 'block' : 'hidden md:block'
           }`}
         >
           <Outlet />
