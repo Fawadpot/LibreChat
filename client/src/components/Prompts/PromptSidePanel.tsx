@@ -19,7 +19,7 @@ export default function PromptSidePanel({ prompts }: { prompts?: TPromptGroup[] 
       <div className="flex w-full justify-end">
         <Button
           variant="outline"
-          className="m-0 mr-2 w-full px-3"
+          className="mx-2 w-full px-3"
           onClick={() => navigate('/d/prompts/new')}
         >
           + Add new Prompt

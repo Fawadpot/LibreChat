@@ -24,7 +24,7 @@ const PromptPreview = () => {
             </label>
           ))
         ) : (
-          <label className="rounded-full border px-2">No variables</label>
+          <label className="mb-1 mr-1 rounded-full border px-2">No variables</label>
         )}
       </div>
     </>
