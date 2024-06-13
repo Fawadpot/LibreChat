@@ -110,8 +110,14 @@ const patchPromptGroup = async (req, res) => {
 router.patch('/groups/:groupId', patchPromptGroup);
 
 router.patch('/:promptId/tags/production', async (req, res) => {
-  const { promptId } = req.params;
-  res.status(200).send(await makePromptProduction(promptId));
+  try {
+    const { promptId } = req.params;
+    const result = await makePromptProduction(promptId);
+    res.status(200).send(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: 'Error updating prompt production' });
+  }
 });
 
 router.patch('/:promptId/labels', async (req, res) => {

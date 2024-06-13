@@ -191,29 +191,27 @@ module.exports = {
       return { message: 'Error updating prompt group' };
     }
   },
+  /**
+   * Function to make a prompt production based on its ID.
+   * @param {String} promptId - The ID of the prompt to make production.
+   * @returns {Object} The result of the production operation.
+   */
   makePromptProduction: async (promptId) => {
     try {
-      const prompt = await Prompt.findOne({ _id: promptId });
+      const prompt = await Prompt.findById(promptId).lean();
+
       if (!prompt) {
         throw new Error('Prompt not found');
       }
 
-      if (!prompt.tags.includes('production')) {
-        prompt.tags.push('production');
+      if (!prompt.isProduction) {
+        await Prompt.findOneAndUpdate({ _id: promptId }, { $set: { isProduction: true } });
       }
 
-      const remainingPrompts = await Prompt.find({ groupId: prompt.groupId }).sort({
-        createdAt: 1,
-      });
-
-      for (let i = 0; i < remainingPrompts.length; i++) {
-        if (remainingPrompts[i].tags.includes('production')) {
-          remainingPrompts[i].tags = remainingPrompts[i].tags.filter((tag) => tag !== 'production');
-          await remainingPrompts[i].save();
-        }
-      }
-
-      await prompt.save();
+      await Prompt.updateMany(
+        { groupId: prompt.groupId, _id: { $ne: promptId }, isProduction: true },
+        { $set: { isProduction: false } },
+      );
 
       return { message: 'Prompt production made successfully' };
     } catch (error) {
