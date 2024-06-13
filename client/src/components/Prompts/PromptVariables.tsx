@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
+import { Braces } from 'lucide-react';
 import { extractUniqueVariables } from '~/utils';
 
 const PromptPreview = () => {
@@ -13,7 +14,8 @@ const PromptPreview = () => {
 
   return (
     <>
-      <h3 className="rounded-t-lg border border-gray-300 py-2 pl-4 text-base font-semibold">
+      <h3 className="flex items-center gap-2 rounded-t-lg border border-gray-300 py-2 pl-4 text-base font-semibold">
+        <Braces className="icon-sm" />
         Variables
       </h3>
       <div className="mb-4 flex w-full flex-row flex-wrap rounded-b-lg border border-gray-300 p-4 md:min-h-16">

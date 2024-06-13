@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import { TrashIcon, Share2Icon } from 'lucide-react';
+import { Share2Icon, Layers3 } from 'lucide-react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
@@ -13,6 +13,7 @@ import {
 import { useGetPromptGroup, useGetPrompts } from '~/data-provider';
 import { Button, Skeleton } from '~/components/ui';
 import PromptVariables from './PromptVariables';
+import { TrashIcon } from '~/components/svg';
 import PromptEditor from './PromptEditor';
 import PromptName from './PromptName';
 import { cn } from '~/utils';
@@ -133,7 +134,7 @@ const PromptPreview = () => {
                     size={'sm'}
                     onClick={() => deletePromptGroupMutation.mutate({ id: group?._id || '' })}
                   >
-                    <TrashIcon className="cursor-pointer" />
+                    <TrashIcon className="icon-lg cursor-pointer" />
                   </Button>
                 </>
               )}
@@ -164,7 +165,10 @@ const PromptPreview = () => {
               ) : (
                 !!prompts.length && (
                   <>
-                    <h2 className="mb-4 text-base font-semibold">Versions</h2>
+                    <h2 className="mb-4 flex gap-2 text-base font-semibold">
+                      <Layers3 className="icon-lg" />
+                      Versions
+                    </h2>
                     <ul className="flex flex-col gap-3">
                       {prompts.map((prompt, index) => {
                         const tags: string[] = [];
