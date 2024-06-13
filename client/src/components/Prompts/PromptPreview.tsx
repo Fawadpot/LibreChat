@@ -109,7 +109,7 @@ const PromptPreview = () => {
       </div>
       <div className="flex h-full w-full flex-col md:flex-row">
         {/* Left Section */}
-        <div className="flex-1 overflow-y-auto border-r border-gray-300 p-4">
+        <div className="flex-1 overflow-y-auto border-r border-gray-300 p-4 md:max-h-[calc(100vh-200px)]">
           <PromptEditor
             type={selectedPrompt?.type || ''}
             prompt={selectedPrompt?.prompt || ''}
@@ -131,7 +131,7 @@ const PromptPreview = () => {
           </div>
         </div>
         {/* Right Section */}
-        <div className="flex-1 overflow-y-auto p-4 md:w-1/4 md:max-w-[35%] lg:max-w-[30%] xl:max-w-[25%]">
+        <div className="flex-1 overflow-y-auto p-4 md:max-h-[calc(100vh-200px)] md:w-1/4 md:max-w-[35%] lg:max-w-[30%] xl:max-w-[25%]">
           {!!prompts.length && (
             <>
               <h2 className="mb-4 text-base font-semibold">Versions</h2>

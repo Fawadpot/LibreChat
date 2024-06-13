@@ -7,7 +7,7 @@ export default function DashboardRoute() {
     return null;
   }
   return (
-    <div className="w-full">
+    <div className="h-screen w-full">
       <Outlet />
     </div>
   );

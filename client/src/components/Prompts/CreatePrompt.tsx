@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
-import { Button, Textarea, Input } from '~/components/ui';
+import { Button, TextareaAutosize, Input } from '~/components/ui';
 import { useCreatePrompt } from '~/data-provider';
 
 type CreateFormValues = {
@@ -52,8 +52,8 @@ const PromptEditorForm = ({
   }, [watchType, defaultValues.prompt, setValue]);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="w-full p-4">
-      <div className="flex w-full flex-row items-center text-2xl font-bold md:w-1/2">
+    <form onSubmit={handleSubmit(onSubmit)} className="w-full px-4 py-2">
+      <div className="mb-4 flex w-full flex-row items-center text-2xl font-bold md:w-1/2">
         <Controller
           name="name"
           control={control}
@@ -69,22 +69,26 @@ const PromptEditorForm = ({
       </div>
       <div className="w-full">
         <div>
-          <h2 className="flex w-full items-center justify-between rounded-t-lg border border-gray-300 pl-4 pr-1 text-base font-semibold">
+          <h2 className="flex items-center justify-between rounded-t-lg border border-gray-300 py-2 pl-4 pr-1 text-base font-semibold">
             {watchType} prompt
           </h2>
-          <div className="mb-4 rounded-b-lg border border-gray-300 p-4">
+          <div className="mb-4 min-h-32 rounded-b-lg border border-gray-300 p-4 transition-all duration-150">
             <Controller
               name="prompt"
               control={control}
               render={({ field }) => (
-                <Textarea {...field} className="mb-2 w-full rounded border border-gray-300 p-2" />
+                <TextareaAutosize
+                  {...field}
+                  className="w-full rounded border border-gray-300 px-2 py-1"
+                  minRows={6}
+                />
               )}
             />
           </div>
         </div>
 
         <div className="flex justify-end">
-          <Button type="submit" variant={'default'} disabled={!isDirty || isSubmitting}>
+          <Button type="submit" variant="default" disabled={!isDirty || isSubmitting}>
             Create Prompt
           </Button>
         </div>
