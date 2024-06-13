@@ -476,7 +476,7 @@ export function getPrompts(filter: t.TPromptsWithFilterRequest): Promise<t.TProm
 
 export function getPromptGroups(
   filter: t.TPromptGroupsWithFilterRequest,
-): Promise<t.TPromptGroupsWithFilterResponse> {
+): Promise<t.PromptGroupListResponse> {
   return request.get(endpoints.getPromptGroupsWithFilters(filter));
 }
 

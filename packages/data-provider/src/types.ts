@@ -1,11 +1,12 @@
 import OpenAI from 'openai';
+import type { InfiniteData } from '@tanstack/react-query';
 import type {
-  TResPlugin,
   TMessage,
-  TConversation,
-  EModelEndpoint,
+  TResPlugin,
   ImageDetail,
   TSharedLink,
+  TConversation,
+  EModelEndpoint,
 } from './schemas';
 import type { TSpecsConfig } from './models';
 export type TOpenAIMessage = OpenAI.Chat.ChatCompletionMessageParam;
@@ -322,6 +323,8 @@ export type TImportResponse = {
   message: string;
 };
 
+/** Prompts */
+
 export type TPrompt = {
   prompt: string;
   type: 'text' | 'chat';
@@ -364,18 +367,23 @@ export type TPromptsWithFilterRequest = {
 };
 
 export type TPromptGroupsWithFilterRequest = {
-  pageNumber: number;
-  pageSize: number;
+  pageNumber: string;
+  pageSize: string | number;
+  before?: string | null;
+  after?: string | null;
+  order?: 'asc' | 'desc';
   name?: string;
   isActive?: boolean;
 };
 
-export type TPromptGroupsWithFilterResponse = {
+export type PromptGroupListResponse = {
   promptGroups: TPromptGroup[];
-  totalPages: number;
-  totalPromptGroups: number;
-  currentPage: number;
+  pageNumber: string;
+  pageSize: string | number;
+  pages: string | number;
 };
+
+export type PromptGroupsData = InfiniteData<PromptGroupListResponse>;
 
 export type TCreatePromptResponse = {
   prompt: TPrompt;

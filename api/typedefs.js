@@ -274,6 +274,19 @@
  */
 
 /**
+ * @exports TPromptGroupsWithFilterRequest
+ * @typedef {import('librechat-data-provider').TPromptGroupsWithFilterRequest } TPromptGroupsWithFilterRequest
+ * @memberof typedefs
+ */
+
+/**
+ * @exports PromptGroupListResponse
+ * @typedef {import('librechat-data-provider').PromptGroupListResponse } PromptGroupListResponse
+ * @memberof typedefs
+ */
+
+/** Assistants */
+/**
  * @exports Assistant
  * @typedef {import('librechat-data-provider').Assistant} Assistant
  * @memberof typedefs

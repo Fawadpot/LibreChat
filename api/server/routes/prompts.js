@@ -14,27 +14,28 @@ const {
 const { requireJwtAuth } = require('~/server/middleware');
 
 const router = express.Router();
+router.use(requireJwtAuth);
 
-router.get('/groups/:groupId', requireJwtAuth, async (req, res) => {
+/**
+ * Route to get single prompt group by its ID
+ * GET /groups/:groupId
+ */
+router.get('/groups/:groupId', async (req, res) => {
   let groupId = req.params.groupId;
   const group = await getPromptGroup({ _id: groupId });
   res.status(200).send(group);
 });
 
-router.get('/groups', requireJwtAuth, async (req, res) => {
-  let pageNumber = req.query.pageNumber || 1;
-  pageNumber = parseInt(pageNumber, 10);
+/**
+ * Route to fetch paginated prompt groups with filters
+ * GET /groups
+ */
+router.get('/groups', async (req, res) => {
+  let pageNumber = req.query.pageNumber || '1';
+  pageNumber = pageNumber.toString();
 
-  if (isNaN(pageNumber) || pageNumber < 1) {
-    return res.status(400).json({ error: 'Invalid page number' });
-  }
-
-  let pageSize = req.query.pageSize || 25;
-  pageSize = parseInt(pageSize, 10);
-
-  if (isNaN(pageSize) || pageSize < 1) {
-    return res.status(400).json({ error: 'Invalid page size' });
-  }
+  let pageSize = req.query.pageSize || '25';
+  pageSize = pageSize.toString();
 
   let filter = req.query;
 
@@ -43,6 +44,9 @@ router.get('/groups', requireJwtAuth, async (req, res) => {
   } else {
     filter = { author: req.user.id };
   }
+
+  filter.pageNumber = pageNumber;
+  filter.pageSize = pageSize;
 
   res.status(200).send(await getPromptGroups(filter));
 });
@@ -78,7 +82,7 @@ const patchPrompt = async (req, res) => {
   }
 };
 
-router.post('/', requireJwtAuth, patchPrompt);
+router.post('/', patchPrompt);
 
 /**
  * Updates a prompt group
@@ -96,40 +100,40 @@ const patchPromptGroup = async (req, res) => {
   res.status(200).send(await updatePromptGroup({ _id: groupId }, { name, isActive }));
 };
 
-router.patch('/groups/:groupId', requireJwtAuth, patchPromptGroup);
+router.patch('/groups/:groupId', patchPromptGroup);
 
-router.patch('/:promptId/tags/production', requireJwtAuth, async (req, res) => {
+router.patch('/:promptId/tags/production', async (req, res) => {
   const { promptId } = req.params;
   res.status(200).send(await makePromptProduction(promptId));
 });
 
-router.patch('/:promptId/labels', requireJwtAuth, async (req, res) => {
+router.patch('/:promptId/labels', async (req, res) => {
   const { promptId } = req.params;
   const { labels } = req.body;
   res.status(200).send(await updatePromptLabels(promptId, labels));
 });
 
-router.get('/:promptId', requireJwtAuth, async (req, res) => {
+router.get('/:promptId', async (req, res) => {
   const { promptId } = req.params;
   const author = req.user.id;
   const prompt = await getPrompt({ _id: promptId, author });
   res.status(200).send(prompt);
 });
 
-router.get('/', requireJwtAuth, async (req, res) => {
+router.get('/', async (req, res) => {
   const author = req.user.id;
   const { groupId } = req.query;
   const prompts = await getPrompts({ groupId, author });
   res.status(200).send(prompts);
 });
 
-router.delete('/:promptId', requireJwtAuth, async (req, res) => {
+router.delete('/:promptId', async (req, res) => {
   const { promptId } = req.params;
   const author = req.user.id;
   res.status(200).send(await deletePrompt({ promptId, author }));
 });
 
-router.delete('/groups/:groupId', requireJwtAuth, async (req, res) => {
+router.delete('/groups/:groupId', async (req, res) => {
   const { groupId } = req.params;
   res.status(200).send(await deletePromptGroup(groupId));
 });

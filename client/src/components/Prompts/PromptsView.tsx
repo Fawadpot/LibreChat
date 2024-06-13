@@ -1,15 +1,33 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { ListFilter } from 'lucide-react';
-import { useGetPromptGroups } from '~/data-provider';
+import { usePromptGroupsInfiniteQuery } from '~/data-provider';
 import { Button, Input } from '~/components/ui';
 import PromptSidePanel from './PromptSidePanel';
 
 export default function PromptsView() {
   const params = useParams();
   const navigate = useNavigate();
-  const [queryState, setQueryState] = useState({ pageSize: 10, pageNumber: 1, name: '' });
-  const groupsQuery = useGetPromptGroups(queryState);
+  const [name, setName] = useState('');
+  const [pageSize, _setPageSize] = useState(10);
+  const [pageNumber, _setPageNumber] = useState(1);
+
+  const groupsQuery = usePromptGroupsInfiniteQuery({
+    pageSize,
+    pageNumber: pageNumber + '',
+    name,
+    isActive: true,
+  });
+
+  const promptGroups = useMemo(() => {
+    return groupsQuery?.data?.pages.flatMap((page) => page.promptGroups) || [];
+  }, [groupsQuery.data]);
+
+  const fetchNextPage = () => {
+    if (groupsQuery.hasNextPage) {
+      groupsQuery.fetchNextPage();
+    }
+  };
 
   return (
     <div className="w-full bg-[#f9f9f9] p-0 lg:p-7">
@@ -45,10 +63,8 @@ export default function PromptsView() {
               </Button>
               <Input
                 placeholder={'Filter prompts...'}
-                value={queryState.name}
-                onChange={(e) => {
-                  setQueryState((prev) => ({ ...prev, name: e.target.value }));
-                }}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 className="max-w-sm dark:border-gray-500"
               />
             </div>
@@ -58,27 +74,21 @@ export default function PromptsView() {
               </Button>
             </div>
           </div>
-          {groupsQuery?.isLoading ? null : (
-            <PromptSidePanel prompts={groupsQuery?.data?.promptGroups} />
-          )}
+          {groupsQuery.isLoading ? null : <PromptSidePanel prompts={promptGroups} />}
           <div className="mx-2 mt-2 flex justify-between">
             <Button
               variant={'outline'}
-              onClick={() =>
-                setQueryState((prev) => ({ ...prev, pageNumber: prev.pageNumber - 1 }))
-              }
-              disabled={queryState.pageNumber === 1}
+              onClick={() => groupsQuery.fetchPreviousPage()}
+              disabled={!groupsQuery.hasPreviousPage}
             >
               Prev
             </Button>
             <Button
               variant={'outline'}
-              onClick={() =>
-                setQueryState((prev) => ({ ...prev, pageNumber: prev.pageNumber + 1 }))
-              }
-              disabled={queryState.pageNumber === groupsQuery?.data?.totalPages}
+              onClick={() => fetchNextPage()}
+              disabled={!groupsQuery.hasNextPage || groupsQuery.isFetchingNextPage}
             >
-              Next
+              {groupsQuery.isFetchingNextPage ? 'Loading more...' : 'Next'}
             </Button>
           </div>
         </div>

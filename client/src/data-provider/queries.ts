@@ -423,6 +423,32 @@ export const useVoicesQuery = (): UseQueryResult<t.VoiceResponse> => {
   return useQuery([QueryKeys.voices], () => dataService.getVoices());
 };
 
+export const usePromptGroupsInfiniteQuery = (
+  params?: t.TPromptGroupsWithFilterRequest,
+  config?: UseInfiniteQueryOptions<t.PromptGroupListResponse, unknown>,
+) => {
+  return useInfiniteQuery<t.PromptGroupListResponse, unknown>(
+    [QueryKeys.promptGroups, params],
+    ({ pageParam = '1' }) =>
+      dataService.getPromptGroups({
+        ...params,
+        pageNumber: pageParam?.toString(),
+        pageSize: (params?.pageSize || 10).toString(),
+      }),
+    {
+      getNextPageParam: (lastPage) => {
+        const currentPageNumber = Number(lastPage.pageNumber);
+        const totalPages = Number(lastPage.pages);
+        return currentPageNumber < totalPages ? currentPageNumber + 1 : undefined;
+      },
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+      ...config,
+    },
+  );
+};
+
 export const useGetPromptGroup = (
   id: string,
   config?: UseQueryOptions<t.TPromptGroup>,
@@ -458,31 +484,6 @@ export const useGetPrompts = (
       refetchOnReconnect: false,
       refetchOnMount: false,
       retry: false,
-      ...config,
-      enabled: config?.enabled !== undefined ? config?.enabled : true,
-    },
-  );
-};
-
-// update the typing to reflect the backend response
-export const useGetPromptGroups = (
-  filter: t.TPromptGroupsWithFilterRequest,
-  config?: UseQueryOptions<t.TPromptGroupsWithFilterResponse, unknown>,
-): QueryObserverResult<t.TPromptGroupsWithFilterResponse, unknown> => {
-  return useQuery<t.TPromptGroupsWithFilterResponse, unknown>(
-    [QueryKeys.promptGroups, filter.pageNumber, filter.name],
-    async () => {
-      if (!filter.name) {
-        delete filter.name;
-      }
-      return dataService.getPromptGroups(filter);
-    },
-    {
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchOnMount: false,
-      retry: false,
-      keepPreviousData: true,
       ...config,
       enabled: config?.enabled !== undefined ? config?.enabled : true,
     },

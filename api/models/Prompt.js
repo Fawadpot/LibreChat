@@ -108,30 +108,38 @@ module.exports = {
       return { prompt: 'Error getting prompt group' };
     }
   },
+  /**
+   * Get prompt groups with filters
+   * @param {TPromptGroupsWithFilterRequest} filter
+   * @returns {Promise<PromptGroupListResponse>}
+   */
   getPromptGroups: async (filter) => {
     try {
-      const { pageNumber, pageSize } = filter;
-      delete filter.pageNumber;
-      delete filter.pageSize;
+      const { pageNumber, pageSize, name, isActive } = filter;
+
       const query = {};
-      if (filter.name) {
-        query.name = new RegExp(filter.name, 'i');
+      if (name) {
+        query.name = new RegExp(name, 'i');
       }
+      if (isActive !== undefined) {
+        query.isActive = isActive;
+      }
+
       const promptGroups = await PromptGroup.find(query)
         .sort({ createdAt: -1 })
-        .skip((pageNumber - 1) * pageSize)
-        .limit(pageSize)
+        .skip((parseInt(pageNumber, 10) - 1) * parseInt(pageSize, 10))
+        .limit(parseInt(pageSize, 10))
         .lean();
       const totalPromptGroups = await PromptGroup.countDocuments(query);
       return {
         promptGroups,
-        totalPages: +Math.ceil(totalPromptGroups / pageSize),
-        totalPromptGroups: +totalPromptGroups,
-        currentPage: +pageNumber,
+        pageNumber: pageNumber.toString(),
+        pageSize: pageSize.toString(),
+        pages: Math.ceil(totalPromptGroups / pageSize).toString(),
       };
     } catch (error) {
       logger.error('Error getting prompt groups', error);
-      return { prompt: 'Error getting prompt groups' };
+      return { message: 'Error getting prompt groups' };
     }
   },
   deletePrompt: async ({ promptId, author }) => {
