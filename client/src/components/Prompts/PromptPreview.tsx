@@ -3,7 +3,7 @@ import { TrashIcon, Share2Icon } from 'lucide-react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
-import type { TPrompt, TCreatePrompt } from 'librechat-data-provider';
+import type { TCreatePrompt } from 'librechat-data-provider';
 import {
   useCreatePrompt,
   useDeletePromptGroup,
@@ -11,10 +11,11 @@ import {
   useMakePromptProduction,
 } from '~/data-provider/mutations';
 import { useGetPromptGroup, useGetPrompts } from '~/data-provider';
-import { cn, extractUniqueVariables } from '~/utils';
 import { Button, Skeleton } from '~/components/ui';
+import PromptVariables from './PromptVariables';
 import PromptEditor from './PromptEditor';
 import PromptName from './PromptName';
+import { cn } from '~/utils';
 
 const PromptPreview = () => {
   const params = useParams();
@@ -24,9 +25,11 @@ const PromptPreview = () => {
     { groupId: params.promptId ?? '' },
     { enabled: !!params.promptId },
   );
+
   const prevIsEditingRef = useRef(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [selectedPrompt, setSelectedPrompt] = useState<TPrompt | undefined>();
+  const [selectionIndex, setSelectionIndex] = useState<number>(0);
+  const selectedPrompt = useMemo(() => prompts[selectionIndex], [prompts, selectionIndex]);
 
   const methods = useForm({
     defaultValues: {
@@ -39,17 +42,21 @@ const PromptPreview = () => {
   const watchedPrompt = watch('prompt');
 
   const createPromptMutation = useCreatePrompt({
-    onMutate(variables) {
-      setSelectedPrompt((prev) => prev && { ...prev, prompt: variables.prompt.prompt });
+    onMutate() {
+      setSelectionIndex(0);
     },
     onSuccess() {
-      // Update form values if needed
       setValue('prompt', '');
       setValue('promptName', group?.name || '');
     },
   });
   const updateGroupMutation = useUpdatePromptGroup();
-  const makePromptProductionMutation = useMakePromptProduction();
+  const makeProductionMutation = useMakePromptProduction({
+    onSuccess(_data, variables) {
+      const productionIndex = prompts.findIndex((prompt) => variables.id === prompt._id);
+      setSelectionIndex(productionIndex);
+    },
+  });
   const deletePromptGroupMutation = useDeletePromptGroup({
     onSuccess: () => {
       navigate('/d/prompts');
@@ -86,18 +93,8 @@ const PromptPreview = () => {
   }, [isEditing, watchedPrompt, onSave]);
 
   useEffect(() => {
-    if (params.promptId && prompts && prompts.length > 0) {
-      setSelectedPrompt(prompts[0]);
-    }
-  }, [params.promptId, prompts]);
-
-  useEffect(() => {
     setValue('prompt', selectedPrompt?.prompt || '');
   }, [selectedPrompt, setValue]);
-
-  const variables = useMemo(() => {
-    return extractUniqueVariables(watchedPrompt || '');
-  }, [watchedPrompt]);
 
   return (
     <FormProvider {...methods}>
@@ -126,9 +123,7 @@ const PromptPreview = () => {
                   <Button
                     variant={'default'}
                     size={'sm'}
-                    onClick={() =>
-                      makePromptProductionMutation.mutate({ id: selectedPrompt?._id || '' })
-                    }
+                    onClick={() => makeProductionMutation.mutate({ id: selectedPrompt?._id || '' })}
                     disabled={selectedPrompt?.isProduction}
                   >
                     Make it Production
@@ -158,20 +153,7 @@ const PromptPreview = () => {
                     type={selectedPrompt?.type || ''}
                     prompt={selectedPrompt?.prompt || ''}
                   />
-                  <h3 className="rounded-t-lg border border-gray-300 px-4 text-base font-semibold">
-                    Variables
-                  </h3>
-                  <div className="mb-4 flex w-full flex-row flex-wrap rounded-b-lg border border-gray-300 p-4">
-                    {variables.length ? (
-                      variables.map((variable, index) => (
-                        <label className="mb-1 mr-1 rounded-full border px-2" key={index}>
-                          {variable}
-                        </label>
-                      ))
-                    ) : (
-                      <label className="rounded-full border px-2">No variables</label>
-                    )}
-                  </div>
+                  <PromptVariables />
                 </>
               )}
             </div>
@@ -199,11 +181,9 @@ const PromptPreview = () => {
                             key={index}
                             className={cn(
                               'cursor-pointer rounded-lg border p-4',
-                              prompt === selectedPrompt ? 'bg-gray-100' : 'bg-white',
+                              index === selectionIndex ? 'bg-gray-100' : 'bg-white',
                             )}
-                            onClick={() => {
-                              setSelectedPrompt(prompt);
-                            }}
+                            onClick={() => setSelectionIndex(index)}
                           >
                             <p className="font-bold">Version: {prompts.length - index}</p>
                             {tags.length > 0 && (

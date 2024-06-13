@@ -21,7 +21,7 @@ const PromptEditor: React.FC<Props> = ({ type, prompt, name, isEditing, setIsEdi
 
   return (
     <div>
-      <h2 className="flex items-center justify-between rounded-t-lg border border-gray-300 py-2 pl-4 pr-1 text-base font-semibold">
+      <h2 className="flex items-center justify-between rounded-t-lg border border-gray-300 py-2 pl-4 text-base font-semibold">
         {type} prompt
         <EditIcon
           onClick={() => setIsEditing((prev) => !prev)}
