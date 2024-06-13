@@ -24,7 +24,7 @@ export default function PromptListItem({ prompt }: { prompt: TPromptGroup }) {
 
   return (
     <div
-      className="w-100 my-3 mr-2 flex cursor-pointer flex-row rounded-md border-0 bg-white p-4 transition duration-300 ease-in-out hover:bg-slate-200"
+      className="w-100 mx-2 my-3 flex cursor-pointer flex-row rounded-md border-0 bg-white p-4 transition duration-300 ease-in-out hover:bg-gray-100"
       onClick={() => {
         navigate(`/d/prompts/${prompt._id}`, { replace: true });
       }}
@@ -42,7 +42,7 @@ export default function PromptListItem({ prompt }: { prompt: TPromptGroup }) {
               }}
             />
             <Button
-              className="w-min bg-transparent text-[#666666] hover:bg-slate-200"
+              className="w-min bg-transparent text-[#666666] hover:bg-gray-200"
               onClick={() => {
                 updateGroup.mutate({ payload: { name: nameInputField }, id: prompt?._id || '' });
                 setNameEditFlag(false);
@@ -55,12 +55,15 @@ export default function PromptListItem({ prompt }: { prompt: TPromptGroup }) {
           <strong>{prompt.name}</strong>
         )}
       </div>
-      <div className="mr-0 flex w-1/2 flex-row items-center justify-end sm:mr-4">
+      <div className="flex w-1/2 flex-row items-center justify-end gap-1">
         <HoverToggle
           isActiveConvo={true}
           isPopoverActive={popoverActive}
           setIsPopoverActive={setPopoverActive}
-          className=""
+          className="z-10 h-8 w-8 px-2"
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
         >
           <DropDownMenu>
             <RenameButton
@@ -74,10 +77,13 @@ export default function PromptListItem({ prompt }: { prompt: TPromptGroup }) {
           </DropDownMenu>
         </HoverToggle>
         <Button
-          className="w-min bg-transparent text-[#666666] hover:bg-slate-200"
-          onClick={() => deletePromptGroupMutation.mutate({ id: prompt?._id || '' })}
+          className="z-1 h-8 w-8 bg-transparent p-2 text-[#666666] hover:bg-gray-200"
+          onClick={(e) => {
+            e.stopPropagation();
+            deletePromptGroupMutation.mutate({ id: prompt?._id || '' });
+          }}
         >
-          <NewTrashIcon className="m-0 p-0" />
+          <NewTrashIcon />
         </Button>
       </div>
     </div>
