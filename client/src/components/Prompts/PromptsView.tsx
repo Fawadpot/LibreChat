@@ -54,12 +54,12 @@ export default function PromptsView() {
             isDetailView ? 'hidden lg:block' : 'md:w-full',
           )}
         >
-          <h2 className="m-3 flex items-center gap-x-2 text-center text-lg lg:text-left">
+          <h1 className="m-3 flex items-center gap-x-2 text-center text-xl lg:text-left">
             <MessageSquareQuote className="h-5 w-5 text-gray-500" />
             <strong>Prompts</strong>
-          </h2>
+          </h1>
           <div className="flex w-full flex-row justify-between">
-            <div className="flex w-2/3 flex-row justify-start gap-x-2 pr-2">
+            <div className="mx-4 flex w-2/3 flex-row justify-start gap-x-2 pr-2">
               <Button variant="ghost" className="m-0 mr-2 p-0">
                 <ListFilter className="h-4 w-4" />
               </Button>
@@ -74,7 +74,7 @@ export default function PromptsView() {
           <div className="flex-grow overflow-y-auto">
             {!groupsQuery.isLoading && <PromptSidePanel prompts={promptGroups} />}
           </div>
-          <div className="mx-2 mt-2 flex justify-between">
+          <div className="m-2 flex justify-end gap-2">
             <Button
               variant={'outline'}
               onClick={() => groupsQuery.fetchPreviousPage()}
