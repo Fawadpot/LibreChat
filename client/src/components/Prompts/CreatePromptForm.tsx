@@ -15,7 +15,7 @@ const defaultPrompt: CreateFormValues = {
   type: 'text',
 };
 
-const PromptEditorForm = ({
+const CreatePromptForm = ({
   defaultValues = defaultPrompt,
 }: {
   defaultValues?: CreateFormValues;
@@ -97,4 +97,4 @@ const PromptEditorForm = ({
   );
 };
 
-export default PromptEditorForm;
+export default CreatePromptForm;
