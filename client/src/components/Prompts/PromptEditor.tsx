@@ -1,33 +1,23 @@
 import { EditIcon } from 'lucide-react';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect } from 'react';
+import { Controller, useFormContext } from 'react-hook-form';
 import { TextareaAutosize } from '~/components/ui';
 import { cn } from '~/utils';
 
 type Props = {
   type: string;
+  name: string;
   prompt: string;
-  onSave: (newPrompt: string) => void;
+  isEditing: boolean;
+  setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const PromptEditor: React.FC<Props> = ({ type, prompt, onSave }) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [newPrompt, setNewPrompt] = useState(prompt);
-  const prevIsEditingRef = useRef(isEditing);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setNewPrompt(e.target.value);
-  };
+const PromptEditor: React.FC<Props> = ({ type, prompt, name, isEditing, setIsEditing }) => {
+  const { control, setValue } = useFormContext();
 
   useEffect(() => {
-    setNewPrompt(prompt);
-  }, [type, prompt]);
-
-  useEffect(() => {
-    if (prevIsEditingRef.current && !isEditing) {
-      onSave(newPrompt);
-    }
-    prevIsEditingRef.current = isEditing;
-  }, [isEditing, newPrompt, onSave]);
+    setValue(name, prompt);
+  }, [prompt, setValue, name]);
 
   return (
     <div>
@@ -48,18 +38,23 @@ const PromptEditor: React.FC<Props> = ({ type, prompt, onSave }) => {
         )}
         onClick={() => !isEditing && setIsEditing(true)}
       >
-        {isEditing ? (
-          <TextareaAutosize
-            className="w-full rounded border border-gray-300 px-2 py-1"
-            value={newPrompt}
-            defaultValue={prompt}
-            onChange={handleInputChange}
-            onBlur={() => setIsEditing(false)}
-            minRows={3}
-          />
-        ) : (
-          <span className="block px-2 py-1">{prompt}</span>
-        )}
+        <Controller
+          name={name}
+          control={control}
+          // Ensure it's editable only when isEditing is true
+          render={({ field }) =>
+            isEditing ? (
+              <TextareaAutosize
+                {...field}
+                className="w-full rounded border border-gray-300 px-2 py-1"
+                minRows={3}
+                onBlur={() => setIsEditing(false)}
+              />
+            ) : (
+              <span className="block px-2 py-1">{field.value}</span>
+            )
+          }
+        />
       </div>
     </div>
   );

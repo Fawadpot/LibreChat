@@ -18,8 +18,8 @@ import VectorStorePreview from '~/components/Files/VectorStore/VectorStorePrevie
 import DataTableFilePreview from '~/components/Files/FileList/DataTableFilePreview';
 import PromptsView from '~/components/Prompts/PromptsView';
 import EmptyPromptPreview from '~/components/Prompts/EmptyPromptPreview';
+import CreatePromptForm from '~/components/Prompts/CreatePromptForm';
 import PromptPreview from '~/components/Prompts/PromptPreview';
-import CreatePrompt from '~/components/Prompts/CreatePrompt';
 import DashboardRoute from './DashboardRoute';
 import Root from './Root';
 import Search from './Search';
@@ -130,7 +130,7 @@ export const router = createBrowserRouter([
               },
               {
                 path: 'new',
-                element: <CreatePrompt />,
+                element: <CreatePromptForm />,
               },
               {
                 path: ':promptId',
