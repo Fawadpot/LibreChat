@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TPromptGroup } from 'librechat-data-provider/dist/types';
+import { Button } from '~/components/ui';
 import PromptsList from './PromptsList';
-import { Button } from '../ui';
 
 export default function PromptSidePanel({ prompts }: { prompts?: TPromptGroup[] }) {
   const navigate = useNavigate();
