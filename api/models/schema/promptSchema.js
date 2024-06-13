@@ -70,10 +70,6 @@ const promptSchema = new Schema(
       required: true,
       index: true,
     },
-    version: {
-      type: Number,
-      required: true,
-    },
     author: {
       type: Schema.Types.ObjectId,
       ref: 'User',
@@ -88,17 +84,9 @@ const promptSchema = new Schema(
       enum: ['text', 'chat'],
       required: true,
     },
-    config: {
-      type: Schema.Types.Mixed,
-      default: {},
-    },
-    tags: {
-      type: [String],
-      default: [],
-    },
-    labels: {
-      type: [String],
-      default: [],
+    isProduction: {
+      type: Boolean,
+      default: false,
     },
   },
   {
@@ -106,8 +94,9 @@ const promptSchema = new Schema(
   },
 );
 
-promptSchema.index({ groupId: 1, version: 1 }, { unique: true });
-
 const Prompt = mongoose.model('Prompt', promptSchema);
+
+promptSchema.index({ createdAt: 1, updatedAt: 1 });
+promptGroupSchema.index({ createdAt: 1, updatedAt: 1 });
 
 module.exports = { Prompt, PromptGroup };

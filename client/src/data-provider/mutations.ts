@@ -1,6 +1,7 @@
 import {
   EToolResources,
   LocalStorageKeys,
+  InfiniteCollections,
   defaultAssistantsVersion,
 } from 'librechat-data-provider';
 import { useSetRecoilState } from 'recoil';
@@ -9,12 +10,18 @@ import { dataService, MutationKeys, QueryKeys, defaultOrderQuery } from 'librech
 import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
 import type t from 'librechat-data-provider';
 import {
+  /* Shared Links */
   addSharedLink,
-  addConversation,
   deleteSharedLink,
+  /* Conversations */
+  addConversation,
   updateConvoFields,
   updateConversation,
   deleteConversation,
+  /* Prompts */
+  addPromptGroup,
+  updatePromptGroup,
+  deletePromptGroup,
 } from '~/utils';
 import { useConversationsInfiniteQuery, useSharedLinksInfiniteQuery } from './queries';
 import { normalizeData } from '~/utils/collection';
@@ -174,7 +181,7 @@ export const useCreateSharedLinkMutation = (
           vars.isPublic
             ? addSharedLink(sharedLink, _data)
             : deleteSharedLink(sharedLink, _data.shareId),
-          'sharedLinks',
+          InfiniteCollections.SHARED_LINKS,
           pageSize,
         );
       });
@@ -216,7 +223,7 @@ export const useUpdateSharedLinkMutation = (
           // Therefore, when isPublic is true, use addSharedLink instead of updateSharedLink.
             addSharedLink(sharedLink, _data)
             : deleteSharedLink(sharedLink, _data.shareId),
-          'sharedLinks',
+          InfiniteCollections.SHARED_LINKS,
           sharedLink.pages[0].pageSize as number,
         );
       });
@@ -254,7 +261,7 @@ export const useDeleteSharedLinkMutation = (
         }
         return normalizeData(
           deleteSharedLink(data, vars.shareId),
-          'sharedLinks',
+          InfiniteCollections.SHARED_LINKS,
           data.pages[0].pageSize as number,
         );
       });
@@ -899,34 +906,18 @@ export const useUpdatePromptGroup = (
       options?.onError?.(error, variables, context);
     },
     onSuccess: (response, variables, context) => {
-      queryClient.setQueryData(
-        [QueryKeys.promptGroup, variables?.id],
-        (oldData: t.TPromptGroup | undefined) => {
-          return {
-            ...(oldData ?? ({} as t.TPromptGroup)),
-            ...variables.payload,
-          };
-        },
-      );
-      queryClient.setQueryData(
-        [QueryKeys.promptGroups],
-        (oldData: t.TPromptGroupsWithFilterResponse | undefined) => {
-          const newPromptGroups = oldData?.promptGroups?.map((group: t.TPromptGroup) => {
-            if (group?.['_id'] === variables?.id) {
-              return { ...group, ...variables.payload };
-            }
-            return group;
-          });
-
-          if (!newPromptGroups) {
-            return oldData;
-          }
-          return {
-            ...(oldData ?? ({} as t.TPromptGroupsWithFilterResponse)),
-            promptGroups: newPromptGroups,
-          };
-        },
-      );
+      queryClient.setQueryData([QueryKeys.promptGroup, variables?.id], response);
+      queryClient.setQueryData<t.PromptGroupListData>([QueryKeys.promptGroups], (data) => {
+        if (!data) {
+          return data;
+        }
+        const pageSize = data.pages[0].pageSize as number;
+        return normalizeData(
+          updatePromptGroup(data, response),
+          InfiniteCollections.PROMPT_GROUPS,
+          pageSize,
+        );
+      });
       options?.onSuccess?.(response, variables, context);
     },
   });
@@ -949,14 +940,28 @@ export const useCreatePrompt = (
       }
     },
     onSuccess: (response, variables, context) => {
-      if (response?.prompt.version > 1) {
-        queryClient.setQueryData([QueryKeys.prompts], (oldData: t.TPrompt[] | undefined) => {
-          return [response.prompt, ...(oldData ?? [])];
+      const { prompt, group } = response;
+      queryClient.setQueryData(
+        [QueryKeys.prompts, variables?.prompt?.groupId],
+        (oldData: t.TPrompt[] | undefined) => {
+          return [prompt, ...(oldData ?? [])];
+        },
+      );
+
+      if (group) {
+        queryClient.setQueryData<t.PromptGroupListData>([QueryKeys.promptGroups], (data) => {
+          if (!data) {
+            return data;
+          }
+          const pageSize = data.pages[0].pageSize as number;
+          return normalizeData(
+            addPromptGroup(data, group),
+            InfiniteCollections.PROMPT_GROUPS,
+            pageSize,
+          );
         });
-        queryClient.invalidateQueries([QueryKeys.prompts]);
-      } else {
-        queryClient.invalidateQueries([QueryKeys.promptGroups]);
       }
+
       if (options?.onSuccess) {
         options.onSuccess(response, variables, context);
       }
@@ -981,8 +986,7 @@ export const useDeletePrompt = (
       }
     },
     onSuccess: (response, variables, context) => {
-      // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-      queryClient.setQueryData([QueryKeys.prompts], (oldData: any) => {
+      queryClient.setQueryData<t.TPrompt[]>([QueryKeys.prompts], (oldData?: t.TPrompt[]) => {
         return oldData ? oldData.filter((prompt) => prompt._id !== variables._id) : [];
       });
       if (options?.onSuccess) {
@@ -1015,7 +1019,17 @@ export const useDeletePromptGroup = (
       }
     },
     onSuccess: (response, variables, context) => {
-      queryClient.invalidateQueries([QueryKeys.promptGroups]);
+      queryClient.setQueryData<t.PromptGroupListData>([QueryKeys.promptGroups], (data) => {
+        if (!data) {
+          return data;
+        }
+        const pageSize = data.pages[0].pageSize as number;
+        return normalizeData(
+          deletePromptGroup(data, variables.id),
+          InfiniteCollections.PROMPT_GROUPS,
+          pageSize,
+        );
+      });
       if (options?.onSuccess) {
         options.onSuccess(response, variables, context);
       }

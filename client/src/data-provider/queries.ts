@@ -428,7 +428,7 @@ export const usePromptGroupsInfiniteQuery = (
   config?: UseInfiniteQueryOptions<t.PromptGroupListResponse, unknown>,
 ) => {
   return useInfiniteQuery<t.PromptGroupListResponse, unknown>(
-    [QueryKeys.promptGroups, params],
+    [QueryKeys.promptGroups],
     ({ pageParam = '1' }) =>
       dataService.getPromptGroups({
         ...params,
@@ -477,7 +477,7 @@ export const useGetPrompts = (
   config?: UseQueryOptions<t.TPrompt[]>,
 ): QueryObserverResult<t.TPrompt[]> => {
   return useQuery<t.TPrompt[]>(
-    [QueryKeys.prompts, filter.groupId],
+    [QueryKeys.prompts, filter.groupId ?? ''],
     () => dataService.getPrompts(filter),
     {
       refetchOnWindowFocus: false,

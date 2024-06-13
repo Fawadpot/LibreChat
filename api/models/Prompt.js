@@ -1,78 +1,70 @@
 const { ObjectId } = require('mongodb');
-const { logger } = require('~/config');
 const { Prompt, PromptGroup } = require('./schema/promptSchema');
+const { logger } = require('~/config');
 
 module.exports = {
+  /**
+   * Create a prompt and its respective group
+   * @param {TCreatePromptRecord} saveData
+   * @returns {Promise<TCreatePromptResponse>}
+   */
+  createPromptGroup: async (saveData) => {
+    try {
+      const { prompt, group, author, authorName } = saveData;
+      const newPromptGroup = await PromptGroup.create({ name: group.name, author, authorName });
+      const groupId = newPromptGroup._id;
+
+      const newPrompt = await Prompt.create({
+        ...prompt,
+        groupId,
+        author,
+        isProduction: true,
+      });
+
+      return { prompt: newPrompt, group: newPromptGroup };
+    } catch (error) {
+      logger.error('Error saving prompt', error);
+      return { message: 'Error saving prompt' };
+    }
+  },
   /**
    * Save a prompt
    * @param {TSavePrompt} saveData
    * @returns {Promise<{ prompt: TPrompt }>}
    */
-  savePrompt: async ({ name, prompt, type, groupId, labels, tags = [], author, authorName }) => {
+  savePrompt: async (saveData) => {
     try {
-      tags.push('latest');
-
-      let promptGroupId;
-      let versionNumber = 1;
-
-      if (!groupId && name) {
-        const newPromptGroup = await PromptGroup.create({ name, author, authorName });
-        promptGroupId = newPromptGroup._id;
-        tags.push('production');
-      } else {
-        promptGroupId = new ObjectId(groupId);
-        await Prompt.updateMany({ groupId: promptGroupId }, { $pull: { tags: 'latest' } });
-        const promptCount = await Prompt.countDocuments({ groupId: promptGroupId });
-        versionNumber = promptCount + 1;
-      }
-
-      const newPrompt = await Prompt.create({
-        prompt,
-        groupId: promptGroupId,
-        type,
-        labels,
-        tags,
+      const { prompt, author } = saveData;
+      const newPromptData = {
+        ...prompt,
         author,
-        version: versionNumber,
-      });
+      };
+
+      /** @type {TPrompt} */
+      let newPrompt;
+      try {
+        newPrompt = await Prompt.create(newPromptData);
+      } catch (error) {
+        if (error?.message?.includes('groupId_1_version_1')) {
+          await Prompt.db.collection('prompts').dropIndex('groupId_1_version_1');
+        } else {
+          throw error;
+        }
+        newPrompt = await Prompt.create(newPromptData);
+      }
 
       return { prompt: newPrompt };
     } catch (error) {
       logger.error('Error saving prompt', error);
-      return { prompt: 'Error saving prompt' };
+      return { message: 'Error saving prompt' };
     }
   },
   getPrompts: async (filter) => {
     try {
-      if (filter.groupId) {
-        filter.groupId = new ObjectId(filter.groupId);
-      }
-
-      if (filter.author) {
-        filter.author = new ObjectId(filter.author);
-      }
-
-      const cleanedFilter = {};
-
-      for (const key in filter) {
-        const value = filter[key];
-        if (value !== undefined && value !== null) {
-          // Handle tags and labels as arrays with $all operator
-          if (key === 'tags' || key === 'labels') {
-            if (Array.isArray(value) && value.length > 0) {
-              cleanedFilter[key] = { $all: value };
-            }
-          } else {
-            cleanedFilter[key] = value;
-          }
-        }
-      }
-
-      const result = await Prompt.find(cleanedFilter).sort({ version: -1 }).lean();
-      return result;
+      return await Prompt.find(filter).sort({ createdAt: -1 }).lean();
     } catch (error) {
       logger.error('Error getting prompts', error);
-      return { prompt: 'Error getting prompts' };
+      return { message: 'Error getting prompts' };
     }
   },
   getPrompt: async (filter) => {
@@ -83,7 +75,7 @@ module.exports = {
       return await Prompt.findOne(filter).lean();
     } catch (error) {
       logger.error('Error getting prompt', error);
-      return { prompt: 'Error getting prompt' };
+      return { message: 'Error getting prompt' };
     }
   },
   getPromptGroupsWithPrompts: async (filter) => {
@@ -97,7 +89,7 @@ module.exports = {
         .lean();
     } catch (error) {
       logger.error('Error getting prompt groups', error);
-      return { prompt: 'Error getting prompt groups' };
+      return { message: 'Error getting prompt groups' };
     }
   },
   getPromptGroup: async (filter) => {
@@ -105,7 +97,7 @@ module.exports = {
       return await PromptGroup.findOne(filter).lean();
     } catch (error) {
       logger.error('Error getting prompt group', error);
-      return { prompt: 'Error getting prompt group' };
+      return { message: 'Error getting prompt group' };
     }
   },
   /**
@@ -176,27 +168,30 @@ module.exports = {
       return { message: 'Prompt deleted successfully' };
     } catch (error) {
       logger.error('Error deleting prompt', error);
-      return { prompt: 'Error deleting prompt' };
+      return { message: 'Error deleting prompt' };
     }
   },
   /**
    * Update prompt group
    * @param {Partial<MongoPromptGroup>} filter - Filter to find prompt group
    * @param {Partial<MongoPromptGroup>} data - Data to update
-   * @returns {Promise<{promptGroup: string}>}
+   * @returns {Promise<TUpdatePromptGroupResponse>}
    */
   updatePromptGroup: async (filter, data) => {
     try {
-      const response = await PromptGroup.updateOne(filter, data);
+      const updatedDoc = await PromptGroup.findOneAndUpdate(filter, data, {
+        new: true,
+        upsert: false,
+      });
 
-      if (response.matchedCount === 0) {
-        return { promptGroup: 'Prompt group not found' };
+      if (!updatedDoc) {
+        throw new Error('Prompt group not found');
       }
 
-      return { promptGroup: 'Prompt group updated successfully' };
+      return { promptGroup: updatedDoc };
     } catch (error) {
       logger.error('Error updating prompt group', error);
-      return { promptGroup: 'Error updating prompt group' };
+      return { message: 'Error updating prompt group' };
     }
   },
   makePromptProduction: async (promptId) => {
@@ -226,7 +221,7 @@ module.exports = {
       return { message: 'Prompt production made successfully' };
     } catch (error) {
       logger.error('Error making prompt production', error);
-      return { prompt: 'Error making prompt production' };
+      return { message: 'Error making prompt production' };
     }
   },
   updatePromptLabels: async (_id, labels) => {
@@ -238,7 +233,7 @@ module.exports = {
       return { message: 'Prompt labels updated successfully' };
     } catch (error) {
       logger.error('Error updating prompt labels', error);
-      return { prompt: 'Error updating prompt labels' };
+      return { message: 'Error updating prompt labels' };
     }
   },
   deletePromptGroup: async (_id) => {
@@ -253,7 +248,7 @@ module.exports = {
       return { promptGroup: 'Prompt group deleted successfully' };
     } catch (error) {
       logger.error('Error deleting prompt group', error);
-      return { promptGroup: 'Error deleting prompt group' };
+      return { message: 'Error deleting prompt group' };
     }
   },
 };

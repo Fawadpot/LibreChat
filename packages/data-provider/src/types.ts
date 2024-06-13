@@ -329,9 +329,7 @@ export type TPrompt = {
   prompt: string;
   type: 'text' | 'chat';
   groupId: string;
-  version: number;
-  tags: string[];
-  labels: string[];
+  isProduction?: boolean;
   config?: object;
   createdAt: string;
   updatedAt: string;
@@ -348,16 +346,17 @@ export type TPromptGroup = {
   projectId?: string | null;
   author: string;
   authorName: string;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
   _id?: string;
 };
 
-export type TCreatePrompt = Pick<TPrompt, 'prompt' | 'type' | 'groupId' | 'labels' | 'tags'> & {
-  name?: string;
+export type TCreatePrompt = {
+  prompt: Pick<TPrompt, 'prompt' | 'type'> & { groupId?: string };
+  group?: { name: string };
 };
 
-export type TSavePrompt = TCreatePrompt & Pick<TPromptGroup, 'author' | 'authorName'>;
+export type TCreatePromptRecord = TCreatePrompt & Pick<TPromptGroup, 'author' | 'authorName'>;
 
 export type TPromptsWithFilterRequest = {
   groupId: string;
@@ -383,10 +382,11 @@ export type PromptGroupListResponse = {
   pages: string | number;
 };
 
-export type PromptGroupsData = InfiniteData<PromptGroupListResponse>;
+export type PromptGroupListData = InfiniteData<PromptGroupListResponse>;
 
 export type TCreatePromptResponse = {
   prompt: TPrompt;
+  group?: TPromptGroup;
 };
 
 export type TUpdatePromptGroupPayload = {
@@ -399,9 +399,7 @@ export type TUpdatePromptGroupVariables = {
   payload: TUpdatePromptGroupPayload;
 };
 
-export type TUpdatePromptGroupResponse = {
-  promptGroup: string;
-};
+export type TUpdatePromptGroupResponse = TPromptGroup;
 
 export type TDeletePromptResponse = {
   message: string;

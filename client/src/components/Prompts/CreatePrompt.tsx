@@ -1,101 +1,96 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { TCreatePrompt } from 'librechat-data-provider';
-import { Cross1Icon } from '@radix-ui/react-icons';
+import { useForm, Controller } from 'react-hook-form';
+import { Button, Textarea, Input } from '~/components/ui';
 import { useCreatePrompt } from '~/data-provider';
-import PromptEditor from './PromptEditor';
-import { Button, Input } from '../ui';
 
-export default function CreatePrompt() {
-  const navigate = useNavigate();
-  const [prompt, setPrompt] = useState<TCreatePrompt>({
-    name: '',
-    prompt: '',
-    type: 'text',
-    groupId: '',
-    labels: [],
-    tags: [],
+type CreateFormValues = {
+  name: string;
+  prompt: string;
+  type: 'text' | 'chat';
+};
+const defaultPrompt: CreateFormValues = {
+  name: '',
+  prompt: '',
+  type: 'text',
+};
+
+const PromptEditorForm = ({
+  defaultValues = defaultPrompt,
+}: {
+  defaultValues?: CreateFormValues;
+}) => {
+  const {
+    handleSubmit,
+    control,
+    setValue,
+    watch,
+    formState: { isDirty, isSubmitting },
+  } = useForm({
+    defaultValues,
   });
-  const [categoryInput, setCategoryInput] = useState<string>('');
+
+  const navigate = useNavigate();
   const createPromptMutation = useCreatePrompt({
     onSuccess: (response) => {
       navigate(`/d/prompts/${response.prompt.groupId}`, { replace: true });
     },
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCategoryInput(e.target.value);
+  const onSubmit = (data: CreateFormValues) => {
+    const { name, ...rest } = data;
+    createPromptMutation.mutate({
+      prompt: rest,
+      group: { name },
+    });
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && categoryInput.trim()) {
-      setPrompt((prevPrompt) => ({
-        ...prevPrompt,
-        labels: [...(prevPrompt?.labels || []), categoryInput.trim()],
-      }));
-      setCategoryInput('');
-    }
-  };
+  const watchType = watch('type');
+
+  useEffect(() => {
+    setValue('prompt', defaultValues.prompt);
+  }, [watchType, defaultValues.prompt, setValue]);
 
   return (
-    <div className="w-full p-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="w-full p-4">
       <div className="flex w-full flex-row items-center text-2xl font-bold md:w-1/2">
-        <Input
-          type="text"
-          value={prompt?.name ?? ''}
-          onChange={(e) => setPrompt((prev) => prev && { ...prev, name: e.target.value })}
-          className="mr-2 border border-gray-300 p-2 text-2xl"
-          placeholder="Prompt Name"
+        <Controller
+          name="name"
+          control={control}
+          render={({ field }) => (
+            <Input
+              {...field}
+              type="text"
+              className="mr-2 border border-gray-300 p-2 text-2xl"
+              placeholder="Prompt Name"
+            />
+          )}
         />
       </div>
       <div className="w-full">
-        <PromptEditor
-          permanentEditMode={true}
-          type={prompt?.type || ''}
-          prompt={prompt?.prompt || ''}
-          onSave={(value) => {
-            setPrompt((prev) => prev && { ...prev, prompt: value });
-          }}
-        />
-        <Input
-          type="text"
-          className="mb-4"
-          placeholder="+ Add Labels"
-          value={categoryInput}
-          onChange={handleInputChange}
-          onKeyPress={handleKeyPress}
-        />
-        <h3 className="rounded-t-lg border border-gray-300 px-4 text-base font-semibold">Labels</h3>
-        <div className="mb-4 flex w-full flex-row flex-wrap rounded-b-lg border border-gray-300 p-4">
-          {prompt?.labels?.length ? (
-            prompt?.labels?.map((label, index) => (
-              <label
-                className="mb-1 mr-1 flex items-center gap-x-2 rounded-full border px-2"
-                key={index}
-              >
-                {label}
-                <Cross1Icon
-                  onClick={() => {
-                    const newLabels = prompt?.labels.filter((l) => l !== label);
-                    setPrompt((prev) => prev && { ...prev, labels: newLabels });
-                  }}
-                  className="cursor-pointer"
-                />
-              </label>
-            ))
-          ) : (
-            <label className="rounded-full border px-2">No Labels</label>
-          )}
+        <div>
+          <h2 className="flex w-full items-center justify-between rounded-t-lg border border-gray-300 pl-4 pr-1 text-base font-semibold">
+            {watchType} prompt
+          </h2>
+          <div className="mb-4 rounded-b-lg border border-gray-300 p-4">
+            <Controller
+              name="prompt"
+              control={control}
+              render={({ field }) => (
+                <Textarea {...field} className="mb-2 w-full rounded border border-gray-300 p-2" />
+              )}
+            />
+          </div>
         </div>
-        <Button
-          variant={'default'}
-          onClick={() => {
-            createPromptMutation.mutate(prompt);
-          }}
-        >
-          Create Prompt
-        </Button>
+
+        <div className="flex justify-end">
+          <Button type="submit" variant={'default'} disabled={!isDirty || isSubmitting}>
+            Create Prompt
+          </Button>
+        </div>
       </div>
-    </div>
+    </form>
   );
-}
+};
+
+export default PromptEditorForm;

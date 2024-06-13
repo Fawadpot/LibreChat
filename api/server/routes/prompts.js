@@ -1,13 +1,14 @@
 const express = require('express');
 const {
   getPrompt,
-  savePrompt,
   getPrompts,
+  savePrompt,
   deletePrompt,
   getPromptGroup,
   getPromptGroups,
   updatePromptGroup,
   deletePromptGroup,
+  createPromptGroup,
   updatePromptLabels,
   makePromptProduction,
 } = require('~/models/Prompt');
@@ -57,24 +58,27 @@ router.get('/groups', async (req, res) => {
  * @param {TCreatePrompt} req.body
  * @param {Express.Response} res
  */
-const patchPrompt = async (req, res) => {
+const createPrompt = async (req, res) => {
   try {
-    const { name, prompt, groupId, type, labels, tags } = req.body;
+    const { prompt, group } = req.body;
+    if (!prompt) {
+      return res.status(400).send({ error: 'Prompt is required' });
+    }
+
     const saveData = {
       prompt,
-      type,
-      groupId,
-      labels,
-      tags,
+      group,
       author: req.user.id,
       authorName: req.user.name,
     };
 
-    if (name) {
-      saveData.name = name;
+    /** @type {TCreatePromptResponse} */
+    let result;
+    if (group && group.name) {
+      result = await createPromptGroup(saveData);
+    } else {
+      result = await savePrompt(saveData);
     }
-
-    const result = await savePrompt(saveData);
     res.status(200).send(result);
   } catch (error) {
     console.error(error);
@@ -82,7 +86,7 @@ const patchPrompt = async (req, res) => {
   }
 };
 
-router.post('/', patchPrompt);
+router.post('/', createPrompt);
 
 /**
  * Updates a prompt group
@@ -95,9 +99,15 @@ router.post('/', patchPrompt);
  * @param {Express.Response} res
  */
 const patchPromptGroup = async (req, res) => {
-  const { groupId } = req.params;
-  const { name, isActive = false } = req.body;
-  res.status(200).send(await updatePromptGroup({ _id: groupId }, { name, isActive }));
+  try {
+    const { groupId } = req.params;
+    const { name, isActive = false } = req.body;
+    const promptGroup = await updatePromptGroup({ _id: groupId }, { name, isActive });
+    res.status(200).send(promptGroup);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: 'Error updating prompt group' });
+  }
 };
 
 router.patch('/groups/:groupId', patchPromptGroup);
@@ -121,10 +131,15 @@ router.get('/:promptId', async (req, res) => {
 });
 
 router.get('/', async (req, res) => {
-  const author = req.user.id;
-  const { groupId } = req.query;
-  const prompts = await getPrompts({ groupId, author });
-  res.status(200).send(prompts);
+  try {
+    const author = req.user.id;
+    const { groupId } = req.query;
+    const prompts = await getPrompts({ groupId, author });
+    res.status(200).send(prompts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: 'Error getting prompts' });
+  }
 });
 
 router.delete('/:promptId', async (req, res) => {

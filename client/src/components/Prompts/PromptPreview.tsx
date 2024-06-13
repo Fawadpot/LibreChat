@@ -55,7 +55,7 @@ const PromptPreview = () => {
   const params = useParams();
   const navigate = useNavigate();
   const { data: group } = useGetPromptGroup(params.promptId || '');
-  const promptsQuery = useGetPrompts(
+  const { data: prompts = [] } = useGetPrompts(
     { groupId: params.promptId ?? '' },
     { enabled: !!params.promptId },
   );
@@ -65,8 +65,8 @@ const PromptPreview = () => {
   const [labelInput, setLabelInput] = useState<string>('');
   const [labels, setLabels] = useState<string[]>([]);
 
+  const createPromptMutation = useCreatePrompt();
   const updateGroupMutation = useUpdatePromptGroup();
-  const createNewVersionMutation = useCreatePrompt();
   const makePromptProductionMutation = useMakePromptProduction();
   const updatePromptLabelsMutation = useUpdatePromptLabels();
   const deletePromptGroupMutation = useDeletePromptGroup({
@@ -92,12 +92,11 @@ const PromptPreview = () => {
   };
 
   useEffect(() => {
-    if (params.promptId && promptsQuery?.data && promptsQuery?.data?.length > 0) {
-      setSelectedPrompt(promptsQuery.data[selectedPromptIndex]);
-      setLabels(promptsQuery.data[selectedPromptIndex].labels || []);
-      setVariables(extractUniqueVariables(promptsQuery.data[selectedPromptIndex].prompt));
+    if (params.promptId && prompts && prompts.length > 0 && prompts[selectedPromptIndex]) {
+      setSelectedPrompt(prompts[selectedPromptIndex]);
+      setVariables(extractUniqueVariables(prompts[selectedPromptIndex].prompt));
     }
-  }, [params.promptId, promptsQuery.data, selectedPromptIndex]);
+  }, [params.promptId, prompts, selectedPromptIndex]);
 
   useEffect(() => {
     if (selectedPrompt) {
@@ -122,7 +121,7 @@ const PromptPreview = () => {
             variant={'default'}
             size={'sm'}
             onClick={() => makePromptProductionMutation.mutate({ id: selectedPrompt?._id || '' })}
-            disabled={selectedPrompt?.tags.includes('production')}
+            disabled={selectedPrompt?.isProduction}
           >
             Make it Production
           </Button>
@@ -144,14 +143,13 @@ const PromptPreview = () => {
             onSave={(value) => {
               setSelectedPrompt((prev) => prev && { ...prev, prompt: value });
               const tempPrompt: TCreatePrompt = {
-                prompt: value,
-                type: selectedPrompt?.type ?? 'text',
-                labels: selectedPrompt?.labels ?? [],
-                groupId: selectedPrompt?.groupId ?? '',
-                tags: [],
+                prompt: {
+                  type: selectedPrompt?.type ?? 'text',
+                  groupId: selectedPrompt?.groupId ?? '',
+                  prompt: value,
+                },
               };
-
-              createNewVersionMutation.mutate(tempPrompt);
+              createPromptMutation.mutate(tempPrompt);
             }}
           />
           <h3 className="rounded-t-lg border border-gray-300 px-4 text-base font-semibold">
@@ -207,11 +205,11 @@ const PromptPreview = () => {
           </div>
         </div>
         {/* Right Section */}
-        {!!promptsQuery?.data?.length && (
+        {!!prompts?.length && (
           <div className="w-full p-4 md:w-1/3">
             <h2 className="mb-4 text-base font-semibold">Versions</h2>
             <ul>
-              {promptsQuery?.data?.map((prompt, index) => (
+              {prompts?.map((prompt, index) => (
                 <li
                   key={index}
                   className={`mb-4 cursor-pointer rounded-lg border p-4 ${
@@ -221,11 +219,10 @@ const PromptPreview = () => {
                     setSelectedPrompt(prompt);
                     setSelectedPromptIndex(index);
                     setVariables(extractUniqueVariables(prompt.prompt));
-                    setLabels(prompt.labels || []);
                   }}
                 >
-                  <p className="font-bold">Version: {prompt.version}</p>
-                  <p className="italic">Tags: {prompt.tags.join(', ')}</p>
+                  {/* <p className="font-bold">Version: {prompt.version}</p> */}
+                  {/* <p className="italic">Tags: {prompt.tags.join(', ')}</p> */}
                   <p className="text-xs text-gray-600">{formatDateTime(prompt.createdAt)}</p>
                   {group?.authorName && (
                     <p className="text-xs text-gray-600">by {group.authorName}</p>
