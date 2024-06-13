@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
-import type { TPromptGroup } from 'librechat-data-provider';
-import { useGetCategories, useUpdatePromptGroup } from '~/data-provider';
+import { useGetCategories } from '~/data-provider';
 import { SelectDropDown } from '~/components/ui';
 import CategoryIcon from './CategoryIcon';
 
@@ -18,11 +17,11 @@ const emptyCategory = {
 };
 
 const CategorySelector = ({
-  group,
-  updateGroupMutation,
+  currentCategory,
+  onValueChange,
 }: {
-  group?: TPromptGroup;
-  updateGroupMutation: ReturnType<typeof useUpdatePromptGroup>;
+  currentCategory?: string;
+  onValueChange?: (value: string) => void;
 }) => {
   const { control, watch } = useFormContext();
   const { data: categories = loadingCategories } = useGetCategories({
@@ -37,9 +36,9 @@ const CategorySelector = ({
   const watchedCategory = watch('category');
   const categoryOption = useMemo(
     () =>
-      categories.find((category) => category.value === (watchedCategory ?? group?.category)) ??
+      categories.find((category) => category.value === (watchedCategory ?? currentCategory)) ??
       emptyCategory,
-    [watchedCategory, categories, group?.category],
+    [watchedCategory, categories, currentCategory],
   );
 
   return (
@@ -53,10 +52,7 @@ const CategorySelector = ({
           value={categoryOption || ''}
           setValue={(value) => {
             field.onChange(value);
-            updateGroupMutation.mutate({
-              id: group?._id || '',
-              payload: { name: group?.name || '', category: value },
-            });
+            onValueChange?.(value);
           }}
           availableValues={categories}
           showAbove={false}

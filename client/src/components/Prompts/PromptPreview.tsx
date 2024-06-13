@@ -120,7 +120,15 @@ const PromptPreview = () => {
               />
             )}
             <div className="flex h-10 flex-row gap-x-2">
-              <CategorySelector group={group} updateGroupMutation={updateGroupMutation} />
+              <CategorySelector
+                currentCategory={group?.category}
+                onValueChange={(value) =>
+                  updateGroupMutation.mutate({
+                    id: group?._id || '',
+                    payload: { name: group?.name || '', category: value },
+                  })
+                }
+              />
               <Button
                 variant={'default'}
                 size={'sm'}

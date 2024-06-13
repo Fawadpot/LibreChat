@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { Button, TextareaAutosize, Input } from '~/components/ui';
+import CategorySelector from './CategorySelector';
 import { useCreatePrompt } from '~/data-provider';
 import PromptVariables from './PromptVariables';
 import { cn } from '~/utils';
@@ -9,6 +10,7 @@ import { cn } from '~/utils';
 type CreateFormValues = {
   name: string;
   prompt: string;
+  category: string;
   type: 'text' | 'chat';
 };
 
@@ -16,6 +18,7 @@ const defaultPrompt: CreateFormValues = {
   name: '',
   prompt: '',
   type: 'text',
+  category: '',
 };
 
 const CreatePromptForm = ({
@@ -43,10 +46,10 @@ const CreatePromptForm = ({
   });
 
   const onSubmit = (data: CreateFormValues) => {
-    const { name, ...rest } = data;
+    const { name, category, ...rest } = data;
     createPromptMutation.mutate({
       prompt: rest,
-      group: { name },
+      group: { name, category },
     });
   };
 
@@ -59,30 +62,33 @@ const CreatePromptForm = ({
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)} className="w-full px-4 py-2">
-        <div className="mb-1 flex flex-col items-start font-bold sm:text-xl md:mb-0 md:text-2xl">
-          <Controller
-            name="name"
-            control={control}
-            rules={{ required: 'Prompt name is required' }}
-            render={({ field }) => (
-              <div className="mb-1 flex items-center md:mb-0">
-                <Input
-                  {...field}
-                  type="text"
-                  className="mr-2 w-full border border-gray-300 p-2 text-2xl"
-                  placeholder="Prompt Name*"
-                />
-                <div
-                  className={cn(
-                    'mt-1 w-56 text-sm text-red-500',
-                    errors.name ? 'visible h-auto' : 'invisible h-0',
-                  )}
-                >
-                  {errors.name ? errors.name.message : ' '}
+        <div className="mb-1 flex flex-col items-center justify-between font-bold sm:text-xl md:mb-0 md:text-2xl">
+          <div className="flex w-full flex-col items-center justify-between sm:flex-row">
+            <Controller
+              name="name"
+              control={control}
+              rules={{ required: 'Prompt name is required' }}
+              render={({ field }) => (
+                <div className="mb-1 flex items-center md:mb-0">
+                  <Input
+                    {...field}
+                    type="text"
+                    className="mr-2 w-full border border-gray-300 p-2 text-2xl"
+                    placeholder="Prompt Name*"
+                  />
+                  <div
+                    className={cn(
+                      'mt-1 w-56 text-sm text-red-500',
+                      errors.name ? 'visible h-auto' : 'invisible h-0',
+                    )}
+                  >
+                    {errors.name ? errors.name.message : ' '}
+                  </div>
                 </div>
-              </div>
-            )}
-          />
+              )}
+            />
+            <CategorySelector />
+          </div>
         </div>
         <div className="w-full md:mt-[1.075rem]">
           <div>
