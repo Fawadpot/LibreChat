@@ -927,18 +927,10 @@ export const useCreatePrompt = (
   options?: t.CreatePromptOptions,
 ): UseMutationResult<t.TCreatePromptResponse, unknown, t.TCreatePrompt, unknown> => {
   const queryClient = useQueryClient();
+  const { onSuccess, ...rest } = options || {};
   return useMutation({
     mutationFn: (payload: t.TCreatePrompt) => dataService.createPrompt(payload),
-    onMutate: (variables) => {
-      if (options?.onMutate) {
-        options.onMutate(variables);
-      }
-    },
-    onError: (error, variables, context) => {
-      if (options?.onError) {
-        options.onError(error, variables, context);
-      }
-    },
+    ...rest,
     onSuccess: (response, variables, context) => {
       const { prompt, group } = response;
       queryClient.setQueryData(
@@ -962,8 +954,8 @@ export const useCreatePrompt = (
         });
       }
 
-      if (options?.onSuccess) {
-        options.onSuccess(response, variables, context);
+      if (onSuccess) {
+        onSuccess(response, variables, context);
       }
     },
   });
@@ -973,24 +965,16 @@ export const useDeletePrompt = (
   options?: UseMutationOptions<unknown, unknown, t.DeletePromptVariables>,
 ) => {
   const queryClient = useQueryClient();
+  const { onSuccess, ...rest } = options || {};
   return useMutation<unknown, unknown, t.DeletePromptVariables>({
     mutationFn: ({ _id }) => dataService.deletePrompt(_id),
-    onMutate: async (variables) => {
-      if (options?.onMutate) {
-        await options.onMutate(variables);
-      }
-    },
-    onError: (error, variables, context) => {
-      if (options?.onError) {
-        options.onError(error, variables, context);
-      }
-    },
+    ...rest,
     onSuccess: (response, variables, context) => {
       queryClient.setQueryData<t.TPrompt[]>([QueryKeys.prompts], (oldData?: t.TPrompt[]) => {
         return oldData ? oldData.filter((prompt) => prompt._id !== variables._id) : [];
       });
-      if (options?.onSuccess) {
-        options.onSuccess(response, variables, context);
+      if (onSuccess) {
+        onSuccess(response, variables, context);
       }
     },
   });
@@ -1005,19 +989,11 @@ export const useDeletePromptGroup = (
   unknown
 > => {
   const queryClient = useQueryClient();
+  const { onSuccess, ...rest } = options || {};
   return useMutation({
     mutationFn: (variables: t.TDeletePromptGroupRequest) =>
       dataService.deletePromptGroup(variables.id),
-    onMutate: async (variables) => {
-      if (options?.onMutate) {
-        await options.onMutate(variables);
-      }
-    },
-    onError: (error, variables, context) => {
-      if (options?.onError) {
-        options.onError(error, variables, context);
-      }
-    },
+    ...rest,
     onSuccess: (response, variables, context) => {
       queryClient.setQueryData<t.PromptGroupListData>([QueryKeys.promptGroups], (data) => {
         if (!data) {
@@ -1030,8 +1006,8 @@ export const useDeletePromptGroup = (
           pageSize,
         );
       });
-      if (options?.onSuccess) {
-        options.onSuccess(response, variables, context);
+      if (onSuccess) {
+        onSuccess(response, variables, context);
       }
     },
   });
@@ -1046,23 +1022,15 @@ export const useUpdatePromptLabels = (
   unknown
 > => {
   const queryClient = useQueryClient();
+  const { onSuccess, ...rest } = options || {};
   return useMutation({
     mutationFn: (variables: t.TUpdatePromptLabelsRequest) =>
       dataService.updatePromptLabels(variables),
-    onMutate: async (variables) => {
-      if (options?.onMutate) {
-        await options.onMutate(variables);
-      }
-    },
-    onError: (error, variables, context) => {
-      if (options?.onError) {
-        options.onError(error, variables, context);
-      }
-    },
+    ...rest,
     onSuccess: (response, variables, context) => {
       queryClient.invalidateQueries([QueryKeys.prompts]);
-      if (options?.onSuccess) {
-        options.onSuccess(response, variables, context);
+      if (onSuccess) {
+        onSuccess(response, variables, context);
       }
     },
   });
@@ -1077,23 +1045,15 @@ export const useMakePromptProduction = (
   unknown
 > => {
   const queryClient = useQueryClient();
+  const { onSuccess, ...rest } = options || {};
   return useMutation({
     mutationFn: (variables: t.TMakePromptProductionRequest) =>
       dataService.makePromptProduction(variables.id),
-    onMutate: async (variables) => {
-      if (options?.onMutate) {
-        await options.onMutate(variables);
-      }
-    },
-    onError: (error, variables, context) => {
-      if (options?.onError) {
-        options.onError(error, variables, context);
-      }
-    },
+    ...rest,
     onSuccess: (response, variables, context) => {
       queryClient.invalidateQueries([QueryKeys.prompts]);
-      if (options?.onSuccess) {
-        options.onSuccess(response, variables, context);
+      if (onSuccess) {
+        onSuccess(response, variables, context);
       }
     },
   });
