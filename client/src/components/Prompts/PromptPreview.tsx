@@ -1,7 +1,7 @@
 import { format } from 'date-fns';
 import { Share2Icon, Layers3 } from 'lucide-react';
+import { useForm, FormProvider } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useForm, FormProvider, Controller } from 'react-hook-form';
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import type { TCreatePrompt } from 'librechat-data-provider';
 import {
@@ -10,38 +10,18 @@ import {
   useUpdatePromptGroup,
   useMakePromptProduction,
 } from '~/data-provider/mutations';
-import { useGetCategories, useGetPromptGroup, useGetPrompts } from '~/data-provider';
-import { Button, Skeleton, SelectDropDown } from '~/components/ui';
+import { useGetPromptGroup, useGetPrompts } from '~/data-provider';
+import { Button, Skeleton } from '~/components/ui';
+import CategorySelector from './CategorySelector';
 import PromptVariables from './PromptVariables';
 import { TrashIcon } from '~/components/svg';
-import CategoryIcon from './CategoryIcon';
 import PromptEditor from './PromptEditor';
 import PromptName from './PromptName';
 import { cn } from '~/utils';
 
-const loadingCategories = [
-  {
-    label: 'Loading...',
-    value: '',
-  },
-];
-
-const emptyCategory = {
-  label: '-',
-  value: '',
-};
-
 const PromptPreview = () => {
   const params = useParams();
   const navigate = useNavigate();
-  const { data: categories = loadingCategories } = useGetCategories({
-    select: (data) =>
-      data.map((category) => ({
-        label: category.label,
-        value: category.value,
-        icon: <CategoryIcon category={category.value} />,
-      })),
-  });
   const { data: group, isLoading: isLoadingGroup } = useGetPromptGroup(params.promptId || '');
   const { data: prompts = [], isLoading: isLoadingPrompts } = useGetPrompts(
     { groupId: params.promptId ?? '' },
@@ -61,16 +41,8 @@ const PromptPreview = () => {
     },
   });
 
-  const { watch, setValue, control } = methods;
+  const { watch, setValue } = methods;
   const watchedPrompt = watch('prompt');
-  const watchedCategory = watch('category');
-
-  const categoryOption = useMemo(
-    () =>
-      categories.find((category) => category.value === (watchedCategory ?? group?.category)) ??
-      emptyCategory,
-    [watchedCategory, categories, group?.category],
-  );
 
   const createPromptMutation = useCreatePrompt({
     onMutate() {
@@ -148,33 +120,7 @@ const PromptPreview = () => {
               />
             )}
             <div className="flex h-10 flex-row gap-x-2">
-              <Controller
-                name="category"
-                control={control}
-                rules={{ required: true, minLength: 1 }}
-                render={({ field }) => (
-                  <SelectDropDown
-                    title="Category"
-                    value={categoryOption || ''}
-                    setValue={(value) => {
-                      field.onChange(value);
-                      updateGroupMutation.mutate({
-                        id: group?._id || '',
-                        payload: { name: group?.name || '', category: value },
-                      });
-                    }}
-                    availableValues={categories}
-                    showAbove={false}
-                    showLabel={false}
-                    emptyTitle={true}
-                    showOptionIcon={true}
-                    searchPlaceholder="Search categories..."
-                    className="h-10 w-56 cursor-pointer"
-                    currentValueClass="text-md gap-2"
-                    optionsListClass="text-sm"
-                  />
-                )}
-              />
+              <CategorySelector group={group} updateGroupMutation={updateGroupMutation} />
               <Button
                 variant={'default'}
                 size={'sm'}
