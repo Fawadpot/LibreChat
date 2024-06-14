@@ -11,6 +11,7 @@ import {
 } from '~/components/ui';
 import ListCard from '~/components/Prompts/Groups/ListCard';
 import { useLocalize } from '~/hooks';
+import { getSnippet } from '~/utils';
 
 export default function ChatGroupItem({ group }: { group: TPromptGroup }) {
   const localize = useLocalize();
@@ -20,11 +21,14 @@ export default function ChatGroupItem({ group }: { group: TPromptGroup }) {
     <ListCard
       name={group.name}
       category={group.category ?? ''}
-      snippet={group.oneliner ?? group.snippet ?? ''}
+      snippet={group.oneliner ? group.oneliner : getSnippet(group?.productionPrompt?.prompt ?? '')}
     >
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="default" className="h-7 w-7 p-0 dark:bg-gray-800">
+          <Button
+            variant="outline"
+            className="h-7 w-7 p-0 dark:bg-gray-800 dark:hover:border-gray-400 dark:focus:border-gray-500"
+          >
             <MenuIcon className="icon-md dark:text-gray-300" />
           </Button>
         </DropdownMenuTrigger>

@@ -11,10 +11,7 @@ module.exports = {
   createPromptGroup: async (saveData) => {
     try {
       const { prompt, group, author, authorName } = saveData;
-      const snippet =
-        prompt.prompt.length > 56 ? `${prompt.prompt.slice(0, 53)}...` : prompt.prompt;
-
-      const newPromptGroup = await PromptGroup.create({ ...group, author, authorName, snippet });
+      const newPromptGroup = await PromptGroup.create({ ...group, author, authorName });
       const groupId = newPromptGroup._id;
 
       const newPrompt = await Prompt.create({

@@ -9,7 +9,6 @@ const Schema = mongoose.Schema;
  * @property {ObjectId} [projectId=null] - The project ID of the prompt group
  * @property {ObjectId} [productionId=null] - The project ID of the prompt group
  * @property {string} authorName - The name of the author of the prompt group
- * @property {string} snippet - The snippet of the production prompt version
  * @property {number} [numberOfGenerations=0] - Number of generations the prompt group has
  * @property {string} [oneliner=''] - Oneliner description of the prompt group
  * @property {string} [category=''] - Category of the prompt group
@@ -30,10 +29,6 @@ const promptGroupSchema = new Schema(
       default: 0,
     },
     oneliner: {
-      type: String,
-      default: '',
-    },
-    snippet: {
       type: String,
       default: '',
     },

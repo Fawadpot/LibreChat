@@ -345,11 +345,10 @@ export type TPromptGroup = {
   name: string;
   numberOfGenerations?: number;
   oneliner?: string;
-  snippet: string;
   category?: string;
   projectId?: string | null;
   productionId?: string | null;
-  productionPrompt?: TPrompt | null;
+  productionPrompt?: Pick<TPrompt, 'prompt'> | null;
   author: string;
   authorName: string;
   createdAt?: Date;
