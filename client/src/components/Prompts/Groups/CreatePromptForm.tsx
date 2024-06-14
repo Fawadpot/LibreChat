@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { LocalStorageKeys } from 'librechat-data-provider';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
 import CategorySelector from '~/components/Prompts/Groups/CategorySelector';
 import PromptVariables from '~/components/Prompts/PromptVariables';
@@ -10,8 +11,8 @@ import { cn } from '~/utils';
 type CreateFormValues = {
   name: string;
   prompt: string;
-  category: string;
   type: 'text' | 'chat';
+  category: string;
 };
 
 const defaultPrompt: CreateFormValues = {
@@ -29,7 +30,10 @@ const CreatePromptForm = ({
   const localize = useLocalize();
   const navigate = useNavigate();
   const methods = useForm({
-    defaultValues,
+    defaultValues: {
+      ...defaultValues,
+      category: localStorage.getItem(LocalStorageKeys.LAST_PROMPT_CATEGORY) ?? '',
+    },
   });
 
   const {
@@ -60,14 +64,14 @@ const CreatePromptForm = ({
             <Controller
               name="name"
               control={control}
-              rules={{ required: 'Prompt name is required' }}
+              rules={{ required: localize('com_ui_is_required', localize('com_ui_prompt_name')) }}
               render={({ field }) => (
                 <div className="mb-1 flex items-center md:mb-0">
                   <Input
                     {...field}
                     type="text"
                     className="mr-2 w-full border border-gray-300 p-2 text-2xl"
-                    placeholder="Prompt Name*"
+                    placeholder={`${localize('com_ui_prompt_name')}*`}
                   />
                   <div
                     className={cn(
@@ -92,7 +96,7 @@ const CreatePromptForm = ({
               <Controller
                 name="prompt"
                 control={control}
-                rules={{ required: 'Prompt content is required' }}
+                rules={{ required: localize('com_ui_is_required', localize('com_ui_text_prompt')) }}
                 render={({ field }) => (
                   <div>
                     <TextareaAutosize
@@ -115,7 +119,7 @@ const CreatePromptForm = ({
           <PromptVariables />
           <div className="flex justify-end">
             <Button type="submit" variant="default" disabled={!isDirty || isSubmitting || !isValid}>
-              Create Prompt
+              {localize('com_ui_create_var', localize('com_ui_prompt'))}
             </Button>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
+import { LocalStorageKeys } from 'librechat-data-provider';
 import { useGetCategories } from '~/data-provider';
 import { SelectDropDown } from '~/components/ui';
 import CategoryIcon from './CategoryIcon';
@@ -54,6 +55,7 @@ const CategorySelector = ({
           value={categoryOption || ''}
           setValue={(value) => {
             setValue('category', value, { shouldDirty: false });
+            localStorage.setItem(LocalStorageKeys.LAST_PROMPT_CATEGORY, value);
             onValueChange?.(value);
           }}
           availableValues={categories}
