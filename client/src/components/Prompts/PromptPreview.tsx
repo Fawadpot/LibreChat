@@ -11,7 +11,7 @@ import {
 } from '~/data-provider/mutations';
 import { useGetPromptGroup, useGetPrompts } from '~/data-provider';
 import { Button, Skeleton } from '~/components/ui';
-import CategorySelector from './CategorySelector';
+import CategorySelector from './Groups/CategorySelector';
 import PromptVariables from './PromptVariables';
 import PromptVersions from './PromptVersions';
 import { TrashIcon } from '~/components/svg';

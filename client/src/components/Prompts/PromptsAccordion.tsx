@@ -1,4 +1,4 @@
-import PromptSidePanel from './PromptSidePanel';
+import PromptSidePanel from './Groups/GroupsSidePanel';
 
 export default function PromptsAccordion() {
   return (

@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import type { TPromptGroup } from 'librechat-data-provider';
-import DashGroupItem from './DashGroupItem';
-import ChatGroupItem from './ChatGroupItem';
+import DashGroupItem from '~/components/Prompts/Groups/DashGroupItem';
+import ChatGroupItem from '~/components/Prompts/Groups/ChatGroupItem';
 import { Button } from '~/components/ui';
 
 export default function PromptGroupsList({ groups }: { groups?: TPromptGroup[] }) {

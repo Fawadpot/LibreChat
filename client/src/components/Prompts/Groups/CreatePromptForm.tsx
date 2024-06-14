@@ -4,7 +4,7 @@ import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { Button, TextareaAutosize, Input } from '~/components/ui';
 import CategorySelector from './CategorySelector';
 import { useCreatePrompt } from '~/data-provider';
-import PromptVariables from './PromptVariables';
+import PromptVariables from '../PromptVariables';
 import { cn } from '~/utils';
 
 type CreateFormValues = {

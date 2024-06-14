@@ -1,6 +1,6 @@
-import CategoryIcon from './CategoryIcon';
+import CategoryIcon from '~/components/Prompts/Groups/CategoryIcon';
 
-export default function GroupListCard({
+export default function ListCard({
   category,
   oneliner,
   snippet,

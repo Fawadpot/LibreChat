@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { MessageSquareQuote } from 'lucide-react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
-import PromptSidePanel from './PromptSidePanel';
+import PromptSidePanel from './Groups/GroupsSidePanel';
 import { Button } from '~/components/ui';
 import { cn } from '~/utils';
 

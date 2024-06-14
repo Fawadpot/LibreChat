@@ -1,12 +1,12 @@
 import { useState, useMemo } from 'react';
 import { ListFilter, MessageSquareQuote } from 'lucide-react';
 import { usePromptGroupsInfiniteQuery } from '~/data-provider';
-import PromptGroupsList from './PromptGroupsList';
+import List from '~/components/Prompts/Groups/List';
 import { Button, Input } from '~/components/ui';
 import { useLocalize } from '~/hooks';
 import { cn } from '~/utils';
 
-export default function PromptSidePanel({
+export default function GroupsSidePanel({
   isDetailView,
   showHeader,
   className = '',
@@ -64,7 +64,7 @@ export default function PromptSidePanel({
         </div> */}
       </div>
       <div className="flex-grow overflow-y-auto">
-        {!groupsQuery.isLoading && <PromptGroupsList groups={promptGroups} />}
+        {!groupsQuery.isLoading && <List groups={promptGroups} />}
       </div>
       <div className="m-2 flex justify-end gap-2">
         <Button
