@@ -1,4 +1,4 @@
-import type * as types from '../types';
+import * as types from '../types';
 import {
   Assistant,
   AssistantCreateParams,
@@ -135,7 +135,8 @@ export type UpdatePromptLabelOptions = MutationOptions<
 
 export type MakePromptProductionOptions = MutationOptions<
   types.TMakePromptProductionResponse,
-  types.TMakePromptProductionRequest
+  types.TMakePromptProductionRequest,
+  Array<types.TPrompt> | undefined
 >;
 
 /* Auth mutations */

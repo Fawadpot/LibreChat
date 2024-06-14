@@ -8,7 +8,7 @@ import { useSetRecoilState } from 'recoil';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { dataService, MutationKeys, QueryKeys, defaultOrderQuery } from 'librechat-data-provider';
 import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import type t from 'librechat-data-provider';
+import t from 'librechat-data-provider';
 import {
   /* Shared Links */
   addSharedLink,
@@ -1021,14 +1021,12 @@ export const useUpdatePromptLabels = (
   t.TUpdatePromptLabelsRequest,
   unknown
 > => {
-  const queryClient = useQueryClient();
   const { onSuccess, ...rest } = options || {};
   return useMutation({
     mutationFn: (variables: t.TUpdatePromptLabelsRequest) =>
       dataService.updatePromptLabels(variables),
     ...rest,
     onSuccess: (response, variables, context) => {
-      queryClient.invalidateQueries([QueryKeys.prompts]);
       if (onSuccess) {
         onSuccess(response, variables, context);
       }
@@ -1036,22 +1034,39 @@ export const useUpdatePromptLabels = (
   });
 };
 
-export const useMakePromptProduction = (
-  options?: t.MakePromptProductionOptions,
-): UseMutationResult<
-  t.TMakePromptProductionResponse,
-  unknown,
-  t.TMakePromptProductionRequest,
-  unknown
-> => {
+export const useMakePromptProduction = (options?: t.MakePromptProductionOptions) => {
   const queryClient = useQueryClient();
-  const { onSuccess, ...rest } = options || {};
+  const { onSuccess, onError, onMutate } = options || {};
   return useMutation({
     mutationFn: (variables: t.TMakePromptProductionRequest) =>
       dataService.makePromptProduction(variables.id),
-    ...rest,
+    onMutate: (variables: t.TMakePromptProductionRequest) => {
+      const previousPrompts = queryClient.getQueryData<t.TPrompt[]>([QueryKeys.prompts]);
+
+      queryClient.setQueryData<t.TPrompt[]>(
+        [QueryKeys.prompts, variables.groupId],
+        (oldPrompts = []) =>
+          oldPrompts.map((prompt) =>
+            prompt._id === variables.id
+              ? { ...prompt, isProduction: true }
+              : { ...prompt, isProduction: false },
+          ),
+      );
+      if (onMutate) {
+        onMutate(variables);
+      }
+
+      return previousPrompts;
+    },
+    onError: (err, variables, context) => {
+      if (context) {
+        queryClient.setQueryData([QueryKeys.prompts], context);
+      }
+      if (onError) {
+        onError(err, variables, context);
+      }
+    },
     onSuccess: (response, variables, context) => {
-      queryClient.invalidateQueries([QueryKeys.prompts]);
       if (onSuccess) {
         onSuccess(response, variables, context);
       }

@@ -415,6 +415,7 @@ export type TMakePromptProductionResponse = {
 
 export type TMakePromptProductionRequest = {
   id: string;
+  groupId: string;
 };
 
 export type TUpdatePromptLabelsRequest = {

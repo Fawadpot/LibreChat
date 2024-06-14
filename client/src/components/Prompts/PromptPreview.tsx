@@ -141,8 +141,15 @@ const PromptPreview = () => {
                 size={'sm'}
                 className="h-10 bg-green-400 transition-all hover:bg-green-500"
                 variant={'default'}
-                onClick={() => makeProductionMutation.mutate({ id: selectedPrompt?._id || '' })}
-                disabled={isLoadingGroup || selectedPrompt?.isProduction}
+                onClick={() =>
+                  makeProductionMutation.mutate({
+                    id: selectedPrompt?._id || '',
+                    groupId: group?._id || '',
+                  })
+                }
+                disabled={
+                  isLoadingGroup || selectedPrompt?.isProduction || makeProductionMutation.isLoading
+                }
               >
                 <Rocket />
               </Button>
