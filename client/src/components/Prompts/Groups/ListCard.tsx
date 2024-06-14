@@ -2,11 +2,13 @@ import CategoryIcon from '~/components/Prompts/Groups/CategoryIcon';
 
 export default function ListCard({
   category,
+  name,
   oneliner,
   snippet,
   children,
 }: {
   category: string;
+  name: string;
   oneliner?: string;
   snippet: string;
   children?: React.ReactNode;
@@ -20,7 +22,7 @@ export default function ListCard({
         <div className="flex flex-row gap-2">
           <CategoryIcon category={category} className="icon-md" />
           <h3 className="break-word text-balance text-sm font-semibold text-gray-800 dark:text-gray-200">
-            {category}
+            {name}
           </h3>
         </div>
         <div>{children}</div>
