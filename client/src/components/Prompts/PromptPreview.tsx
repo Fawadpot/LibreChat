@@ -145,12 +145,14 @@ const PromptPreview = () => {
                 size={'sm'}
                 className="h-10 bg-green-400 transition-all hover:bg-green-500"
                 variant={'default'}
-                onClick={() =>
+                onClick={() => {
+                  const { _id: promptVersionId = '', prompt } = selectedPrompt;
                   makeProductionMutation.mutate({
-                    id: selectedPrompt?._id || '',
+                    id: promptVersionId || '',
                     groupId: group?._id || '',
-                  })
-                }
+                    productionPrompt: { prompt },
+                  });
+                }}
                 disabled={
                   isLoadingGroup ||
                   selectedPrompt?._id === group?.productionId ||

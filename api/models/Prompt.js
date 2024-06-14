@@ -39,7 +39,13 @@ module.exports = {
         .select('-__v')
         .exec();
 
-      return { prompt: newPrompt, group: newPromptGroup };
+      return {
+        prompt: newPrompt,
+        group: {
+          ...newPromptGroup,
+          productionPrompt: { prompt: newPrompt.prompt },
+        },
+      };
     } catch (error) {
       logger.error('Error saving prompt group', error);
       throw new Error('Error saving prompt group');

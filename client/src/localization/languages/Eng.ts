@@ -140,6 +140,7 @@ export default {
   com_ui_upload_invalid: 'Invalid file for upload. Must be an image not exceeding 2 MB',
   com_ui_cancel: 'Cancel',
   com_ui_save: 'Save',
+  com_ui_renaming_var: 'Renaming "{0}"',
   com_ui_save_submit: 'Save & Submit',
   com_user_message: 'You',
   com_ui_read_aloud: 'Read aloud',
