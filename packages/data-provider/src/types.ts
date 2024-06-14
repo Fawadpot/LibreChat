@@ -349,6 +349,7 @@ export type TPromptGroup = {
   category?: string;
   projectId?: string | null;
   productionId?: string | null;
+  productionPrompt?: TPrompt | null;
   author: string;
   authorName: string;
   createdAt?: Date;

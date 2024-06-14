@@ -116,19 +116,52 @@ module.exports = {
    */
   getPromptGroups: async (filter) => {
     try {
-      const { pageNumber, pageSize, name } = filter;
+      const { pageNumber = 1, pageSize = 10, name } = filter;
 
       const query = {};
       if (name) {
         query.name = new RegExp(name, 'i');
       }
 
-      const promptGroups = await PromptGroup.find(query)
-        .sort({ createdAt: -1 })
-        .skip((parseInt(pageNumber, 10) - 1) * parseInt(pageSize, 10))
-        .limit(parseInt(pageSize, 10))
-        .lean();
+      const skip = (parseInt(pageNumber, 10) - 1) * parseInt(pageSize, 10);
+      const limit = parseInt(pageSize, 10);
+
+      const promptGroupsAggregate = PromptGroup.aggregate([
+        { $match: query },
+        { $sort: { createdAt: -1 } },
+        { $skip: skip },
+        { $limit: limit },
+        {
+          $lookup: {
+            from: 'prompts',
+            localField: 'productionId',
+            foreignField: '_id',
+            as: 'productionPrompt',
+          },
+        },
+        { $unwind: { path: '$productionPrompt', preserveNullAndEmptyArrays: true } },
+        {
+          $project: {
+            name: 1,
+            numberOfGenerations: 1,
+            oneliner: 1,
+            category: 1,
+            projectId: 1,
+            productionId: 1,
+            author: 1,
+            authorName: 1,
+            createdAt: 1,
+            updatedAt: 1,
+            'productionPrompt.prompt': 1,
+            // 'productionPrompt._id': 1,
+            // 'productionPrompt.type': 1,
+          },
+        },
+      ]);
+
+      const promptGroups = await promptGroupsAggregate.exec();
       const totalPromptGroups = await PromptGroup.countDocuments(query);
+
       return {
         promptGroups,
         pageNumber: pageNumber.toString(),

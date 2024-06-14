@@ -50,6 +50,7 @@ const promptGroupSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Prompt',
       required: true,
+      index: true,
     },
     author: {
       type: Schema.Types.ObjectId,
