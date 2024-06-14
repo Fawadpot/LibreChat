@@ -71,7 +71,7 @@ const PromptName: React.FC<Props> = ({ name, onSave }) => {
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
             ref={inputRef}
-            className="mr-2 w-56 rounded-md border p-2 md:w-auto"
+            className="mr-2 w-56 rounded-md border bg-transparent p-2 focus:outline-none dark:border-gray-600 md:w-auto"
             autoFocus={true}
           />
           <button

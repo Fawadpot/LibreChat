@@ -29,7 +29,7 @@ export default function PromptsView() {
           <BackToChat className="h-9 lg:hidden" />
         </div>
       )}
-      <div className="flex w-full flex-grow flex-row divide-x overflow-hidden">
+      <div className="flex w-full flex-grow flex-row divide-x overflow-hidden dark:divide-gray-600">
         <GroupSidePanel isDetailView={isDetailView} showHeader={true} />
         <div
           className={cn(
