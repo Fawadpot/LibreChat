@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
+import CategorySelector from '~/components/Prompts/Groups/CategorySelector';
+import PromptVariables from '~/components/Prompts/PromptVariables';
 import { Button, TextareaAutosize, Input } from '~/components/ui';
-import CategorySelector from './CategorySelector';
 import { useCreatePrompt } from '~/data-provider';
-import PromptVariables from '../PromptVariables';
+import { useLocalize } from '~/hooks';
 import { cn } from '~/utils';
 
 type CreateFormValues = {
@@ -26,19 +26,18 @@ const CreatePromptForm = ({
 }: {
   defaultValues?: CreateFormValues;
 }) => {
+  const localize = useLocalize();
+  const navigate = useNavigate();
   const methods = useForm({
     defaultValues,
   });
 
   const {
-    watch,
     control,
-    setValue,
     handleSubmit,
     formState: { isDirty, isSubmitting, errors, isValid },
   } = methods;
 
-  const navigate = useNavigate();
   const createPromptMutation = useCreatePrompt({
     onSuccess: (response) => {
       navigate(`/d/prompts/${response.prompt.groupId}`, { replace: true });
@@ -52,12 +51,6 @@ const CreatePromptForm = ({
       group: { name, category },
     });
   };
-
-  const watchType = watch('type');
-
-  useEffect(() => {
-    setValue('prompt', defaultValues.prompt);
-  }, [watchType, defaultValues.prompt, setValue]);
 
   return (
     <FormProvider {...methods}>
@@ -93,7 +86,7 @@ const CreatePromptForm = ({
         <div className="w-full md:mt-[1.075rem]">
           <div>
             <h2 className="flex items-center justify-between rounded-t-lg border border-gray-300 py-2 pl-4 pr-1 text-base font-semibold">
-              {watchType} prompt*
+              {localize('com_ui_text_prompt')}*
             </h2>
             <div className="mb-4 min-h-32 rounded-b-lg border border-gray-300 p-4 transition-all duration-150">
               <Controller
@@ -120,7 +113,6 @@ const CreatePromptForm = ({
             </div>
           </div>
           <PromptVariables />
-
           <div className="flex justify-end">
             <Button type="submit" variant="default" disabled={!isDirty || isSubmitting || !isValid}>
               Create Prompt

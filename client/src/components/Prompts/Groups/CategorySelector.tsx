@@ -48,7 +48,6 @@ const CategorySelector = ({
     <Controller
       name="category"
       control={control}
-      rules={{ required: true, minLength: 1 }}
       render={() => (
         <SelectDropDown
           title="Category"

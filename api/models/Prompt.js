@@ -11,23 +11,35 @@ module.exports = {
   createPromptGroup: async (saveData) => {
     try {
       const { prompt, group, author, authorName } = saveData;
-      const newPromptGroup = await PromptGroup.create({ ...group, author, authorName });
-      const groupId = newPromptGroup._id;
 
-      const newPrompt = await Prompt.create({
-        ...prompt,
-        groupId,
-        author,
-      });
+      let newPromptGroup = await PromptGroup.findOneAndUpdate(
+        { ...group, author, authorName, productionId: null },
+        { $setOnInsert: { ...group, author, authorName, productionId: null } },
+        { new: true, upsert: true },
+      )
+        .lean()
+        .select('-__v')
+        .exec();
 
-      await PromptGroup.findByIdAndUpdate(groupId, {
-        productionId: newPrompt._id,
-      });
+      const newPrompt = await Prompt.findOneAndUpdate(
+        { ...prompt, author, groupId: newPromptGroup._id },
+        { $setOnInsert: { ...prompt, author, groupId: newPromptGroup._id } },
+        { new: true, upsert: true },
+      )
+        .lean()
+        .select('-__v')
+        .exec();
 
-      const promptGroupLean = await PromptGroup.findById(groupId).lean().exec();
-      const promptLean = await Prompt.findById(newPrompt._id).lean().exec();
+      newPromptGroup = await PromptGroup.findByIdAndUpdate(
+        newPromptGroup._id,
+        { productionId: newPrompt._id },
+        { new: true },
+      )
+        .lean()
+        .select('-__v')
+        .exec();
 
-      return { prompt: promptLean, group: promptGroupLean };
+      return { prompt: newPrompt, group: newPromptGroup };
     } catch (error) {
       logger.error('Error saving prompt group', error);
       throw new Error('Error saving prompt group');
