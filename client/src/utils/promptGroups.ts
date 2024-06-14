@@ -56,6 +56,6 @@ export const updateGroupFields = (
   );
 };
 
-export const getSnippet = (promptText: string) => {
-  return promptText.length > 56 ? `${promptText.slice(0, 53)}...` : promptText;
+export const getSnippet = (promptText: string, length = 56) => {
+  return promptText.length > length ? `${promptText.slice(0, length - 3)}...` : promptText;
 };

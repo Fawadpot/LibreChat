@@ -21,7 +21,9 @@ export default function ChatGroupItem({ group }: { group: TPromptGroup }) {
     <ListCard
       name={group.name}
       category={group.category ?? ''}
-      snippet={group.oneliner ? group.oneliner : getSnippet(group?.productionPrompt?.prompt ?? '')}
+      snippet={
+        group.oneliner ? group.oneliner : getSnippet(group?.productionPrompt?.prompt ?? '', 40)
+      }
     >
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -35,7 +37,7 @@ export default function ChatGroupItem({ group }: { group: TPromptGroup }) {
         <DropdownMenuContent className="mt-2 w-36 rounded-lg" collisionPadding={2} align="end">
           <DropdownMenuGroup>
             <DropdownMenuItem
-              className="rounded-lg dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:bg-gray-700"
+              className="cursor-pointer rounded-lg dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:bg-gray-700"
               onClick={() => navigate(`/d/prompts/${group._id}`)}
             >
               <EditIcon className="mr-2 h-4 w-4" />
