@@ -1,3 +1,4 @@
+import React from 'react';
 import { FileSources } from 'librechat-data-provider';
 import type * as InputNumberPrimitive from 'rc-input-number';
 import type { ColumnDef } from '@tanstack/react-table';
@@ -75,7 +76,7 @@ export type IconMapProps = {
 export type NavLink = {
   title: string;
   label?: string;
-  icon: LucideIcon;
+  icon: LucideIcon | React.FC;
   Component?: React.ComponentType;
   onClick?: () => void;
   variant?: 'default' | 'ghost';
