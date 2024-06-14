@@ -26,7 +26,7 @@ const CategorySelector = ({
   onValueChange?: (value: string) => void;
   className?: string;
 }) => {
-  const { control, watch } = useFormContext();
+  const { control, watch, setValue } = useFormContext();
   const { data: categories = loadingCategories } = useGetCategories({
     select: (data) =>
       data.map((category) => ({
@@ -49,12 +49,12 @@ const CategorySelector = ({
       name="category"
       control={control}
       rules={{ required: true, minLength: 1 }}
-      render={({ field }) => (
+      render={() => (
         <SelectDropDown
           title="Category"
           value={categoryOption || ''}
           setValue={(value) => {
-            field.onChange(value);
+            setValue('category', value, { shouldDirty: false });
             onValueChange?.(value);
           }}
           availableValues={categories}

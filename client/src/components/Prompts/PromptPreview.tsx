@@ -40,17 +40,16 @@ const PromptPreview = () => {
     },
   });
 
-  const { watch, setValue } = methods;
-  const watchedPrompt = watch('prompt');
+  const { handleSubmit, setValue, reset } = methods;
 
   const createPromptMutation = useCreatePrompt({
-    onMutate() {
+    onSuccess(data) {
+      reset({
+        prompt: data.prompt.prompt,
+        promptName: data.group?.name || '',
+        category: data.group?.category || '',
+      });
       setSelectionIndex(0);
-    },
-    onSuccess() {
-      setValue('prompt', '');
-      setValue('promptName', group?.name || '');
-      setValue('category', group?.category || '');
     },
   });
   const updateGroupMutation = useUpdatePromptGroup();
@@ -80,9 +79,10 @@ const PromptPreview = () => {
         },
       };
 
-      if (value.trim() === selectedPrompt?.prompt?.trim()) {
+      if (value === selectedPrompt?.prompt) {
         return;
       }
+
       createPromptMutation.mutate(tempPrompt);
     },
     [selectedPrompt, createPromptMutation],
@@ -90,19 +90,19 @@ const PromptPreview = () => {
 
   useEffect(() => {
     if (prevIsEditingRef.current && !isEditing) {
-      onSave(watchedPrompt);
+      handleSubmit((data) => onSave(data.prompt))();
     }
     prevIsEditingRef.current = isEditing;
-  }, [isEditing, watchedPrompt, onSave]);
+  }, [isEditing, onSave, handleSubmit]);
 
   useEffect(() => {
-    setValue('prompt', selectedPrompt?.prompt || '');
-    setValue('category', group?.category || '');
+    setValue('prompt', selectedPrompt?.prompt || '', { shouldDirty: false });
+    setValue('category', group?.category || '', { shouldDirty: false });
   }, [selectedPrompt, group?.category, setValue]);
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(() => onSave(watchedPrompt))}>
+      <form onSubmit={handleSubmit((data) => onSave(data.prompt))}>
         <div>
           <div className="flex flex-col items-center justify-between px-4 sm:flex-row">
             {isLoadingGroup ? (
@@ -165,7 +165,7 @@ const PromptPreview = () => {
           </div>
           <div className="flex h-full w-full flex-col md:flex-row">
             {/* Left Section */}
-            <div className="flex-1 overflow-y-auto border-r border-gray-300 p-4 md:max-h-[calc(100vh-200px)]">
+            <div className="flex-1 overflow-y-auto border-r border-gray-300 p-4 md:max-h-[calc(100vh-150px)]">
               {isLoadingPrompts ? (
                 <Skeleton className="h-96" />
               ) : (
@@ -182,7 +182,7 @@ const PromptPreview = () => {
               )}
             </div>
             {/* Right Section */}
-            <div className="flex-1 overflow-y-auto p-4 md:max-h-[calc(100vh-200px)] md:w-1/4 md:max-w-[35%] lg:max-w-[30%] xl:max-w-[25%]">
+            <div className="flex-1 overflow-y-auto p-4 md:max-h-[calc(100vh-150px)] md:w-1/4 md:max-w-[35%] lg:max-w-[30%] xl:max-w-[25%]">
               {isLoadingPrompts ? (
                 <Skeleton className="h-96 w-full" />
               ) : (

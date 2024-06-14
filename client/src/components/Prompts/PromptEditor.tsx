@@ -1,8 +1,8 @@
+import { useMemo } from 'react';
 import { EditIcon } from 'lucide-react';
-import React, { useEffect } from 'react';
-import { Controller, useFormContext } from 'react-hook-form';
+import { Controller, useFormContext, useFormState } from 'react-hook-form';
+import { SaveIcon, CrossIcon } from '~/components/svg';
 import { TextareaAutosize } from '~/components/ui';
-import { SaveIcon } from '~/components/svg';
 import { cn } from '~/utils';
 
 type Props = {
@@ -13,14 +13,16 @@ type Props = {
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const PromptEditor: React.FC<Props> = ({ type, prompt, name, isEditing, setIsEditing }) => {
-  const { control, setValue } = useFormContext();
+const PromptEditor: React.FC<Props> = ({ type, name, isEditing, setIsEditing }) => {
+  const { control } = useFormContext();
+  const { dirtyFields } = useFormState({ control: control });
 
-  useEffect(() => {
-    setValue(name, prompt);
-  }, [prompt, setValue, name]);
-
-  const EditorIcon = isEditing ? SaveIcon : EditIcon;
+  const EditorIcon = useMemo(() => {
+    if (isEditing && !dirtyFields.prompt) {
+      return CrossIcon;
+    }
+    return isEditing ? SaveIcon : EditIcon;
+  }, [isEditing, dirtyFields.prompt]);
 
   return (
     <div>
@@ -37,15 +39,17 @@ const PromptEditor: React.FC<Props> = ({ type, prompt, name, isEditing, setIsEdi
       </h2>
       <div
         className={cn(
-          'mb-4 min-h-32 rounded-b-lg border border-gray-300 p-4 transition-all duration-150',
+          'group relative mb-4 min-h-32 rounded-b-lg border border-gray-300 p-4 transition-all duration-150 hover:opacity-90',
           { 'cursor-pointer hover:bg-gray-100/50': !isEditing },
         )}
         onClick={() => !isEditing && setIsEditing(true)}
       >
+        {!isEditing && (
+          <EditIcon className="icon-xl absolute inset-0 m-auto hidden opacity-25 group-hover:block" />
+        )}
         <Controller
           name={name}
           control={control}
-          // Ensure it's editable only when isEditing is true
           render={({ field }) =>
             isEditing ? (
               <TextareaAutosize

@@ -34,7 +34,7 @@ export default function PromptListItem({ prompt }: { prompt: TPromptGroup }) {
         navigate(`/d/prompts/${prompt._id}`, { replace: true });
       }}
     >
-      <div className="flex w-1/2 flex-row items-center justify-start">
+      <div className="flex w-1/2 flex-row items-center justify-start truncate">
         {/* <Checkbox /> */}
 
         {nameEditFlag ? (
