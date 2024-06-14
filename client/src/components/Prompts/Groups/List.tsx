@@ -5,7 +5,7 @@ import ChatGroupItem from '~/components/Prompts/Groups/ChatGroupItem';
 import { Button } from '~/components/ui';
 
 export default function List({
-  groups,
+  groups = [],
   isChatRoute,
 }: {
   groups?: TPromptGroup[];

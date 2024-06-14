@@ -1,11 +1,12 @@
-import { useState, useMemo } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { ListFilter, MessageSquareQuote } from 'lucide-react';
-import { usePromptGroupsInfiniteQuery } from '~/data-provider';
-import List from '~/components/Prompts/Groups/List';
+import { useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
+// import { useNavigate, useLocation } from 'react-router-dom';
+// import { ListFilter, MessageSquareQuote } from 'lucide-react';
+import { MessageSquareQuote } from 'lucide-react';
 import PanelNavigation from '~/components/Prompts/Groups/PanelNavigation';
-import { Button, Input } from '~/components/ui';
-import { useLocalize } from '~/hooks';
+import { useLocalize, usePromptGroupsNav } from '~/hooks';
+import List from '~/components/Prompts/Groups/List';
+// import { Button, Input } from '~/components/ui';
 import { cn } from '~/utils';
 
 export default function GroupSidePanel({
@@ -17,30 +18,11 @@ export default function GroupSidePanel({
   showHeader?: boolean;
   className?: string;
 }) {
+  const { prevPage, nextPage, isFetching, hasNextPage, promptGroups, hasPreviousPage } =
+    usePromptGroupsNav();
   const localize = useLocalize();
-  const navigate = useNavigate();
   const location = useLocation();
-
-  const [name, setName] = useState('');
-  const [pageSize, _setPageSize] = useState(10);
-  const [pageNumber, _setPageNumber] = useState(1);
   const isChatRoute = useMemo(() => location.pathname.startsWith('/c/'), [location.pathname]);
-
-  const groupsQuery = usePromptGroupsInfiniteQuery({
-    pageSize,
-    pageNumber: pageNumber + '',
-    name,
-  });
-
-  const promptGroups = useMemo(() => {
-    return groupsQuery?.data?.pages.flatMap((page) => page.promptGroups) || [];
-  }, [groupsQuery.data]);
-
-  const fetchNextPage = () => {
-    if (groupsQuery.hasNextPage) {
-      groupsQuery.fetchNextPage();
-    }
-  };
 
   return (
     <div
@@ -70,31 +52,15 @@ export default function GroupSidePanel({
         </div> */}
       </div>
       <div className="flex-grow overflow-y-auto">
-        {!groupsQuery.isLoading && <List groups={promptGroups} isChatRoute={isChatRoute} />}
+        <List groups={promptGroups} isChatRoute={isChatRoute} />
       </div>
-      {/* <div className="m-2 flex justify-end gap-2">
-        <Button
-          variant="outline"
-          onClick={() => groupsQuery.fetchPreviousPage()}
-          disabled={!groupsQuery.hasPreviousPage}
-        >
-          Prev
-        </Button>
-        <Button
-          variant="outline"
-          onClick={() => fetchNextPage()}
-          disabled={!groupsQuery.hasNextPage || groupsQuery.isFetchingNextPage}
-        >
-          {groupsQuery.isFetchingNextPage ? 'Loading more...' : 'Next'}
-        </Button>
-      </div> */}
       <PanelNavigation
-        isFetching={groupsQuery.isFetchingNextPage}
-        hasNextPage={!!groupsQuery.hasNextPage}
-        hasPreviousPage={!!groupsQuery.hasPreviousPage}
-        nextPage={fetchNextPage}
-        prevPage={() => groupsQuery.fetchPreviousPage()}
+        nextPage={nextPage}
+        prevPage={prevPage}
+        isFetching={isFetching}
+        hasNextPage={hasNextPage}
         isChatRoute={isChatRoute}
+        hasPreviousPage={hasPreviousPage}
       />
     </div>
   );

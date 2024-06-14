@@ -1,9 +1,10 @@
+import { memo } from 'react';
 import ManagePrompts from '~/components/Prompts/ManagePrompts';
 import BackToChat from '~/components/Prompts/BackToChat';
 import { Button } from '~/components/ui';
 import { useLocalize } from '~/hooks';
 
-export default function PanelNavigation({
+function PanelNavigation({
   prevPage,
   nextPage,
   hasPreviousPage,
@@ -27,9 +28,11 @@ export default function PanelNavigation({
           {localize('com_ui_prev')}
         </Button>
         <Button variant="outline" onClick={() => nextPage()} disabled={!hasNextPage || isFetching}>
-          {isFetching ? localize('com_ui_loading') : localize('com_ui_next')}
+          {localize('com_ui_next')}
         </Button>
       </div>
     </div>
   );
 }
+
+export default memo(PanelNavigation);

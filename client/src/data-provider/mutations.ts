@@ -912,12 +912,7 @@ export const useUpdatePromptGroup = (
         if (!data) {
           return data;
         }
-        const pageSize = data.pages[0].pageSize as number;
-        return normalizeData(
-          updatePromptGroup(data, response),
-          InfiniteCollections.PROMPT_GROUPS,
-          pageSize,
-        );
+        return updatePromptGroup(data, response);
       });
       options?.onSuccess?.(response, variables, context);
     },
@@ -946,12 +941,7 @@ export const useCreatePrompt = (
           if (!data) {
             return data;
           }
-          const pageSize = data.pages[0].pageSize as number;
-          return normalizeData(
-            addPromptGroup(data, group),
-            InfiniteCollections.PROMPT_GROUPS,
-            pageSize,
-          );
+          return addPromptGroup(data, group);
         });
       }
 
@@ -1000,12 +990,8 @@ export const useDeletePromptGroup = (
         if (!data) {
           return data;
         }
-        const pageSize = data.pages[0].pageSize as number;
-        return normalizeData(
-          deletePromptGroup(data, variables.id),
-          InfiniteCollections.PROMPT_GROUPS,
-          pageSize,
-        );
+
+        return deletePromptGroup(data, variables.id);
       });
       if (onSuccess) {
         onSuccess(response, variables, context);
@@ -1052,17 +1038,13 @@ export const useMakePromptProduction = (options?: t.MakePromptProductionOptions)
       const previousListData = JSON.parse(JSON.stringify(groupData)) as t.PromptGroupListData;
 
       if (groupData) {
-        const newData = normalizeData(
-          updateGroupFields(
-            /* Paginated Data */
-            groupData,
-            /* Update */
-            { _id: variables.groupId, productionId: variables.id },
-            /* Callback */
-            (group) => queryClient.setQueryData([QueryKeys.promptGroup, variables.groupId], group),
-          ),
-          InfiniteCollections.PROMPT_GROUPS,
-          groupData.pages[0].pageSize as number,
+        const newData = updateGroupFields(
+          /* Paginated Data */
+          groupData,
+          /* Update */
+          { _id: variables.groupId, productionId: variables.id },
+          /* Callback */
+          (group) => queryClient.setQueryData([QueryKeys.promptGroup, variables.groupId], group),
         );
         queryClient.setQueryData<t.PromptGroupListData>([QueryKeys.promptGroups], newData);
       }
