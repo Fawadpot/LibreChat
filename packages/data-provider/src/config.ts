@@ -838,6 +838,8 @@ export enum LocalStorageKeys {
   TEXT_DRAFT = 'textDraft_',
   /** Key for saving file drafts */
   FILES_DRAFT = 'filesDraft_',
+  /** Key for last Selected Prompt Category */
+  LAST_PROMPT_CATEGORY = 'lastPromptCategory',
 }
 
 export enum ForkOptions {

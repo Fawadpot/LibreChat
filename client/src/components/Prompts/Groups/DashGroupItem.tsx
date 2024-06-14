@@ -9,16 +9,16 @@ import { NewTrashIcon } from '~/components/svg';
 import { Button, Input } from '~/components/ui';
 import { cn } from '~/utils';
 
-export default function PromptListItem({ prompt }: { prompt: TPromptGroup }) {
+export default function DashGroupItem({ group }: { group: TPromptGroup }) {
   const params = useParams();
   const navigate = useNavigate();
   const updateGroup = useUpdatePromptGroup();
   const [nameEditFlag, setNameEditFlag] = useState(false);
   const [popoverActive, setPopoverActive] = useState(false);
-  const [nameInputField, setNameInputField] = useState(prompt.name);
+  const [nameInputField, setNameInputField] = useState(group.name);
   const deletePromptGroupMutation = useDeletePromptGroup({
     onSuccess: (response, variables) => {
-      if (variables.id === prompt._id) {
+      if (variables.id === group._id) {
         navigate('/d/prompts');
       }
     },
@@ -27,14 +27,14 @@ export default function PromptListItem({ prompt }: { prompt: TPromptGroup }) {
   return (
     <div
       className={cn(
-        'w-100 mx-2 my-3 flex cursor-pointer flex-row rounded-md border-0 bg-white p-4 transition-all duration-300 ease-in-out hover:bg-gray-100',
-        params.promptId === prompt._id && 'bg-gray-100/50',
+        'w-100 mx-2 my-3 flex cursor-pointer flex-row rounded-md border-0 bg-white p-4 transition-all duration-300 ease-in-out hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-800',
+        params.promptId === group._id && 'bg-gray-100/50',
       )}
       onClick={() => {
-        navigate(`/d/prompts/${prompt._id}`, { replace: true });
+        navigate(`/d/prompts/${group._id}`, { replace: true });
       }}
     >
-      <div className="flex w-1/2 flex-row items-center justify-start">
+      <div className="flex w-1/2 flex-row items-center justify-start truncate">
         {/* <Checkbox /> */}
 
         {nameEditFlag ? (
@@ -49,7 +49,7 @@ export default function PromptListItem({ prompt }: { prompt: TPromptGroup }) {
             <Button
               className="w-min bg-transparent text-[#666666] hover:bg-gray-200"
               onClick={() => {
-                updateGroup.mutate({ payload: { name: nameInputField }, id: prompt?._id || '' });
+                updateGroup.mutate({ payload: { name: nameInputField }, id: group?._id || '' });
                 setNameEditFlag(false);
               }}
             >
@@ -57,7 +57,7 @@ export default function PromptListItem({ prompt }: { prompt: TPromptGroup }) {
             </Button>
           </div>
         ) : (
-          <strong>{prompt.name}</strong>
+          <strong>{group.name}</strong>
         )}
       </div>
       <div className="flex w-1/2 flex-row items-center justify-end gap-1">
@@ -85,7 +85,7 @@ export default function PromptListItem({ prompt }: { prompt: TPromptGroup }) {
           className="z-1 h-8 w-8 bg-transparent p-2 text-[#666666] hover:bg-gray-200"
           onClick={(e) => {
             e.stopPropagation();
-            deletePromptGroupMutation.mutate({ id: prompt?._id || '' });
+            deletePromptGroupMutation.mutate({ id: group?._id || '' });
           }}
         >
           <NewTrashIcon />

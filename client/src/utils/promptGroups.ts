@@ -1,10 +1,10 @@
 import { InfiniteCollections } from 'librechat-data-provider';
 import type {
-  PromptGroupListData,
   PromptGroupListResponse,
+  PromptGroupListData,
   TPromptGroup,
 } from 'librechat-data-provider';
-import { addData, deleteData, updateData } from './collection';
+import { addData, deleteData, updateData, updateFields } from './collection';
 import { InfiniteData } from '@tanstack/react-query';
 
 export const addPromptGroup = (
@@ -15,7 +15,7 @@ export const addPromptGroup = (
     data,
     InfiniteCollections.PROMPT_GROUPS,
     newPromptGroup,
-    (page) => page.promptGroups.findIndex((c) => c._id === newPromptGroup._id),
+    (page) => page.promptGroups.findIndex((group) => group._id === newPromptGroup._id),
   );
 };
 
@@ -27,7 +27,7 @@ export const updatePromptGroup = (
     data,
     InfiniteCollections.PROMPT_GROUPS,
     updatedPromptGroup,
-    (page) => page.promptGroups.findIndex((c) => c._id === updatedPromptGroup._id),
+    (page) => page.promptGroups.findIndex((group) => group._id === updatedPromptGroup._id),
   );
 };
 
@@ -38,6 +38,24 @@ export const deletePromptGroup = (
   return deleteData<PromptGroupListResponse, PromptGroupListData>(
     data,
     InfiniteCollections.PROMPT_GROUPS,
-    (page) => page.promptGroups.findIndex((c) => c._id === groupId),
+    (page) => page.promptGroups.findIndex((group) => group._id === groupId),
   );
+};
+
+export const updateGroupFields = (
+  data: InfiniteData<PromptGroupListResponse>,
+  updatedGroup: Partial<TPromptGroup>,
+  callback: (group: TPromptGroup) => void,
+): InfiniteData<PromptGroupListResponse> => {
+  return updateFields<PromptGroupListResponse, TPromptGroup>(
+    data,
+    updatedGroup,
+    InfiniteCollections.PROMPT_GROUPS,
+    '_id',
+    callback,
+  );
+};
+
+export const getSnippet = (promptText: string, length = 56) => {
+  return promptText.length > length ? `${promptText.slice(0, length - 3)}...` : promptText;
 };

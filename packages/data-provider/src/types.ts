@@ -332,14 +332,12 @@ export type TImportResponse = {
 /** Prompts */
 
 export type TPrompt = {
+  groupId: string;
+  author: string;
   prompt: string;
   type: 'text' | 'chat';
-  groupId: string;
-  isProduction?: boolean;
-  config?: object;
   createdAt: string;
   updatedAt: string;
-  author: string;
   _id?: string;
 };
 
@@ -349,6 +347,8 @@ export type TPromptGroup = {
   oneliner?: string;
   category?: string;
   projectId?: string | null;
+  productionId?: string | null;
+  productionPrompt?: Pick<TPrompt, 'prompt'> | null;
   author: string;
   authorName: string;
   createdAt?: Date;
@@ -358,7 +358,7 @@ export type TPromptGroup = {
 
 export type TCreatePrompt = {
   prompt: Pick<TPrompt, 'prompt' | 'type'> & { groupId?: string };
-  group?: { name: string };
+  group?: { name: string; category?: string };
 };
 
 export type TCreatePromptRecord = TCreatePrompt & Pick<TPromptGroup, 'author' | 'authorName'>;
@@ -415,6 +415,7 @@ export type TMakePromptProductionResponse = {
 
 export type TMakePromptProductionRequest = {
   id: string;
+  groupId: string;
 };
 
 export type TUpdatePromptLabelsRequest = {

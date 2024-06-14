@@ -1,6 +1,7 @@
+import { useMemo } from 'react';
 import { EditIcon } from 'lucide-react';
-import React, { useEffect } from 'react';
-import { Controller, useFormContext } from 'react-hook-form';
+import { Controller, useFormContext, useFormState } from 'react-hook-form';
+import { SaveIcon, CrossIcon } from '~/components/svg';
 import { TextareaAutosize } from '~/components/ui';
 import { cn } from '~/utils';
 
@@ -12,36 +13,43 @@ type Props = {
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const PromptEditor: React.FC<Props> = ({ type, prompt, name, isEditing, setIsEditing }) => {
-  const { control, setValue } = useFormContext();
+const PromptEditor: React.FC<Props> = ({ type, name, isEditing, setIsEditing }) => {
+  const { control } = useFormContext();
+  const { dirtyFields } = useFormState({ control: control });
 
-  useEffect(() => {
-    setValue(name, prompt);
-  }, [prompt, setValue, name]);
+  const EditorIcon = useMemo(() => {
+    if (isEditing && !dirtyFields.prompt) {
+      return CrossIcon;
+    }
+    return isEditing ? SaveIcon : EditIcon;
+  }, [isEditing, dirtyFields.prompt]);
 
   return (
     <div>
       <h2 className="flex items-center justify-between rounded-t-lg border border-gray-300 py-2 pl-4 text-base font-semibold">
         {type} prompt
-        <EditIcon
-          onClick={() => setIsEditing((prev) => !prev)}
-          className={cn(
-            'icon-lg mr-2 cursor-pointer',
-            isEditing ? '' : 'text-gray-400 hover:text-gray-600',
-          )}
-        />
+        <button type="button" onClick={() => setIsEditing((prev) => !prev)} className="mr-2">
+          <EditorIcon
+            className={cn(
+              'icon-lg',
+              isEditing ? 'p-[0.05rem]' : 'text-gray-400 hover:text-gray-600',
+            )}
+          />
+        </button>
       </h2>
       <div
         className={cn(
-          'mb-4 min-h-32 rounded-b-lg border border-gray-300 p-4 transition-all duration-150',
+          'group relative mb-4 min-h-32 rounded-b-lg border border-gray-300 p-4 transition-all duration-150 hover:opacity-90',
           { 'cursor-pointer hover:bg-gray-100/50': !isEditing },
         )}
         onClick={() => !isEditing && setIsEditing(true)}
       >
+        {!isEditing && (
+          <EditIcon className="icon-xl absolute inset-0 m-auto hidden opacity-25 group-hover:block" />
+        )}
         <Controller
           name={name}
           control={control}
-          // Ensure it's editable only when isEditing is true
           render={({ field }) =>
             isEditing ? (
               <TextareaAutosize
@@ -51,7 +59,7 @@ const PromptEditor: React.FC<Props> = ({ type, prompt, name, isEditing, setIsEdi
                 onBlur={() => setIsEditing(false)}
               />
             ) : (
-              <span className="block px-2 py-1">{field.value}</span>
+              <span className="block break-words px-2 py-1">{field.value}</span>
             )
           }
         />

@@ -1,7 +1,6 @@
-import { format } from 'date-fns';
-import { Share2Icon, Layers3 } from 'lucide-react';
+import { Share2Icon, Rocket } from 'lucide-react';
+import { useForm, FormProvider } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useForm, FormProvider, Controller } from 'react-hook-form';
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import type { TCreatePrompt } from 'librechat-data-provider';
 import {
@@ -10,38 +9,18 @@ import {
   useUpdatePromptGroup,
   useMakePromptProduction,
 } from '~/data-provider/mutations';
-import { useGetCategories, useGetPromptGroup, useGetPrompts } from '~/data-provider';
-import { Button, Skeleton, SelectDropDown } from '~/components/ui';
+import { useGetPromptGroup, useGetPrompts } from '~/data-provider';
+import { Button, Skeleton } from '~/components/ui';
+import CategorySelector from './Groups/CategorySelector';
 import PromptVariables from './PromptVariables';
+import PromptVersions from './PromptVersions';
 import { TrashIcon } from '~/components/svg';
-import CategoryIcon from './CategoryIcon';
 import PromptEditor from './PromptEditor';
 import PromptName from './PromptName';
-import { cn } from '~/utils';
-
-const loadingCategories = [
-  {
-    label: 'Loading...',
-    value: '',
-  },
-];
-
-const emptyCategory = {
-  label: '-',
-  value: '',
-};
 
 const PromptPreview = () => {
   const params = useParams();
   const navigate = useNavigate();
-  const { data: categories = loadingCategories } = useGetCategories({
-    select: (data) =>
-      data.map((category) => ({
-        label: category.label,
-        value: category.value,
-        icon: <CategoryIcon category={category.value} />,
-      })),
-  });
   const { data: group, isLoading: isLoadingGroup } = useGetPromptGroup(params.promptId || '');
   const { data: prompts = [], isLoading: isLoadingPrompts } = useGetPrompts(
     { groupId: params.promptId ?? '' },
@@ -61,25 +40,16 @@ const PromptPreview = () => {
     },
   });
 
-  const { watch, setValue, control } = methods;
-  const watchedPrompt = watch('prompt');
-  const watchedCategory = watch('category');
-
-  const categoryOption = useMemo(
-    () =>
-      categories.find((category) => category.value === (watchedCategory ?? group?.category)) ??
-      emptyCategory,
-    [watchedCategory, categories, group?.category],
-  );
+  const { handleSubmit, setValue, reset } = methods;
 
   const createPromptMutation = useCreatePrompt({
-    onMutate() {
+    onSuccess(data) {
+      reset({
+        prompt: data.prompt.prompt,
+        promptName: data.group?.name || '',
+        category: data.group?.category || '',
+      });
       setSelectionIndex(0);
-    },
-    onSuccess() {
-      setValue('prompt', '');
-      setValue('promptName', group?.name || '');
-      setValue('category', group?.category || '');
     },
   });
   const updateGroupMutation = useUpdatePromptGroup();
@@ -109,9 +79,10 @@ const PromptPreview = () => {
         },
       };
 
-      if (value.trim() === selectedPrompt?.prompt?.trim()) {
+      if (value === selectedPrompt?.prompt) {
         return;
       }
+
       createPromptMutation.mutate(tempPrompt);
     },
     [selectedPrompt, createPromptMutation],
@@ -119,23 +90,27 @@ const PromptPreview = () => {
 
   useEffect(() => {
     if (prevIsEditingRef.current && !isEditing) {
-      onSave(watchedPrompt);
+      handleSubmit((data) => onSave(data.prompt))();
     }
     prevIsEditingRef.current = isEditing;
-  }, [isEditing, watchedPrompt, onSave]);
+  }, [isEditing, onSave, handleSubmit]);
 
   useEffect(() => {
-    setValue('prompt', selectedPrompt?.prompt || '');
-    setValue('category', group?.category || '');
+    setSelectionIndex(0);
+  }, [params.promptId]);
+
+  useEffect(() => {
+    setValue('prompt', selectedPrompt?.prompt || '', { shouldDirty: false });
+    setValue('category', group?.category || '', { shouldDirty: false });
   }, [selectedPrompt, group?.category, setValue]);
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(() => onSave(watchedPrompt))}>
+      <form onSubmit={handleSubmit((data) => onSave(data.prompt))}>
         <div>
           <div className="flex flex-col items-center justify-between px-4 sm:flex-row">
             {isLoadingGroup ? (
-              <Skeleton className="mb-1 flex h-10 w-full flex-row items-center font-bold sm:text-xl md:mb-0 md:h-12 md:text-2xl" />
+              <Skeleton className="mb-1 flex h-10 w-32 flex-row items-center font-bold sm:text-xl md:mb-0 md:h-12 md:text-2xl" />
             ) : (
               <PromptName
                 name={group?.name}
@@ -148,62 +123,55 @@ const PromptPreview = () => {
               />
             )}
             <div className="flex h-10 flex-row gap-x-2">
-              <Controller
-                name="category"
-                control={control}
-                rules={{ required: true, minLength: 1 }}
-                render={({ field }) => (
-                  <SelectDropDown
-                    title="Category"
-                    value={categoryOption || ''}
-                    setValue={(value) => {
-                      field.onChange(value);
-                      updateGroupMutation.mutate({
-                        id: group?._id || '',
-                        payload: { name: group?.name || '', category: value },
-                      });
-                    }}
-                    availableValues={categories}
-                    showAbove={false}
-                    showLabel={false}
-                    emptyTitle={true}
-                    showOptionIcon={true}
-                    searchPlaceholder="Search categories..."
-                    className="h-10 w-56 cursor-pointer"
-                    currentValueClass="text-md gap-2"
-                    optionsListClass="text-sm"
-                  />
-                )}
+              <CategorySelector
+                className="w-48 md:w-56"
+                currentCategory={group?.category}
+                onValueChange={(value) =>
+                  updateGroupMutation.mutate({
+                    id: group?._id || '',
+                    payload: { name: group?.name || '', category: value },
+                  })
+                }
               />
-              {!isLoadingGroup && (
-                <>
-                  <Button variant={'default'} size={'sm'} className="h-10 w-10">
-                    <Share2Icon className="cursor-pointer" />
-                  </Button>
-                  <Button
-                    size={'sm'}
-                    variant={'default'}
-                    className="h-10"
-                    onClick={() => makeProductionMutation.mutate({ id: selectedPrompt?._id || '' })}
-                    disabled={selectedPrompt?.isProduction}
-                  >
-                    Make it Production
-                  </Button>
-                  <Button
-                    size={'sm'}
-                    variant={'default'}
-                    className="h-10 w-10"
-                    onClick={() => deletePromptGroupMutation.mutate({ id: group?._id || '' })}
-                  >
-                    <TrashIcon className="icon-lg cursor-pointer" />
-                  </Button>
-                </>
-              )}
+              <Button
+                variant={'default'}
+                size={'sm'}
+                className="h-10 w-10 bg-blue-500/90 transition-all hover:bg-blue-600"
+                disabled={isLoadingGroup}
+              >
+                <Share2Icon className="cursor-pointer" />
+              </Button>
+              <Button
+                size={'sm'}
+                className="h-10 bg-green-400 transition-all hover:bg-green-500"
+                variant={'default'}
+                onClick={() =>
+                  makeProductionMutation.mutate({
+                    id: selectedPrompt?._id || '',
+                    groupId: group?._id || '',
+                  })
+                }
+                disabled={
+                  isLoadingGroup ||
+                  selectedPrompt?._id === group?.productionId ||
+                  makeProductionMutation.isLoading
+                }
+              >
+                <Rocket />
+              </Button>
+              <Button
+                size={'sm'}
+                className="h-10 w-10 bg-red-100 text-red-500 transition-all hover:bg-red-500 hover:text-white"
+                disabled={isLoadingGroup}
+                onClick={() => deletePromptGroupMutation.mutate({ id: group?._id || '' })}
+              >
+                <TrashIcon className="icon-lg cursor-pointer" />
+              </Button>
             </div>
           </div>
           <div className="flex h-full w-full flex-col md:flex-row">
             {/* Left Section */}
-            <div className="flex-1 overflow-y-auto border-r border-gray-300 p-4 md:max-h-[calc(100vh-200px)]">
+            <div className="flex-1 overflow-y-auto border-r border-gray-300 p-4 md:max-h-[calc(100vh-150px)]">
               {isLoadingPrompts ? (
                 <Skeleton className="h-96" />
               ) : (
@@ -220,51 +188,17 @@ const PromptPreview = () => {
               )}
             </div>
             {/* Right Section */}
-            <div className="flex-1 overflow-y-auto p-4 md:max-h-[calc(100vh-200px)] md:w-1/4 md:max-w-[35%] lg:max-w-[30%] xl:max-w-[25%]">
+            <div className="flex-1 overflow-y-auto p-4 md:max-h-[calc(100vh-150px)] md:w-1/4 md:max-w-[35%] lg:max-w-[30%] xl:max-w-[25%]">
               {isLoadingPrompts ? (
                 <Skeleton className="h-96 w-full" />
               ) : (
                 !!prompts.length && (
-                  <>
-                    <h2 className="mb-4 flex gap-2 text-base font-semibold">
-                      <Layers3 className="icon-lg" />
-                      Versions
-                    </h2>
-                    <ul className="flex flex-col gap-3">
-                      {prompts.map((prompt, index) => {
-                        const tags: string[] = [];
-                        if (index === 0) {
-                          tags.push('latest');
-                        }
-
-                        if (prompt.isProduction) {
-                          tags.push('production');
-                        }
-
-                        return (
-                          <li
-                            key={index}
-                            className={cn(
-                              'cursor-pointer rounded-lg border p-4',
-                              index === selectionIndex ? 'bg-gray-100' : 'bg-white',
-                            )}
-                            onClick={() => setSelectionIndex(index)}
-                          >
-                            <p className="font-bold">Version: {prompts.length - index}</p>
-                            {tags.length > 0 && (
-                              <p className="text-sm italic">Tags: {tags.join(', ')}</p>
-                            )}
-                            <p className="whitespace-nowrap text-xs text-gray-600">
-                              {format(new Date(prompt.createdAt), 'yyyy-MM-dd HH:mm')}
-                            </p>
-                            {group?.authorName && (
-                              <p className="text-xs text-gray-600">by {group.authorName}</p>
-                            )}
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </>
+                  <PromptVersions
+                    group={group}
+                    prompts={prompts}
+                    selectionIndex={selectionIndex}
+                    setSelectionIndex={setSelectionIndex}
+                  />
                 )
               )}
             </div>

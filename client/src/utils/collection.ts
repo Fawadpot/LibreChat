@@ -102,3 +102,34 @@ export const normalizeData = <TCollection, TData>(
     pages: restructuredPages,
   };
 };
+
+export const updateFields = <TCollection, TData>(
+  data: InfiniteData<TCollection>,
+  updatedItem: Partial<TData>,
+  collectionName: string,
+  identifierField: keyof TData,
+  callback?: (newItem: TData) => void,
+): InfiniteData<TCollection> => {
+  const newData = JSON.parse(JSON.stringify(data)) as InfiniteData<TCollection>;
+  const { pageIndex, index } = findPage<TCollection>(newData, (page) =>
+    page[collectionName].findIndex(
+      (item: TData) => item[identifierField] === updatedItem[identifierField],
+    ),
+  );
+
+  if (pageIndex !== -1 && index !== -1) {
+    const deleted = newData.pages[pageIndex][collectionName].splice(index, 1);
+    const oldItem = deleted[0];
+    const newItem = {
+      ...oldItem,
+      ...updatedItem,
+      updatedAt: new Date().toISOString(),
+    };
+    if (callback) {
+      callback(newItem);
+    }
+    newData.pages[0][collectionName].unshift(newItem);
+  }
+
+  return newData;
+};

@@ -7,6 +7,7 @@ const Schema = mongoose.Schema;
  * @property {string} name - The name of the prompt group
  * @property {ObjectId} author - The author of the prompt group
  * @property {ObjectId} [projectId=null] - The project ID of the prompt group
+ * @property {ObjectId} [productionId=null] - The project ID of the prompt group
  * @property {string} authorName - The name of the author of the prompt group
  * @property {number} [numberOfGenerations=0] - Number of generations the prompt group has
  * @property {string} [oneliner=''] - Oneliner description of the prompt group
@@ -15,13 +16,13 @@ const Schema = mongoose.Schema;
  * @property {Date} [updatedAt] - Date when the prompt group was last updated (added by timestamps)
  */
 
-/** @type {MongooseSchema<MongoPromptGroup>} */
 const promptGroupSchema = new Schema(
   {
     name: {
       type: String,
       required: true,
       unique: true,
+      index: true,
     },
     numberOfGenerations: {
       type: Number,
@@ -40,10 +41,17 @@ const promptGroupSchema = new Schema(
       required: false,
       default: null,
     },
+    productionId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Prompt',
+      required: true,
+      index: true,
+    },
     author: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
+      index: true,
     },
     authorName: {
       type: String,
@@ -78,10 +86,6 @@ const promptSchema = new Schema(
       type: String,
       enum: ['text', 'chat'],
       required: true,
-    },
-    isProduction: {
-      type: Boolean,
-      default: false,
     },
   },
   {

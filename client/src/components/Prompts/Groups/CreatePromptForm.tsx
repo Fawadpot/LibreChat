@@ -1,21 +1,25 @@
-import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { LocalStorageKeys } from 'librechat-data-provider';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
+import CategorySelector from '~/components/Prompts/Groups/CategorySelector';
+import PromptVariables from '~/components/Prompts/PromptVariables';
 import { Button, TextareaAutosize, Input } from '~/components/ui';
 import { useCreatePrompt } from '~/data-provider';
-import PromptVariables from './PromptVariables';
+import { useLocalize } from '~/hooks';
 import { cn } from '~/utils';
 
 type CreateFormValues = {
   name: string;
   prompt: string;
   type: 'text' | 'chat';
+  category: string;
 };
 
 const defaultPrompt: CreateFormValues = {
   name: '',
   prompt: '',
   type: 'text',
+  category: '',
 };
 
 const CreatePromptForm = ({
@@ -23,19 +27,21 @@ const CreatePromptForm = ({
 }: {
   defaultValues?: CreateFormValues;
 }) => {
+  const localize = useLocalize();
+  const navigate = useNavigate();
   const methods = useForm({
-    defaultValues,
+    defaultValues: {
+      ...defaultValues,
+      category: localStorage.getItem(LocalStorageKeys.LAST_PROMPT_CATEGORY) ?? '',
+    },
   });
 
   const {
-    watch,
     control,
-    setValue,
     handleSubmit,
     formState: { isDirty, isSubmitting, errors, isValid },
   } = methods;
 
-  const navigate = useNavigate();
   const createPromptMutation = useCreatePrompt({
     onSuccess: (response) => {
       navigate(`/d/prompts/${response.prompt.groupId}`, { replace: true });
@@ -43,57 +49,54 @@ const CreatePromptForm = ({
   });
 
   const onSubmit = (data: CreateFormValues) => {
-    const { name, ...rest } = data;
+    const { name, category, ...rest } = data;
     createPromptMutation.mutate({
       prompt: rest,
-      group: { name },
+      group: { name, category },
     });
   };
-
-  const watchType = watch('type');
-
-  useEffect(() => {
-    setValue('prompt', defaultValues.prompt);
-  }, [watchType, defaultValues.prompt, setValue]);
 
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)} className="w-full px-4 py-2">
-        <div className="mb-1 flex flex-col items-start font-bold sm:text-xl md:mb-0 md:text-2xl">
-          <Controller
-            name="name"
-            control={control}
-            rules={{ required: 'Prompt name is required' }}
-            render={({ field }) => (
-              <div className="mb-1 flex items-center md:mb-0">
-                <Input
-                  {...field}
-                  type="text"
-                  className="mr-2 w-full border border-gray-300 p-2 text-2xl"
-                  placeholder="Prompt Name*"
-                />
-                <div
-                  className={cn(
-                    'mt-1 w-56 text-sm text-red-500',
-                    errors.name ? 'visible h-auto' : 'invisible h-0',
-                  )}
-                >
-                  {errors.name ? errors.name.message : ' '}
+        <div className="mb-1 flex flex-col items-center justify-between font-bold sm:text-xl md:mb-0 md:text-2xl">
+          <div className="flex w-full flex-col items-center justify-between sm:flex-row">
+            <Controller
+              name="name"
+              control={control}
+              rules={{ required: localize('com_ui_is_required', localize('com_ui_prompt_name')) }}
+              render={({ field }) => (
+                <div className="mb-1 flex items-center md:mb-0">
+                  <Input
+                    {...field}
+                    type="text"
+                    className="mr-2 w-full border border-gray-300 p-2 text-2xl"
+                    placeholder={`${localize('com_ui_prompt_name')}*`}
+                  />
+                  <div
+                    className={cn(
+                      'mt-1 w-56 text-sm text-red-500',
+                      errors.name ? 'visible h-auto' : 'invisible h-0',
+                    )}
+                  >
+                    {errors.name ? errors.name.message : ' '}
+                  </div>
                 </div>
-              </div>
-            )}
-          />
+              )}
+            />
+            <CategorySelector />
+          </div>
         </div>
         <div className="w-full md:mt-[1.075rem]">
           <div>
             <h2 className="flex items-center justify-between rounded-t-lg border border-gray-300 py-2 pl-4 pr-1 text-base font-semibold">
-              {watchType} prompt*
+              {localize('com_ui_text_prompt')}*
             </h2>
             <div className="mb-4 min-h-32 rounded-b-lg border border-gray-300 p-4 transition-all duration-150">
               <Controller
                 name="prompt"
                 control={control}
-                rules={{ required: 'Prompt content is required' }}
+                rules={{ required: localize('com_ui_is_required', localize('com_ui_text_prompt')) }}
                 render={({ field }) => (
                   <div>
                     <TextareaAutosize
@@ -114,10 +117,9 @@ const CreatePromptForm = ({
             </div>
           </div>
           <PromptVariables />
-
           <div className="flex justify-end">
             <Button type="submit" variant="default" disabled={!isDirty || isSubmitting || !isValid}>
-              Create Prompt
+              {localize('com_ui_create_var', localize('com_ui_prompt'))}
             </Button>
           </div>
         </div>

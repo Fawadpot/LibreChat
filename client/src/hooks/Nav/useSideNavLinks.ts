@@ -1,12 +1,14 @@
 import { useMemo } from 'react';
 import {
   ArrowRightToLine,
+  MessageSquareQuote,
   // Settings2,
 } from 'lucide-react';
 import { EModelEndpoint, isAssistantsEndpoint } from 'librechat-data-provider';
 import type { TConfig, TInterfaceConfig } from 'librechat-data-provider';
 import type { NavLink } from '~/common';
 import PanelSwitch from '~/components/SidePanel/Builder/PanelSwitch';
+import PromptsAccordion from '~/components/Prompts/PromptsAccordion';
 // import Parameters from '~/components/SidePanel/Parameters/Panel';
 import FilesPanel from '~/components/SidePanel/Files/Panel';
 import { Blocks, AttachmentIcon } from '~/components/svg';
@@ -35,6 +37,13 @@ export default function useSideNavLinks({
     //     Component: Parameters,
     //   });
     // }
+    links.push({
+      title: 'com_ui_prompts',
+      label: '',
+      icon: MessageSquareQuote,
+      id: 'prompts',
+      Component: PromptsAccordion,
+    });
     if (
       isAssistantsEndpoint(endpoint) &&
       assistants &&

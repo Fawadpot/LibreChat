@@ -11,26 +11,44 @@ module.exports = {
   createPromptGroup: async (saveData) => {
     try {
       const { prompt, group, author, authorName } = saveData;
-      const newPromptGroup = await PromptGroup.create({ ...group, author, authorName });
-      const groupId = newPromptGroup._id;
 
-      const newPrompt = await Prompt.create({
-        ...prompt,
-        groupId,
-        author,
-        isProduction: true,
-      });
+      let newPromptGroup = await PromptGroup.findOneAndUpdate(
+        { ...group, author, authorName, productionId: null },
+        { $setOnInsert: { ...group, author, authorName, productionId: null } },
+        { new: true, upsert: true },
+      )
+        .lean()
+        .select('-__v')
+        .exec();
+
+      const newPrompt = await Prompt.findOneAndUpdate(
+        { ...prompt, author, groupId: newPromptGroup._id },
+        { $setOnInsert: { ...prompt, author, groupId: newPromptGroup._id } },
+        { new: true, upsert: true },
+      )
+        .lean()
+        .select('-__v')
+        .exec();
+
+      newPromptGroup = await PromptGroup.findByIdAndUpdate(
+        newPromptGroup._id,
+        { productionId: newPrompt._id },
+        { new: true },
+      )
+        .lean()
+        .select('-__v')
+        .exec();
 
       return { prompt: newPrompt, group: newPromptGroup };
     } catch (error) {
-      logger.error('Error saving prompt', error);
-      return { message: 'Error saving prompt' };
+      logger.error('Error saving prompt group', error);
+      throw new Error('Error saving prompt group');
     }
   },
   /**
    * Save a prompt
-   * @param {TSavePrompt} saveData
-   * @returns {Promise<{ prompt: TPrompt }>}
+   * @param {TCreatePromptRecord} saveData
+   * @returns {Promise<TCreatePromptResponse>}
    */
   savePrompt: async (saveData) => {
     try {
@@ -107,19 +125,52 @@ module.exports = {
    */
   getPromptGroups: async (filter) => {
     try {
-      const { pageNumber, pageSize, name } = filter;
+      const { pageNumber = 1, pageSize = 10, name } = filter;
 
       const query = {};
       if (name) {
         query.name = new RegExp(name, 'i');
       }
 
-      const promptGroups = await PromptGroup.find(query)
-        .sort({ createdAt: -1 })
-        .skip((parseInt(pageNumber, 10) - 1) * parseInt(pageSize, 10))
-        .limit(parseInt(pageSize, 10))
-        .lean();
+      const skip = (parseInt(pageNumber, 10) - 1) * parseInt(pageSize, 10);
+      const limit = parseInt(pageSize, 10);
+
+      const promptGroupsAggregate = PromptGroup.aggregate([
+        { $match: query },
+        { $sort: { createdAt: -1 } },
+        { $skip: skip },
+        { $limit: limit },
+        {
+          $lookup: {
+            from: 'prompts',
+            localField: 'productionId',
+            foreignField: '_id',
+            as: 'productionPrompt',
+          },
+        },
+        { $unwind: { path: '$productionPrompt', preserveNullAndEmptyArrays: true } },
+        {
+          $project: {
+            name: 1,
+            numberOfGenerations: 1,
+            oneliner: 1,
+            category: 1,
+            projectId: 1,
+            productionId: 1,
+            author: 1,
+            authorName: 1,
+            createdAt: 1,
+            updatedAt: 1,
+            'productionPrompt.prompt': 1,
+            // 'productionPrompt._id': 1,
+            // 'productionPrompt.type': 1,
+          },
+        },
+      ]);
+
+      const promptGroups = await promptGroupsAggregate.exec();
       const totalPromptGroups = await PromptGroup.countDocuments(query);
+
       return {
         promptGroups,
         pageNumber: pageNumber.toString(),
@@ -204,16 +255,17 @@ module.exports = {
         throw new Error('Prompt not found');
       }
 
-      if (!prompt.isProduction) {
-        await Prompt.findOneAndUpdate({ _id: promptId }, { $set: { isProduction: true } });
-      }
+      await PromptGroup.findByIdAndUpdate(
+        prompt.groupId,
+        { productionId: prompt._id },
+        { new: true },
+      )
+        .lean()
+        .exec();
 
-      await Prompt.updateMany(
-        { groupId: prompt.groupId, _id: { $ne: promptId }, isProduction: true },
-        { $set: { isProduction: false } },
-      );
-
-      return { message: 'Prompt production made successfully' };
+      return {
+        message: 'Prompt production made successfully',
+      };
     } catch (error) {
       logger.error('Error making prompt production', error);
       return { message: 'Error making prompt production' };

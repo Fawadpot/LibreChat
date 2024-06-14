@@ -10,6 +10,7 @@ import {
   GraduationCapIcon,
   TerminalSquareIcon,
 } from 'lucide-react';
+import { cn } from '~/utils';
 
 const categoryIconMap: Record<string, React.ElementType> = {
   misc: BoxIcon,
@@ -20,26 +21,32 @@ const categoryIconMap: Record<string, React.ElementType> = {
   finance: LineChartIcon,
   code: TerminalSquareIcon,
   travel: PlaneTakeoffIcon,
-  teach: GraduationCapIcon,
+  teach_or_explain: GraduationCapIcon,
 };
 
 const categoryColorMap: Record<string, string> = {
   code: 'text-red-500',
   misc: 'text-blue-300',
-  teach: 'text-blue-300',
   shop: 'text-purple-400',
   idea: 'text-yellow-300',
   write: 'text-purple-400',
   travel: 'text-yellow-300',
   finance: 'text-orange-400',
   roleplay: 'text-orange-400',
+  teach_or_explain: 'text-blue-300',
 };
 
-export default function CategoryIcon({ category }: { category: string }) {
+export default function CategoryIcon({
+  category,
+  className = '',
+}: {
+  category: string;
+  className?: string;
+}) {
   const IconComponent = categoryIconMap[category];
   const colorClass = categoryColorMap[category];
   if (!IconComponent) {
     return null;
   }
-  return <IconComponent className={colorClass} />;
+  return <IconComponent className={cn(colorClass, className)} />;
 }
