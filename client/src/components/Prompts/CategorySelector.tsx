@@ -3,6 +3,7 @@ import { useFormContext, Controller } from 'react-hook-form';
 import { useGetCategories } from '~/data-provider';
 import { SelectDropDown } from '~/components/ui';
 import CategoryIcon from './CategoryIcon';
+import { cn } from '~/utils';
 
 const loadingCategories = [
   {
@@ -19,9 +20,11 @@ const emptyCategory = {
 const CategorySelector = ({
   currentCategory,
   onValueChange,
+  className = '',
 }: {
   currentCategory?: string;
   onValueChange?: (value: string) => void;
+  className?: string;
 }) => {
   const { control, watch } = useFormContext();
   const { data: categories = loadingCategories } = useGetCategories({
@@ -60,7 +63,7 @@ const CategorySelector = ({
           emptyTitle={true}
           showOptionIcon={true}
           searchPlaceholder="Search categories..."
-          className="h-10 w-56 cursor-pointer"
+          className={cn('h-10 w-56 cursor-pointer', className)}
           currentValueClass="text-md gap-2"
           optionsListClass="text-sm"
         />

@@ -1,5 +1,4 @@
-import { format } from 'date-fns';
-import { Share2Icon, Layers3 } from 'lucide-react';
+import { Share2Icon, Rocket } from 'lucide-react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
@@ -14,10 +13,10 @@ import { useGetPromptGroup, useGetPrompts } from '~/data-provider';
 import { Button, Skeleton } from '~/components/ui';
 import CategorySelector from './CategorySelector';
 import PromptVariables from './PromptVariables';
+import PromptVersions from './PromptVersions';
 import { TrashIcon } from '~/components/svg';
 import PromptEditor from './PromptEditor';
 import PromptName from './PromptName';
-import { cn } from '~/utils';
 
 const PromptPreview = () => {
   const params = useParams();
@@ -121,6 +120,7 @@ const PromptPreview = () => {
             )}
             <div className="flex h-10 flex-row gap-x-2">
               <CategorySelector
+                className="w-48 md:w-56"
                 currentCategory={group?.category}
                 onValueChange={(value) =>
                   updateGroupMutation.mutate({
@@ -132,24 +132,23 @@ const PromptPreview = () => {
               <Button
                 variant={'default'}
                 size={'sm'}
-                className="h-10 w-10"
+                className="h-10 w-10 bg-blue-500/90 transition-all hover:bg-blue-600"
                 disabled={isLoadingGroup}
               >
                 <Share2Icon className="cursor-pointer" />
               </Button>
               <Button
                 size={'sm'}
-                className="h-10"
+                className="h-10 bg-green-400 transition-all hover:bg-green-500"
                 variant={'default'}
                 onClick={() => makeProductionMutation.mutate({ id: selectedPrompt?._id || '' })}
                 disabled={isLoadingGroup || selectedPrompt?.isProduction}
               >
-                Make it Production
+                <Rocket />
               </Button>
               <Button
                 size={'sm'}
-                variant={'default'}
-                className="h-10 w-10"
+                className="h-10 w-10 bg-red-100 text-red-500 transition-all hover:bg-red-500 hover:text-white"
                 disabled={isLoadingGroup}
                 onClick={() => deletePromptGroupMutation.mutate({ id: group?._id || '' })}
               >
@@ -181,46 +180,12 @@ const PromptPreview = () => {
                 <Skeleton className="h-96 w-full" />
               ) : (
                 !!prompts.length && (
-                  <>
-                    <h2 className="mb-4 flex gap-2 text-base font-semibold">
-                      <Layers3 className="icon-lg" />
-                      Versions
-                    </h2>
-                    <ul className="flex flex-col gap-3">
-                      {prompts.map((prompt, index) => {
-                        const tags: string[] = [];
-                        if (index === 0) {
-                          tags.push('latest');
-                        }
-
-                        if (prompt.isProduction) {
-                          tags.push('production');
-                        }
-
-                        return (
-                          <li
-                            key={index}
-                            className={cn(
-                              'cursor-pointer rounded-lg border p-4',
-                              index === selectionIndex ? 'bg-gray-100' : 'bg-white',
-                            )}
-                            onClick={() => setSelectionIndex(index)}
-                          >
-                            <p className="font-bold">Version: {prompts.length - index}</p>
-                            {tags.length > 0 && (
-                              <p className="text-sm italic">Tags: {tags.join(', ')}</p>
-                            )}
-                            <p className="whitespace-nowrap text-xs text-gray-600">
-                              {format(new Date(prompt.createdAt), 'yyyy-MM-dd HH:mm')}
-                            </p>
-                            {group?.authorName && (
-                              <p className="text-xs text-gray-600">by {group.authorName}</p>
-                            )}
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </>
+                  <PromptVersions
+                    group={group}
+                    prompts={prompts}
+                    selectionIndex={selectionIndex}
+                    setSelectionIndex={setSelectionIndex}
+                  />
                 )
               )}
             </div>
