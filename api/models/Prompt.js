@@ -11,26 +11,35 @@ module.exports = {
   createPromptGroup: async (saveData) => {
     try {
       const { prompt, group, author, authorName } = saveData;
-      const newPromptGroup = await PromptGroup.create({ ...group, author, authorName });
+      const snippet =
+        prompt.prompt.length > 56 ? `${prompt.prompt.slice(0, 53)}...` : prompt.prompt;
+
+      const newPromptGroup = await PromptGroup.create({ ...group, author, authorName, snippet });
       const groupId = newPromptGroup._id;
 
       const newPrompt = await Prompt.create({
         ...prompt,
         groupId,
         author,
-        isProduction: true,
       });
 
-      return { prompt: newPrompt, group: newPromptGroup };
+      await PromptGroup.findByIdAndUpdate(groupId, {
+        productionId: newPrompt._id,
+      });
+
+      const promptGroupLean = await PromptGroup.findById(groupId).lean().exec();
+      const promptLean = await Prompt.findById(newPrompt._id).lean().exec();
+
+      return { prompt: promptLean, group: promptGroupLean };
     } catch (error) {
-      logger.error('Error saving prompt', error);
-      return { message: 'Error saving prompt' };
+      logger.error('Error saving prompt group', error);
+      throw new Error('Error saving prompt group');
     }
   },
   /**
    * Save a prompt
-   * @param {TSavePrompt} saveData
-   * @returns {Promise<{ prompt: TPrompt }>}
+   * @param {TCreatePromptRecord} saveData
+   * @returns {Promise<TCreatePromptResponse>}
    */
   savePrompt: async (saveData) => {
     try {
@@ -204,16 +213,17 @@ module.exports = {
         throw new Error('Prompt not found');
       }
 
-      if (!prompt.isProduction) {
-        await Prompt.findOneAndUpdate({ _id: promptId }, { $set: { isProduction: true } });
-      }
+      await PromptGroup.findByIdAndUpdate(
+        prompt.groupId,
+        { productionId: prompt._id },
+        { new: true },
+      )
+        .lean()
+        .exec();
 
-      await Prompt.updateMany(
-        { groupId: prompt.groupId, _id: { $ne: promptId }, isProduction: true },
-        { $set: { isProduction: false } },
-      );
-
-      return { message: 'Prompt production made successfully' };
+      return {
+        message: 'Prompt production made successfully',
+      };
     } catch (error) {
       logger.error('Error making prompt production', error);
       return { message: 'Error making prompt production' };

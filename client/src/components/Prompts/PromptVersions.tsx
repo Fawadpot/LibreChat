@@ -29,7 +29,7 @@ const PromptVersions = ({
             tags.push('latest');
           }
 
-          if (prompt.isProduction) {
+          if (prompt._id === group?.productionId) {
             tags.push('production');
           }
 

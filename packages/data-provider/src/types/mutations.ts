@@ -136,7 +136,7 @@ export type UpdatePromptLabelOptions = MutationOptions<
 export type MakePromptProductionOptions = MutationOptions<
   types.TMakePromptProductionResponse,
   types.TMakePromptProductionRequest,
-  Array<types.TPrompt> | undefined
+  { group?: types.TPromptGroup; previousListData?: types.PromptGroupListData } | undefined
 >;
 
 /* Auth mutations */

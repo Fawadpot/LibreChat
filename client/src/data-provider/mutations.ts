@@ -21,6 +21,7 @@ import {
   /* Prompts */
   addPromptGroup,
   updatePromptGroup,
+  updateGroupFields,
   deletePromptGroup,
 } from '~/utils';
 import { useConversationsInfiniteQuery, useSharedLinksInfiniteQuery } from './queries';
@@ -1037,30 +1038,50 @@ export const useUpdatePromptLabels = (
 export const useMakePromptProduction = (options?: t.MakePromptProductionOptions) => {
   const queryClient = useQueryClient();
   const { onSuccess, onError, onMutate } = options || {};
+
   return useMutation({
     mutationFn: (variables: t.TMakePromptProductionRequest) =>
       dataService.makePromptProduction(variables.id),
     onMutate: (variables: t.TMakePromptProductionRequest) => {
-      const previousPrompts = queryClient.getQueryData<t.TPrompt[]>([QueryKeys.prompts]);
+      const group = JSON.parse(
+        JSON.stringify(
+          queryClient.getQueryData<t.TPromptGroup>([QueryKeys.promptGroup, variables.groupId]),
+        ),
+      ) as t.TPromptGroup;
+      const groupData = queryClient.getQueryData<t.PromptGroupListData>([QueryKeys.promptGroups]);
+      const previousListData = JSON.parse(JSON.stringify(groupData)) as t.PromptGroupListData;
 
-      queryClient.setQueryData<t.TPrompt[]>(
-        [QueryKeys.prompts, variables.groupId],
-        (oldPrompts = []) =>
-          oldPrompts.map((prompt) =>
-            prompt._id === variables.id
-              ? { ...prompt, isProduction: true }
-              : { ...prompt, isProduction: false },
+      if (groupData) {
+        const newData = normalizeData(
+          updateGroupFields(
+            /* Paginated Data */
+            groupData,
+            /* Update */
+            { _id: variables.groupId, productionId: variables.id },
+            /* Callback */
+            (group) => queryClient.setQueryData([QueryKeys.promptGroup, variables.groupId], group),
           ),
-      );
+          InfiniteCollections.PROMPT_GROUPS,
+          groupData.pages[0].pageSize as number,
+        );
+        queryClient.setQueryData<t.PromptGroupListData>([QueryKeys.promptGroups], newData);
+      }
+
       if (onMutate) {
         onMutate(variables);
       }
 
-      return previousPrompts;
+      return { group, previousListData };
     },
     onError: (err, variables, context) => {
-      if (context) {
-        queryClient.setQueryData([QueryKeys.prompts], context);
+      if (context?.group) {
+        queryClient.setQueryData([QueryKeys.promptGroups, variables.groupId], context?.group);
+      }
+      if (context?.previousListData) {
+        queryClient.setQueryData<t.PromptGroupListData>(
+          [QueryKeys.promptGroups],
+          context?.previousListData,
+        );
       }
       if (onError) {
         onError(err, variables, context);

@@ -332,14 +332,12 @@ export type TImportResponse = {
 /** Prompts */
 
 export type TPrompt = {
+  groupId: string;
+  author: string;
   prompt: string;
   type: 'text' | 'chat';
-  groupId: string;
-  isProduction?: boolean;
-  config?: object;
   createdAt: string;
   updatedAt: string;
-  author: string;
   _id?: string;
 };
 
@@ -347,8 +345,10 @@ export type TPromptGroup = {
   name: string;
   numberOfGenerations?: number;
   oneliner?: string;
+  snippet: string;
   category?: string;
   projectId?: string | null;
+  productionId?: string | null;
   author: string;
   authorName: string;
   createdAt?: Date;

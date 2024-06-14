@@ -96,6 +96,10 @@ const PromptPreview = () => {
   }, [isEditing, onSave, handleSubmit]);
 
   useEffect(() => {
+    setSelectionIndex(0);
+  }, [params.promptId]);
+
+  useEffect(() => {
     setValue('prompt', selectedPrompt?.prompt || '', { shouldDirty: false });
     setValue('category', group?.category || '', { shouldDirty: false });
   }, [selectedPrompt, group?.category, setValue]);
@@ -148,7 +152,9 @@ const PromptPreview = () => {
                   })
                 }
                 disabled={
-                  isLoadingGroup || selectedPrompt?.isProduction || makeProductionMutation.isLoading
+                  isLoadingGroup ||
+                  selectedPrompt?._id === group?.productionId ||
+                  makeProductionMutation.isLoading
                 }
               >
                 <Rocket />
