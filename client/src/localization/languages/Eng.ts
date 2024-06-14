@@ -118,6 +118,10 @@ export default {
   com_ui_stop: 'Stop',
   com_ui_upload_files: 'Upload files',
   com_ui_prompts: 'Prompts',
+  com_ui_text_prompt: 'Text',
+  com_ui_variables: 'Variables',
+  com_ui_variables_info:
+    'Use double braces in your text to use variables, e.g. {{example variable}}, to later add your own words when you select the prompt.',
   com_ui_showing: 'Showing',
   com_ui_of: 'of',
   com_ui_entries: 'Entries',

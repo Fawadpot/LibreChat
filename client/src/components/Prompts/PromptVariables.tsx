@@ -1,9 +1,11 @@
 import { useMemo } from 'react';
-import { useFormContext } from 'react-hook-form';
 import { Braces } from 'lucide-react';
+import { useFormContext } from 'react-hook-form';
+import { useLocalize } from '~/hooks';
 import { extractUniqueVariables } from '~/utils';
 
 const PromptPreview = () => {
+  const localize = useLocalize();
   const methods = useFormContext();
   const { watch } = methods;
   const watchedPrompt = watch('prompt');
@@ -16,7 +18,7 @@ const PromptPreview = () => {
     <>
       <h3 className="flex items-center gap-2 rounded-t-lg border border-gray-300 py-2 pl-4 text-base font-semibold">
         <Braces className="icon-sm" />
-        Variables
+        {localize('com_ui_variables')}
       </h3>
       <div className="mb-4 flex w-full flex-row flex-wrap rounded-b-lg border border-gray-300 p-4 md:min-h-16">
         {variables.length ? (
@@ -26,7 +28,7 @@ const PromptPreview = () => {
             </label>
           ))
         ) : (
-          <label className="mb-1 mr-1 rounded-full border px-2">No variables</label>
+          <span className="text-sm text-gray-500">{localize('com_ui_variables_info')}</span>
         )}
       </div>
     </>
