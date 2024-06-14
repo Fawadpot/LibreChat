@@ -305,6 +305,19 @@ p > small {
   animation: fadein 3s forwards;
 }
 
+.fade-in {
+  animation: fadeInWithOutTranslate 0.3s ease-in-out;
+}
+
+@keyframes fadeInWithOutTranslate {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 @keyframes fadein {
   from { opacity: 0; transform: translateY(-20px); }
   to { opacity: 1; transform: translateY(0); }

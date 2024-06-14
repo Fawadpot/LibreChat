@@ -5,6 +5,7 @@ import { useChatContext, useAssistantsMapContext } from '~/Providers';
 import { TooltipProvider, Tooltip } from '~/components/ui';
 import ConvoIcon from '~/components/Endpoints/ConvoIcon';
 import { getIconEndpoint, cn } from '~/utils';
+import Prompts from './Prompts';
 
 export default function Landing({ Header }: { Header?: ReactNode }) {
   const { conversation } = useChatContext();
@@ -50,8 +51,9 @@ export default function Landing({ Header }: { Header?: ReactNode }) {
                 size={41}
               />
             </div>
-            {/* Import Prompt Cards here */}
-            {/* <Prompts /> */}
+            <div className="">
+              <Prompts />
+            </div>
           </div>
         </div>
       </Tooltip>

@@ -158,6 +158,9 @@ export const getPromptsWithFilters = (filter: object) => {
 
 export const getPrompt = (_id: string) => `${prompts()}/${_id}`;
 
+export const getRandomPrompts = (limit: number, skip: number) =>
+  `${prompts()}/random?limit=${limit}&skip=${skip}`;
+
 export const postPrompt = prompts;
 
 export const updatePromptGroup = getPromptGroup;

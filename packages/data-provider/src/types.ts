@@ -442,3 +442,12 @@ export type TDeletePromptGroupRequest = {
 };
 
 export type TGetCategoriesResponse = TCategory[];
+
+export type TGetRandomPromptsResponse = {
+  prompts: TPromptGroup[];
+};
+
+export type TGetRandomPromptsRequest = {
+  limit: number;
+  skip: number;
+};

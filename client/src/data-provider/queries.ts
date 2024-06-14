@@ -501,3 +501,21 @@ export const useGetCategories = <TData = t.TGetCategoriesResponse>(
     },
   );
 };
+
+export const useGetRandomPrompts = (
+  filter: t.TGetRandomPromptsRequest,
+  config?: UseQueryOptions<t.TGetRandomPromptsResponse>,
+): QueryObserverResult<t.TGetRandomPromptsResponse> => {
+  return useQuery<t.TGetRandomPromptsResponse>(
+    [QueryKeys.randomPrompts],
+    () => dataService.getRandomPrompts(filter),
+    {
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+      retry: false,
+      ...config,
+      enabled: config?.enabled !== undefined ? config?.enabled : true,
+    },
+  );
+};

@@ -11,6 +11,7 @@ const {
   createPromptGroup,
   updatePromptLabels,
   makePromptProduction,
+  getRandomPromptGroups,
 } = require('~/models/Prompt');
 const { requireJwtAuth } = require('~/server/middleware');
 
@@ -124,6 +125,16 @@ router.patch('/:promptId/labels', async (req, res) => {
   const { promptId } = req.params;
   const { labels } = req.body;
   res.status(200).send(await updatePromptLabels(promptId, labels));
+});
+
+router.get('/random', async (req, res) => {
+  try {
+    const { limit = 4, skip = 0 } = req.query;
+    res.status(200).send(await getRandomPromptGroups({ limit, skip }));
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: 'Error getting random prompt' });
+  }
 });
 
 router.get('/:promptId', async (req, res) => {

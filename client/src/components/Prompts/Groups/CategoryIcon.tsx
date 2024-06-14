@@ -44,7 +44,7 @@ export default function CategoryIcon({
   className?: string;
 }) {
   const IconComponent = categoryIconMap[category];
-  const colorClass = categoryColorMap[category];
+  const colorClass = categoryColorMap[category] + ' ' + className;
   if (!IconComponent) {
     return null;
   }

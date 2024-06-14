@@ -102,6 +102,44 @@ module.exports = {
       return { message: 'Error getting prompt' };
     }
   },
+  /**
+   * Get prompt groups with filters
+   * @param {TGetRandomPromptsRequest} filter
+   * @returns {Promise<TGetRandomPromptsResponse>}
+   */
+  getRandomPromptGroups: async (filter) => {
+    try {
+      const result = await PromptGroup.aggregate([
+        {
+          $match: {
+            category: { $ne: '' },
+          },
+        },
+        {
+          $group: {
+            _id: '$category',
+            promptGroup: { $first: '$$ROOT' },
+          },
+        },
+        {
+          $replaceRoot: { newRoot: '$promptGroup' },
+        },
+        {
+          $sample: { size: +filter.limit + +filter.skip },
+        },
+        {
+          $skip: +filter.skip,
+        },
+        {
+          $limit: +filter.limit,
+        },
+      ]);
+      return { prompts: result };
+    } catch (error) {
+      logger.error('Error getting prompt groups', error);
+      return { message: 'Error getting prompt groups' };
+    }
+  },
   getPromptGroupsWithPrompts: async (filter) => {
     try {
       return await PromptGroup.findOne(filter)
