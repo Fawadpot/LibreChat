@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { MessageSquareQuote } from 'lucide-react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
-import PromptSidePanel from './Groups/GroupsSidePanel';
+import GroupSidePanel from './Groups/GroupSidePanel';
 import { Button } from '~/components/ui';
 import { cn } from '~/utils';
 
@@ -28,7 +28,7 @@ export default function PromptsView() {
         )}
       </div>
       <div className="flex w-full flex-grow flex-row divide-x overflow-hidden">
-        <PromptSidePanel isDetailView={isDetailView} showHeader={true} />
+        <GroupSidePanel isDetailView={isDetailView} showHeader={true} />
         <div
           className={cn(
             'w-full overflow-y-auto lg:w-3/4 xl:w-3/4',

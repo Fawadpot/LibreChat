@@ -6,7 +6,7 @@ import { Button, Input } from '~/components/ui';
 import { useLocalize } from '~/hooks';
 import { cn } from '~/utils';
 
-export default function GroupsSidePanel({
+export default function GroupSidePanel({
   isDetailView,
   showHeader,
   className = '',
