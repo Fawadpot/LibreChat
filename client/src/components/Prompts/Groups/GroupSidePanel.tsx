@@ -1,7 +1,9 @@
 import { useState, useMemo } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ListFilter, MessageSquareQuote } from 'lucide-react';
 import { usePromptGroupsInfiniteQuery } from '~/data-provider';
 import List from '~/components/Prompts/Groups/List';
+import PanelNavigation from '~/components/Prompts/Groups/PanelNavigation';
 import { Button, Input } from '~/components/ui';
 import { useLocalize } from '~/hooks';
 import { cn } from '~/utils';
@@ -16,9 +18,13 @@ export default function GroupSidePanel({
   className?: string;
 }) {
   const localize = useLocalize();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [name, setName] = useState('');
   const [pageSize, _setPageSize] = useState(10);
   const [pageNumber, _setPageNumber] = useState(1);
+  const isChatRoute = useMemo(() => location.pathname.startsWith('/c/'), [location.pathname]);
 
   const groupsQuery = usePromptGroupsInfiniteQuery({
     pageSize,
@@ -64,9 +70,9 @@ export default function GroupSidePanel({
         </div> */}
       </div>
       <div className="flex-grow overflow-y-auto">
-        {!groupsQuery.isLoading && <List groups={promptGroups} />}
+        {!groupsQuery.isLoading && <List groups={promptGroups} isChatRoute={isChatRoute} />}
       </div>
-      <div className="m-2 flex justify-end gap-2">
+      {/* <div className="m-2 flex justify-end gap-2">
         <Button
           variant="outline"
           onClick={() => groupsQuery.fetchPreviousPage()}
@@ -81,7 +87,15 @@ export default function GroupSidePanel({
         >
           {groupsQuery.isFetchingNextPage ? 'Loading more...' : 'Next'}
         </Button>
-      </div>
+      </div> */}
+      <PanelNavigation
+        isFetching={groupsQuery.isFetchingNextPage}
+        hasNextPage={!!groupsQuery.hasNextPage}
+        hasPreviousPage={!!groupsQuery.hasPreviousPage}
+        nextPage={fetchNextPage}
+        prevPage={() => groupsQuery.fetchPreviousPage()}
+        isChatRoute={isChatRoute}
+      />
     </div>
   );
 }

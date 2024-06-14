@@ -119,6 +119,8 @@ export default {
   com_ui_upload_files: 'Upload files',
   com_ui_prompts: 'Prompts',
   com_ui_text_prompt: 'Text',
+  com_ui_back_to_chat: 'Back to Chat',
+  com_ui_manage_prompts: 'Manage Prompts',
   com_ui_variables: 'Variables',
   com_ui_variables_info:
     'Use double braces in your text to use variables, e.g. {{example variable}}, to later add your own words when you select the prompt.',
@@ -176,6 +178,7 @@ export default {
   com_ui_regenerate: 'Regenerate',
   com_ui_continue: 'Continue',
   com_ui_edit: 'Edit',
+  com_ui_loading: 'Loading...',
   com_ui_success: 'Success',
   com_ui_all: 'all',
   com_ui_clear: 'Clear',

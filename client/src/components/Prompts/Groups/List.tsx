@@ -1,15 +1,17 @@
-import React, { useMemo } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import type { TPromptGroup } from 'librechat-data-provider';
 import DashGroupItem from '~/components/Prompts/Groups/DashGroupItem';
 import ChatGroupItem from '~/components/Prompts/Groups/ChatGroupItem';
 import { Button } from '~/components/ui';
 
-export default function PromptGroupsList({ groups }: { groups?: TPromptGroup[] }) {
+export default function List({
+  groups,
+  isChatRoute,
+}: {
+  groups?: TPromptGroup[];
+  isChatRoute?: boolean;
+}) {
   const navigate = useNavigate();
-  const location = useLocation();
-  const isChatRoute = useMemo(() => location.pathname.startsWith('/c/'), [location.pathname]);
-
   return (
     <div className="flex h-full flex-col">
       <div className="my-2 flex w-full flex-row gap-x-2" />
