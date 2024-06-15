@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { useRecoilValue } from 'recoil';
 import { useParams } from 'react-router-dom';
+import { useForm, FormProvider } from 'react-hook-form';
 import { useGetMessagesByConvoId } from 'librechat-data-provider/react-query';
 import { ChatContext, useFileMapContext } from '~/Providers';
 import MessagesView from './Messages/MessagesView';
@@ -31,25 +32,30 @@ function ChatView({ index = 0 }: { index?: number }) {
   });
 
   const chatHelpers = useChatHelpers(index, conversationId);
+  const methods = useForm<{ text: string }>({
+    defaultValues: { text: '' },
+  });
 
   return (
-    <ChatContext.Provider value={chatHelpers}>
-      <Presentation useSidePanel={true}>
-        {isLoading && conversationId !== 'new' ? (
-          <div className="flex h-screen items-center justify-center">
-            <Spinner className="opacity-0" />
+    <FormProvider {...methods}>
+      <ChatContext.Provider value={chatHelpers}>
+        <Presentation useSidePanel={true}>
+          {isLoading && conversationId !== 'new' ? (
+            <div className="flex h-screen items-center justify-center">
+              <Spinner className="opacity-0" />
+            </div>
+          ) : messagesTree && messagesTree.length !== 0 ? (
+            <MessagesView messagesTree={messagesTree} Header={<Header />} />
+          ) : (
+            <PromptLanding Header={<Header />} />
+          )}
+          <div className="w-full border-t-0 pl-0 pt-2 dark:border-white/20 md:w-[calc(100%-.5rem)] md:border-t-0 md:border-transparent md:pl-0 md:pt-0 md:dark:border-transparent">
+            <ChatForm index={index} />
+            <Footer />
           </div>
-        ) : messagesTree && messagesTree.length !== 0 ? (
-          <MessagesView messagesTree={messagesTree} Header={<Header />} />
-        ) : (
-          <PromptLanding Header={<Header />} />
-        )}
-        <div className="w-full border-t-0 pl-0 pt-2 dark:border-white/20 md:w-[calc(100%-.5rem)] md:border-t-0 md:border-transparent md:pl-0 md:pt-0 md:dark:border-transparent">
-          <ChatForm index={index} />
-          <Footer />
-        </div>
-      </Presentation>
-    </ChatContext.Provider>
+        </Presentation>
+      </ChatContext.Provider>
+    </FormProvider>
   );
 }
 
