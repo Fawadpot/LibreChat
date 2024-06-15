@@ -1,13 +1,24 @@
 import { useNavigate } from 'react-router-dom';
-import { Button } from '~/components/ui';
+import { buttonVariants } from '~/components/ui';
 import { useLocalize } from '~/hooks';
+import { cn } from '~/utils';
 
 export default function ManagePrompts({ className }: { className?: string }) {
   const navigate = useNavigate();
   const localize = useLocalize();
+  const clickHandler = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (event.button === 0 && !(event.ctrlKey || event.metaKey)) {
+      event.preventDefault();
+      navigate('/d/prompts');
+    }
+  };
   return (
-    <Button variant="outline" className={className} onClick={() => navigate('/d/prompts')}>
+    <a
+      className={cn(buttonVariants({ variant: 'outline' }), className)}
+      href="/d/prompts"
+      onClick={clickHandler}
+    >
       {localize('com_ui_manage_prompts')}
-    </Button>
+    </a>
   );
 }
