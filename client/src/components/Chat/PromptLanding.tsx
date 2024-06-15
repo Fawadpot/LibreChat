@@ -51,7 +51,7 @@ export default function Landing({ Header }: { Header?: ReactNode }) {
                 size={41}
               />
             </div>
-            <div className="">
+            <div className="h-3/5">
               <Prompts />
             </div>
           </div>

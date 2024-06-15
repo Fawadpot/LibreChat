@@ -1,24 +1,95 @@
-import { useGetRandomPrompts } from '~/data-provider';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { usePromptGroupsNav } from '~/hooks';
 import PromptCard from './PromptCard';
+import { Button } from '../ui';
 
 export default function Prompts() {
-  const randomPromptsQuery = useGetRandomPrompts({ limit: 4, skip: 0 });
+  const { prevPage, nextPage, hasNextPage, promptGroups, hasPreviousPage, setPageSize, pageSize } =
+    usePromptGroupsNav({ initialPageNumber: 1, initialPageSize: 4 });
+
+  const renderPromptCards = (start = 0, count) => {
+    return promptGroups
+      .slice(start, count + start)
+      .map((promptGroup) => <PromptCard key={promptGroup._id} promptGroup={promptGroup} />);
+  };
+
+  const getRows = () => {
+    switch (pageSize) {
+      case 4:
+        return [4];
+      case 8:
+        return [4, 4];
+      case 12:
+        return [4, 4, 4];
+      default:
+        return [];
+    }
+  };
+
+  const rows = getRows();
+
   return (
-    !!randomPromptsQuery.data && (
-      <div className="mx-3 mt-12 flex max-w-3xl flex-wrap items-stretch justify-center gap-4 fade-in">
-        <div className="flex max-w-3xl flex-wrap items-stretch justify-center gap-4">
-          {randomPromptsQuery.data.prompts.map(
-            (promptGroup, i) =>
-              i < 2 && <PromptCard key={promptGroup._id} promptGroup={promptGroup} />,
-          )}
+    <div className="mx-3 flex h-full max-w-3xl flex-col items-stretch justify-center gap-4">
+      <div className="mt-2 flex justify-end gap-2">
+        <Button
+          variant={'outline'}
+          onClick={() => setPageSize(4)}
+          className={`rounded px-3 py-2 ${
+            pageSize === 4 ? 'bg-black text-white' : 'text-slate-500 dark:text-slate-500'
+          }`}
+        >
+          4
+        </Button>
+        <Button
+          variant={'outline'}
+          onClick={() => setPageSize(8)}
+          className={`rounded px-3 py-2 ${
+            pageSize === 8 ? 'bg-black text-white' : 'text-slate-500 dark:text-slate-500'
+          }`}
+        >
+          8
+        </Button>
+        <Button
+          variant={'outline'}
+          onClick={() => setPageSize(12)}
+          className={`rounded p-2 ${
+            pageSize === 12 ? 'bg-black text-white' : 'text-slate-500 dark:text-slate-500'
+          }`}
+        >
+          12
+        </Button>
+      </div>
+      <div className="flex h-full flex-col items-start gap-2">
+        <div
+          className={
+            'flex min-h-[121.1px] min-w-full max-w-3xl flex-col gap-4 overflow-y-auto md:min-w-[22rem] lg:min-w-[43rem]'
+          }
+        >
+          {rows.map((rowSize, index) => (
+            <div key={index} className="flex flex-wrap justify-center gap-4">
+              {renderPromptCards(rowSize * index, rowSize)}
+            </div>
+          ))}
         </div>
-        <div className="flex max-w-3xl flex-wrap items-stretch justify-center gap-4">
-          {randomPromptsQuery.data.prompts.map(
-            (promptGroup, i) =>
-              i > 1 && <PromptCard key={promptGroup._id} promptGroup={promptGroup} />,
-          )}
+        <div className="flex w-full justify-between">
+          <Button
+            variant={'ghost'}
+            onClick={prevPage}
+            disabled={!hasPreviousPage}
+            className="m-0 self-start p-0 hover:bg-transparent"
+          >
+            <ChevronLeft className={`${hasPreviousPage ? '' : 'text-gray-500'}`} />
+          </Button>
+          <Button
+            variant={'ghost'}
+            onClick={nextPage}
+            disabled={!hasNextPage}
+            className="m-0 self-end p-0 hover:bg-transparent"
+          >
+            <ChevronRight className={`${hasNextPage ? '' : 'text-gray-500'}`} />
+          </Button>
         </div>
       </div>
-    )
+    </div>
   );
 }
