@@ -29,7 +29,7 @@ export default function ChatGroupItem({ group }: { group: TPromptGroup }) {
         <DropdownMenuTrigger asChild>
           <Button
             variant="outline"
-            className="h-7 w-7 p-0 dark:bg-gray-800 dark:hover:border-gray-400 dark:focus:border-gray-500"
+            className="h-7 w-7 p-0 transition-all duration-300 ease-in-out hover:border-white dark:bg-gray-800 dark:hover:border-gray-400 dark:focus:border-gray-500"
           >
             <MenuIcon className="icon-md dark:text-gray-300" />
           </Button>
