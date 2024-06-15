@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import ManagePrompts from '~/components/Prompts/ManagePrompts';
-import { Button } from '~/components/ui';
+import { Button, ThemeSelector } from '~/components/ui';
 import { useLocalize } from '~/hooks';
 
 function PanelNavigation({
@@ -21,7 +21,9 @@ function PanelNavigation({
   const localize = useLocalize();
   return (
     <div className="my-1 flex justify-between px-4">
-      <div className="mb-2 flex gap-2">{isChatRoute ? <ManagePrompts /> : null}</div>
+      <div className="mb-2 flex gap-2">
+        {isChatRoute ? <ManagePrompts /> : <ThemeSelector returnThemeOnly={true} />}
+      </div>
       <div className="mb-2 flex gap-2">
         <Button variant="outline" onClick={() => prevPage()} disabled={!hasPreviousPage}>
           {localize('com_ui_prev')}

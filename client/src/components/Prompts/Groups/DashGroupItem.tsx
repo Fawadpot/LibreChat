@@ -120,7 +120,7 @@ export default function DashGroupItem({ group }: { group: TPromptGroup }) {
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="outline"
-                        className="mr-1 h-7 w-7 p-0 hover:bg-gray-200 dark:bg-gray-800 dark:hover:border-gray-400 dark:focus:border-gray-500"
+                        className="mr-1 h-7 w-7 p-0 hover:bg-gray-200 dark:bg-gray-800/50 dark:text-gray-400 dark:hover:border-gray-400 dark:focus:border-gray-500"
                       >
                         <MenuIcon className="icon-md dark:text-gray-300" />
                       </Button>
@@ -140,8 +140,8 @@ export default function DashGroupItem({ group }: { group: TPromptGroup }) {
                     </DropdownMenuContent>
                   </DropdownMenu>
                   <Button
-                    variant="destructive"
-                    className="z-1 h-8 w-8 bg-transparent p-2 text-[#666666] hover:bg-gray-200"
+                    variant="outline"
+                    className="mr-1 h-7 w-7 p-0 hover:bg-gray-200 dark:bg-gray-800/50 dark:text-gray-400 dark:hover:border-gray-400 dark:focus:border-gray-500"
                     onClick={(e) => {
                       e.stopPropagation();
                       deletePromptGroupMutation.mutate({ id: group?._id || '' });

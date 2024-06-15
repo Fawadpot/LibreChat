@@ -12,7 +12,7 @@ export default function PromptsView() {
   const isDetailView = useMemo(() => !!(params.promptId || params['*'] === 'new'), [params]);
 
   return (
-    <div className="flex h-screen w-full flex-col bg-[#f9f9f9] p-0 lg:p-2">
+    <div className="flex h-screen w-full flex-col bg-[#f9f9f9] p-0 dark:bg-transparent lg:p-2">
       {isDetailView && (
         <div className="flex w-full flex-row p-2 lg:hidden">
           <Button
