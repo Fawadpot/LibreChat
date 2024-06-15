@@ -5,6 +5,7 @@ import { useLocation } from 'react-router-dom';
 import { MessageSquareQuote } from 'lucide-react';
 import PanelNavigation from '~/components/Prompts/Groups/PanelNavigation';
 import { useLocalize, useMediaQuery, usePromptGroupsNav } from '~/hooks';
+import AutoSendSwitch from '~/components/Prompts/Groups/AutoSendSwitch';
 import BackToChat from '~/components/Prompts/BackToChat';
 import List from '~/components/Prompts/Groups/List';
 // import { Button, Input } from '~/components/ui';
@@ -57,6 +58,7 @@ export default function GroupSidePanel({
         </div> */}
       </div>
       <div className="flex-grow overflow-y-auto">
+        <AutoSendSwitch />
         <List groups={promptGroups} isChatRoute={isChatRoute} />
       </div>
       <PanelNavigation

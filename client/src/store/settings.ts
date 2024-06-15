@@ -73,6 +73,7 @@ const localStorageAtoms = {
   rememberForkOption: atomWithLocalStorage('rememberForkOption', true),
   playbackRate: atomWithLocalStorage<number | null>('playbackRate', null),
   saveDrafts: atomWithLocalStorage('saveDrafts', false),
+  autoSendPrompts: atomWithLocalStorage('autoSendPrompts', true),
 };
 
 export default { ...staticAtoms, ...localStorageAtoms };

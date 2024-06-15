@@ -542,6 +542,7 @@ export default {
   com_nav_user_name_display: 'Display username in messages',
   com_nav_save_drafts: 'Save drafts locally',
   com_nav_show_code: 'Always show code when using code interpreter',
+  com_nav_auto_send_prompts: 'Auto-send Prompts',
   com_nav_clear_all_chats: 'Clear all chats',
   com_nav_confirm_clear: 'Confirm Clear',
   com_nav_close_sidebar: 'Close sidebar',
