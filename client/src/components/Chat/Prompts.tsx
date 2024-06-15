@@ -32,28 +32,28 @@ export default function Prompts() {
     <div className="mx-3 flex h-full max-w-3xl flex-col items-stretch justify-center gap-4">
       <div className="mt-2 flex justify-end gap-2">
         <Button
-          variant={'outline'}
+          variant={'ghost'}
           onClick={() => setPageSize(4)}
-          className={`rounded px-3 py-2 ${
-            pageSize === 4 ? 'bg-black text-white' : 'text-slate-500 dark:text-slate-500'
+          className={`rounded px-3 py-2 hover:bg-transparent ${
+            pageSize === 4 ? 'text-white' : 'text-gray-500 dark:text-gray-500'
           }`}
         >
           4
         </Button>
         <Button
-          variant={'outline'}
+          variant={'ghost'}
           onClick={() => setPageSize(8)}
-          className={`rounded px-3 py-2 ${
-            pageSize === 8 ? 'bg-black text-white' : 'text-slate-500 dark:text-slate-500'
+          className={`rounded px-3 py-2 hover:bg-transparent ${
+            pageSize === 8 ? 'text-white' : 'text-gray-500 dark:text-gray-500'
           }`}
         >
           8
         </Button>
         <Button
-          variant={'outline'}
+          variant={'ghost'}
           onClick={() => setPageSize(12)}
-          className={`rounded p-2 ${
-            pageSize === 12 ? 'bg-black text-white' : 'text-slate-500 dark:text-slate-500'
+          className={`rounded p-2 hover:bg-transparent ${
+            pageSize === 12 ? 'text-white' : 'text-gray-500 dark:text-gray-500'
           }`}
         >
           12
