@@ -45,7 +45,7 @@ const PromptName: React.FC<Props> = ({ name, onSave }) => {
       setIsEditing(false);
       setNewName(name);
     }
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' || e.key === 'Tab') {
       saveName();
     }
   };
