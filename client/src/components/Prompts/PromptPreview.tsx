@@ -108,7 +108,7 @@ const PromptPreview = () => {
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit((data) => onSave(data.prompt))}>
         <div>
-          <div className="flex flex-col items-center justify-between px-4 sm:flex-row">
+          <div className="flex flex-col items-center justify-between px-4 dark:text-gray-200 sm:flex-row">
             {isLoadingGroup ? (
               <Skeleton className="mb-1 flex h-10 w-32 flex-row items-center font-bold sm:text-xl md:mb-0 md:h-12 md:text-2xl" />
             ) : (
@@ -136,14 +136,14 @@ const PromptPreview = () => {
               <Button
                 variant={'default'}
                 size={'sm'}
-                className="h-10 w-10 bg-blue-500/90 transition-all hover:bg-blue-600"
+                className="h-10 w-10 border border-transparent bg-blue-500/90 transition-all hover:bg-blue-600 dark:border-blue-600 dark:bg-transparent dark:hover:bg-blue-950"
                 disabled={isLoadingGroup}
               >
-                <Share2Icon className="cursor-pointer" />
+                <Share2Icon className="cursor-pointer dark:text-blue-600" />
               </Button>
               <Button
                 size={'sm'}
-                className="h-10 bg-green-400 transition-all hover:bg-green-500"
+                className="h-10 border border-transparent bg-green-400 transition-all hover:bg-green-500 dark:border-green-600 dark:bg-transparent dark:hover:bg-green-900"
                 variant={'default'}
                 onClick={() => {
                   const { _id: promptVersionId = '', prompt } = selectedPrompt;
@@ -159,21 +159,21 @@ const PromptPreview = () => {
                   makeProductionMutation.isLoading
                 }
               >
-                <Rocket />
+                <Rocket className="cursor-pointer dark:text-green-600" />
               </Button>
               <Button
                 size={'sm'}
-                className="h-10 w-10 bg-red-100 text-red-500 transition-all hover:bg-red-500 hover:text-white"
+                className="h-10 w-10 border border-transparent bg-red-100 text-red-500 transition-all hover:bg-red-500 hover:text-white dark:border-red-600 dark:bg-transparent dark:hover:bg-red-950"
                 disabled={isLoadingGroup}
                 onClick={() => deletePromptGroupMutation.mutate({ id: group?._id || '' })}
               >
-                <TrashIcon className="icon-lg cursor-pointer" />
+                <TrashIcon className="icon-lg cursor-pointer dark:text-red-600" />
               </Button>
             </div>
           </div>
           <div className="flex h-full w-full flex-col md:flex-row">
             {/* Left Section */}
-            <div className="flex-1 overflow-y-auto border-r border-gray-300 p-4 md:max-h-[calc(100vh-150px)]">
+            <div className="flex-1 overflow-y-auto border-r border-gray-300 p-4 dark:border-gray-600 md:max-h-[calc(100vh-150px)]">
               {isLoadingPrompts ? (
                 <Skeleton className="h-96" />
               ) : (

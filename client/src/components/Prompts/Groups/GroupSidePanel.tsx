@@ -36,8 +36,8 @@ export default function GroupSidePanel({
     >
       {showHeader && (
         <h1 className="m-3 flex items-center justify-between gap-x-2 text-center text-xl lg:text-left">
-          <div className="flex items-center gap-x-2">
-            <MessageSquareQuote className="h-5 w-5 text-gray-500" />
+          <div className="flex items-center gap-x-2 dark:text-gray-200">
+            <MessageSquareQuote className="h-5 w-5 text-gray-500 dark:text-gray-200" />
             <strong>{localize('com_ui_prompts')}</strong>
           </div>
           <BackToChat />
