@@ -25,7 +25,7 @@ export default function List({
         </Button>
       </div>
       <div className="mt-3 flex-grow overflow-y-auto">
-        <div className="h-[65vh] overflow-y-auto">
+        <div className="overflow-y-auto">
           {groups?.map((group) => {
             if (isChatRoute) {
               return <ChatGroupItem key={group._id} group={group} />;

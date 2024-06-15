@@ -45,7 +45,7 @@ export const deletePromptGroup = (
 export const updateGroupFields = (
   data: InfiniteData<PromptGroupListResponse>,
   updatedGroup: Partial<TPromptGroup>,
-  callback: (group: TPromptGroup) => void,
+  callback?: (group: TPromptGroup) => void,
 ): InfiniteData<PromptGroupListResponse> => {
   return updateFields<PromptGroupListResponse, TPromptGroup>(
     data,

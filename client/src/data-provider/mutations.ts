@@ -20,7 +20,6 @@ import {
   deleteConversation,
   /* Prompts */
   addPromptGroup,
-  updatePromptGroup,
   updateGroupFields,
   deletePromptGroup,
 } from '~/utils';
@@ -896,26 +895,53 @@ export const useUpdatePromptGroup = (
   t.TUpdatePromptGroupVariables,
   unknown
 > => {
+  const { onMutate, onError, onSuccess } = options || {};
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (variables: t.TUpdatePromptGroupVariables) =>
       dataService.updatePromptGroup(variables),
-    onMutate: async (variables) => {
-      options?.onMutate?.(variables);
+    onMutate: (variables: t.TUpdatePromptGroupVariables) => {
+      const group = JSON.parse(
+        JSON.stringify(
+          queryClient.getQueryData<t.TPromptGroup>([QueryKeys.promptGroup, variables.id]),
+        ),
+      ) as t.TPromptGroup;
+      const groupData = queryClient.getQueryData<t.PromptGroupListData>([QueryKeys.promptGroups]);
+      const previousListData = JSON.parse(JSON.stringify(groupData)) as t.PromptGroupListData;
+
+      if (groupData) {
+        const newData = updateGroupFields(
+          /* Paginated Data */
+          groupData,
+          /* Update */
+          { _id: variables.id, ...variables.payload },
+          /* Callback */
+          (group) => queryClient.setQueryData([QueryKeys.promptGroup, variables.id], group),
+        );
+        queryClient.setQueryData<t.PromptGroupListData>([QueryKeys.promptGroups], newData);
+      }
+
+      if (onMutate) {
+        onMutate(variables);
+      }
+
+      return { group, previousListData };
     },
-    onError: (error, variables, context) => {
-      options?.onError?.(error, variables, context);
+    onError: (err, variables, context) => {
+      if (context?.group) {
+        queryClient.setQueryData([QueryKeys.promptGroups, variables.id], context?.group);
+      }
+      if (context?.previousListData) {
+        queryClient.setQueryData<t.PromptGroupListData>(
+          [QueryKeys.promptGroups],
+          context?.previousListData,
+        );
+      }
+      if (onError) {
+        onError(err, variables, context);
+      }
     },
-    onSuccess: (response, variables, context) => {
-      queryClient.setQueryData([QueryKeys.promptGroup, variables?.id], response);
-      queryClient.setQueryData<t.PromptGroupListData>([QueryKeys.promptGroups], (data) => {
-        if (!data) {
-          return data;
-        }
-        return updatePromptGroup(data, response);
-      });
-      options?.onSuccess?.(response, variables, context);
-    },
+    onSuccess,
   });
 };
 
@@ -1042,7 +1068,11 @@ export const useMakePromptProduction = (options?: t.MakePromptProductionOptions)
           /* Paginated Data */
           groupData,
           /* Update */
-          { _id: variables.groupId, productionId: variables.id },
+          {
+            _id: variables.groupId,
+            productionId: variables.id,
+            productionPrompt: variables.productionPrompt,
+          },
           /* Callback */
           (group) => queryClient.setQueryData([QueryKeys.promptGroup, variables.groupId], group),
         );
@@ -1069,11 +1099,7 @@ export const useMakePromptProduction = (options?: t.MakePromptProductionOptions)
         onError(err, variables, context);
       }
     },
-    onSuccess: (response, variables, context) => {
-      if (onSuccess) {
-        onSuccess(response, variables, context);
-      }
-    },
+    onSuccess,
   });
 };
 

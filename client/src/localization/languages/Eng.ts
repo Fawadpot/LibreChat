@@ -126,7 +126,7 @@ export default {
   com_ui_manage_prompts: 'Manage Prompts',
   com_ui_variables: 'Variables',
   com_ui_variables_info:
-    'Use double braces in your text to use variables, e.g. {{example variable}}, to later add your own words when you select the prompt.',
+    'Use double braces in your text to create variables, e.g. {{example variable}}, to later fill when using the prompt.',
   com_ui_showing: 'Showing',
   com_ui_of: 'of',
   com_ui_entries: 'Entries',
@@ -140,6 +140,7 @@ export default {
   com_ui_upload_invalid: 'Invalid file for upload. Must be an image not exceeding 2 MB',
   com_ui_cancel: 'Cancel',
   com_ui_save: 'Save',
+  com_ui_renaming_var: 'Renaming "{0}"',
   com_ui_save_submit: 'Save & Submit',
   com_user_message: 'You',
   com_ui_read_aloud: 'Read aloud',

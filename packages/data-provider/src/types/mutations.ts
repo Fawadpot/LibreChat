@@ -110,9 +110,17 @@ export type UpdateSharedLinkOptions = MutationOptions<
 >;
 export type DeleteSharedLinkOptions = MutationOptions<types.TSharedLink, { shareId: string }>;
 
+export type TUpdatePromptContext =
+  | {
+      group?: types.TPromptGroup;
+      previousListData?: types.PromptGroupListData;
+    }
+  | undefined;
+
 export type UpdatePromptGroupOptions = MutationOptions<
   types.TUpdatePromptGroupResponse,
-  types.TUpdatePromptGroupVariables
+  types.TUpdatePromptGroupVariables,
+  TUpdatePromptContext
 >;
 
 export type CreatePromptOptions = MutationOptions<types.TCreatePromptResponse, types.TCreatePrompt>;
@@ -136,7 +144,7 @@ export type UpdatePromptLabelOptions = MutationOptions<
 export type MakePromptProductionOptions = MutationOptions<
   types.TMakePromptProductionResponse,
   types.TMakePromptProductionRequest,
-  { group?: types.TPromptGroup; previousListData?: types.PromptGroupListData } | undefined
+  TUpdatePromptContext
 >;
 
 /* Auth mutations */
