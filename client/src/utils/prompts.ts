@@ -1,7 +1,9 @@
-export const hasVariables = (text: string): boolean => {
+export const detectVariables = (text: string): boolean => {
   const regex = /{{(.*?)}}/g;
   return regex.test(text);
 };
+
+export const wrapVariable = (variable: string) => `{{${variable}}}`;
 
 export const extractUniqueVariables = (text: string): string[] => {
   const regex = /{{(.*?)}}/g;
