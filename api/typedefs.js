@@ -567,6 +567,12 @@
  */
 
 /**
+ * @exports MongoProject
+ * @typedef {import('~/models/schema/projectSchema.js').MongoProject} MongoProject
+ * @memberof typedefs
+ */
+
+/**
  * @exports MongoPromptGroup
  * @typedef {import('~/models/schema/promptSchema.js').MongoPromptGroup} MongoPromptGroup
  * @memberof typedefs

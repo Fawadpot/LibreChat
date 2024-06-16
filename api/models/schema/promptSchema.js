@@ -35,10 +35,10 @@ const promptGroupSchema = new Schema(
       type: String,
       default: '',
     },
-    projectId: {
-      type: Schema.Types.ObjectId,
-      required: false,
-      default: null,
+    projectIds: {
+      type: [Schema.Types.ObjectId],
+      ref: 'Project',
+      index: true,
     },
     productionId: {
       type: Schema.Types.ObjectId,

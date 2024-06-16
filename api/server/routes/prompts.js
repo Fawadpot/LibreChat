@@ -37,7 +37,7 @@ router.get('/groups', async (req, res) => {
     const filter = req.query;
     /* Note: The aggregation requires an ObjectId */
     filter.author = req.user._id;
-    const groups = await getPromptGroups(filter);
+    const groups = await getPromptGroups(req, filter);
     res.status(200).send(groups);
   } catch (error) {
     console.error(error);
