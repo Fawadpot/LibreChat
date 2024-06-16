@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { MessageSquareQuote } from 'lucide-react';
+import { ArrowLeft, MessageSquareQuote } from 'lucide-react';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -33,8 +33,13 @@ export default function DashBreadcrumb() {
     <Breadcrumb className="mt-1 px-2 dark:text-gray-200">
       <BreadcrumbList>
         <BreadcrumbItem className="hover:dark:text-white">
-          <BreadcrumbLink href="/" onClick={chatLinkHandler}>
-            {localize('com_ui_chat')}
+          <BreadcrumbLink
+            href="/"
+            className="flex flex-row items-center gap-1"
+            onClick={chatLinkHandler}
+          >
+            <ArrowLeft className="icon-xs" />
+            {localize('com_ui_back_to_chat')}
           </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
@@ -43,7 +48,7 @@ export default function DashBreadcrumb() {
             <DropdownMenuTrigger className="flex cursor-default items-center gap-1">
               {/* <BreadcrumbEllipsis className="h-4 w-4" /> */}
               <BreadcrumbItem className="hover:dark:text-white">
-                <span className="text-gray-400">Dashboard</span>
+                <span className="text-gray-400">{localize('com_ui_dashboard')}</span>
               </BreadcrumbItem>
               <span className="sr-only">Toggle menu</span>
             </DropdownMenuTrigger>
@@ -58,11 +63,11 @@ export default function DashBreadcrumb() {
         <BreadcrumbItem className="hover:dark:text-white">
           <BreadcrumbLink
             href="/d/prompts"
-            className="flex flex-row gap-1"
+            className="flex flex-row items-center gap-1"
             onClick={promptsLinkHandler}
           >
             <MessageSquareQuote className="h-5 w-5 dark:text-gray-300" />
-            Prompts
+            {localize('com_ui_prompts')}
           </BreadcrumbLink>
         </BreadcrumbItem>
       </BreadcrumbList>
