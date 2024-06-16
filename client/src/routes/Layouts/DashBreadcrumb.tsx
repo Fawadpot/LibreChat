@@ -43,30 +43,32 @@ export default function DashBreadcrumb() {
           </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
+        {/*
         <BreadcrumbItem className="hover:dark:text-white">
           <DropdownMenu>
             <DropdownMenuTrigger className="flex cursor-default items-center gap-1">
-              {/* <BreadcrumbEllipsis className="h-4 w-4" /> */}
+              <BreadcrumbEllipsis className="h-4 w-4" />
               <BreadcrumbItem className="hover:dark:text-white">
                 <span className="text-gray-400">{localize('com_ui_dashboard')}</span>
               </BreadcrumbItem>
               <span className="sr-only">Toggle menu</span>
             </DropdownMenuTrigger>
-            {/* <DropdownMenuContent align="start">
+           <DropdownMenuContent align="start">
               <DropdownMenuItem>Documentation</DropdownMenuItem>
               <DropdownMenuItem>Themes</DropdownMenuItem>
               <DropdownMenuItem>GitHub</DropdownMenuItem>
-            </DropdownMenuContent> */}
+            </DropdownMenuContent>
           </DropdownMenu>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
+        */}
         <BreadcrumbItem className="hover:dark:text-white">
           <BreadcrumbLink
             href="/d/prompts"
             className="flex flex-row items-center gap-1"
             onClick={promptsLinkHandler}
           >
-            <MessageSquareQuote className="h-5 w-5 dark:text-gray-300" />
+            <MessageSquareQuote className="h-4 w-4 dark:text-gray-300" />
             {localize('com_ui_prompts')}
           </BreadcrumbLink>
         </BreadcrumbItem>

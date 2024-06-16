@@ -43,7 +43,7 @@ export default function GroupSidePanel({
           />
         </div> */}
       </div>
-      <AutoSendSwitch />
+      <AutoSendSwitch className="dark:text-white" />
       <div className="flex-grow overflow-y-auto">
         <List groups={promptGroups} isChatRoute={isChatRoute} />
       </div>
