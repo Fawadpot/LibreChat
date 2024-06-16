@@ -28,7 +28,7 @@ export default function usePromptGroupsNav({ initialPageSize = 10, initialPageNu
     maxPageNumberReached.current = 1;
     setPageNumber(1);
     groupsQuery.refetch();
-  }, [pageSize]);
+  }, [pageSize, groupsQuery]);
 
   const promptGroups = useMemo(() => {
     return groupsQuery?.data?.pages?.[pageNumber - 1 + '']?.promptGroups || [];
