@@ -1,4 +1,5 @@
 export * from './AlertDialog';
+export * from './Breadcrumb';
 export * from './Button';
 export * from './Checkbox';
 export * from './DataTableColumnHeader';

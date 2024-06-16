@@ -1,28 +1,23 @@
 import { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
+// import { ListFilter } from 'lucide-react';
 // import { useNavigate, useLocation } from 'react-router-dom';
-// import { ListFilter, MessageSquareQuote } from 'lucide-react';
-import { MessageSquareQuote } from 'lucide-react';
 import PanelNavigation from '~/components/Prompts/Groups/PanelNavigation';
-import { useLocalize, useMediaQuery, usePromptGroupsNav } from '~/hooks';
 import AutoSendSwitch from '~/components/Prompts/Groups/AutoSendSwitch';
-import BackToChat from '~/components/Prompts/BackToChat';
+import { useMediaQuery, usePromptGroupsNav } from '~/hooks';
 import List from '~/components/Prompts/Groups/List';
 // import { Button, Input } from '~/components/ui';
 import { cn } from '~/utils';
 
 export default function GroupSidePanel({
   isDetailView,
-  showHeader,
   className = '',
 }: {
   isDetailView?: boolean;
-  showHeader?: boolean;
   className?: string;
 }) {
   const { prevPage, nextPage, isFetching, hasNextPage, promptGroups, hasPreviousPage } =
     usePromptGroupsNav();
-  const localize = useLocalize();
   const location = useLocation();
   const isChatRoute = useMemo(() => location.pathname.startsWith('/c/'), [location.pathname]);
   const isSmallerScreen = useMediaQuery('(max-width: 1024px)');
@@ -35,15 +30,6 @@ export default function GroupSidePanel({
         className,
       )}
     >
-      {showHeader && (
-        <h1 className="m-3 flex items-center justify-between gap-x-2 text-center text-xl lg:text-left">
-          <div className="flex items-center gap-x-2">
-            <MessageSquareQuote className="h-5 w-5 text-gray-500" />
-            <strong>{localize('com_ui_prompts')}</strong>
-          </div>
-          <BackToChat />
-        </h1>
-      )}
       <div className="flex w-full flex-row justify-between">
         {/* <div className="mx-4 flex w-2/3 flex-row justify-start gap-x-2 pr-2">
           <Button variant="ghost" className="m-0 mr-2 p-0">

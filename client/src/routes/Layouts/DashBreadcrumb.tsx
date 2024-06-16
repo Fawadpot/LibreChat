@@ -1,0 +1,71 @@
+import { useMemo } from 'react';
+import { MessageSquareQuote } from 'lucide-react';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+  // BreadcrumbEllipsis,
+  DropdownMenu,
+  // DropdownMenuItem,
+  // DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '~/components/ui';
+import { useLocalize, useCustomLink } from '~/hooks';
+import { useDashboardContext } from '~/Providers';
+
+const getConversationId = (prevLocationPath: string) => {
+  if (!prevLocationPath || prevLocationPath.includes('/d/')) {
+    return 'new';
+  }
+  const lastPathnameParts = prevLocationPath.split('/');
+  return lastPathnameParts[lastPathnameParts.length - 1];
+};
+
+export default function DashBreadcrumb() {
+  const localize = useLocalize();
+  const { prevLocationPath } = useDashboardContext();
+  const lastConversationId = useMemo(() => getConversationId(prevLocationPath), [prevLocationPath]);
+  const chatLinkHandler = useCustomLink('/c/' + lastConversationId);
+  const promptsLinkHandler = useCustomLink('/d/prompts');
+  return (
+    <Breadcrumb className="mt-1 px-2 dark:text-gray-200">
+      <BreadcrumbList>
+        <BreadcrumbItem className="hover:dark:text-white">
+          <BreadcrumbLink href="/" onClick={chatLinkHandler}>
+            {localize('com_ui_chat')}
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem className="hover:dark:text-white">
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex cursor-default items-center gap-1">
+              {/* <BreadcrumbEllipsis className="h-4 w-4" /> */}
+              <BreadcrumbItem className="hover:dark:text-white">
+                <span className="text-gray-400">Dashboard</span>
+              </BreadcrumbItem>
+              <span className="sr-only">Toggle menu</span>
+            </DropdownMenuTrigger>
+            {/* <DropdownMenuContent align="start">
+              <DropdownMenuItem>Documentation</DropdownMenuItem>
+              <DropdownMenuItem>Themes</DropdownMenuItem>
+              <DropdownMenuItem>GitHub</DropdownMenuItem>
+            </DropdownMenuContent> */}
+          </DropdownMenu>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem className="hover:dark:text-white">
+          <BreadcrumbLink
+            href="/d/prompts"
+            className="flex flex-row gap-1"
+            onClick={promptsLinkHandler}
+          >
+            <MessageSquareQuote className="h-5 w-5 dark:text-gray-300" />
+            Prompts
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
+  );
+}

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Menu as MenuIcon, Edit as EditIcon } from 'lucide-react';
 import type { TPromptGroup } from 'librechat-data-provider';
 import {
@@ -11,18 +10,17 @@ import {
   DropdownMenuTrigger,
 } from '~/components/ui';
 import VariableDialog from '~/components/Prompts/Groups/VariableDialog';
+import { useLocalize, useSubmitMessage, useCustomLink } from '~/hooks';
 import ListCard from '~/components/Prompts/Groups/ListCard';
-import { useLocalize, useSubmitMessage } from '~/hooks';
 import { getSnippet, detectVariables } from '~/utils';
 
 export default function ChatGroupItem({ group }: { group: TPromptGroup }) {
   const localize = useLocalize();
-  const navigate = useNavigate();
   const { submitPrompt } = useSubmitMessage();
-
   const [isDialogOpen, setDialogOpen] = useState(false);
+  const onEditClick = useCustomLink<HTMLDivElement>(`/d/prompts/${group._id}`);
 
-  const onClickHandler = () => {
+  const onCardClick = () => {
     const text = group.productionPrompt?.prompt ?? '';
     if (!text) {
       return;
@@ -40,7 +38,7 @@ export default function ChatGroupItem({ group }: { group: TPromptGroup }) {
       <ListCard
         name={group.name}
         category={group.category ?? ''}
-        onClick={onClickHandler}
+        onClick={onCardClick}
         snippet={
           group.oneliner ? group.oneliner : getSnippet(group?.productionPrompt?.prompt ?? '', 40)
         }
@@ -58,7 +56,7 @@ export default function ChatGroupItem({ group }: { group: TPromptGroup }) {
             <DropdownMenuGroup>
               <DropdownMenuItem
                 className="cursor-pointer rounded-lg dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:bg-gray-700"
-                onClick={() => navigate(`/d/prompts/${group._id}`)}
+                onClick={onEditClick}
               >
                 <EditIcon className="mr-2 h-4 w-4" />
                 <span>{localize('com_ui_edit')}</span>

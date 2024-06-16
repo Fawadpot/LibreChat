@@ -1,24 +1,42 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { QueryKeys } from 'librechat-data-provider';
 import { useQueryClient } from '@tanstack/react-query';
-import { useAuthContext } from '~/hooks';
+import { useAuthContext, usePreviousLocation } from '~/hooks';
+import { DashboardContext } from '~/Providers';
 import store from '~/store';
 
 export default function DashboardRoute() {
   const queryClient = useQueryClient();
+  const { isAuthenticated } = useAuthContext();
+  const prevLocationRef = usePreviousLocation();
   const clearConvoState = store.useClearConvoState();
+  const [prevLocationPath, setPrevLocationPath] = useState('');
+
+  useEffect(() => {
+    if (!prevLocationRef.current) {
+      return;
+    }
+    if (prevLocationRef.current.pathname.includes('/d')) {
+      return;
+    }
+    setPrevLocationPath(prevLocationRef.current?.pathname || '');
+  }, [prevLocationRef]);
+
   useEffect(() => {
     queryClient.removeQueries([QueryKeys.messages, 'new']);
     clearConvoState();
   }, [queryClient, clearConvoState]);
-  const { isAuthenticated } = useAuthContext();
+
   if (!isAuthenticated) {
     return null;
   }
+
   return (
-    <div className="h-screen w-full">
-      <Outlet />
-    </div>
+    <DashboardContext.Provider value={{ prevLocationPath }}>
+      <div className="h-screen w-full">
+        <Outlet />
+      </div>
+    </DashboardContext.Provider>
   );
 }
