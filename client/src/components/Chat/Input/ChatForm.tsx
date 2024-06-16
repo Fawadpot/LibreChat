@@ -61,7 +61,7 @@ const ChatForm = ({ index = 0 }) => {
   });
 
   const assistantMap = useAssistantsMapContext();
-  const submitMessage = useSubmitMessage({ clearDraft });
+  const { submitMessage } = useSubmitMessage({ clearDraft });
 
   const { endpoint: _endpoint, endpointType } = conversation ?? { endpoint: null };
   const endpoint = endpointType ?? _endpoint;

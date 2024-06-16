@@ -1,10 +1,16 @@
 import { useCallback } from 'react';
+import { useRecoilValue } from 'recoil';
 import { useFormContext } from 'react-hook-form';
+import { forceResize, insertTextAtCursor } from '~/utils';
 import { useChatContext } from '~/Providers';
+import { mainTextareaId } from '~/common';
+import store from '~/store';
 
 export default function useSubmitMessage(helpers?: { clearDraft?: () => void }) {
   const { ask } = useChatContext();
   const methods = useFormContext<{ text: string }>();
+  const autoSendPrompts = useRecoilValue(store.autoSendPrompts);
+
   const submitMessage = useCallback(
     (data?: { text: string }) => {
       if (!data) {
@@ -17,5 +23,22 @@ export default function useSubmitMessage(helpers?: { clearDraft?: () => void }) 
     [ask, methods, helpers],
   );
 
-  return submitMessage;
+  const submitPrompt = useCallback(
+    (text: string) => {
+      if (autoSendPrompts) {
+        submitMessage({ text });
+      } else {
+        const currentText = methods.getValues('text');
+        const newText = currentText ? `\n${text}` : text;
+        const textarea = document.getElementById(mainTextareaId) as HTMLTextAreaElement | null;
+        if (textarea) {
+          insertTextAtCursor(textarea, newText);
+          forceResize(textarea);
+        }
+      }
+    },
+    [autoSendPrompts, submitMessage, methods],
+  );
+
+  return { submitMessage, submitPrompt };
 }

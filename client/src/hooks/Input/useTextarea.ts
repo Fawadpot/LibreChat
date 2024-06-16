@@ -119,7 +119,7 @@ export default function useTextarea({
 
       if (textAreaRef.current?.getAttribute('placeholder') !== placeholder) {
         textAreaRef.current?.setAttribute('placeholder', placeholder);
-        forceResize(textAreaRef);
+        forceResize(textAreaRef.current);
       }
     };
 
@@ -176,7 +176,7 @@ export default function useTextarea({
       if (e.key === 'Enter' && !enterToSend && !isCtrlEnter && textAreaRef.current) {
         e.preventDefault();
         insertTextAtCursor(textAreaRef.current, '\n');
-        forceResize(textAreaRef);
+        forceResize(textAreaRef.current);
         return;
       }
 
