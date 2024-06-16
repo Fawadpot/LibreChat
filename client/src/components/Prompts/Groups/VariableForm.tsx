@@ -82,7 +82,7 @@ export default function VariableForm({
   return (
     <div className="container mx-auto p-1">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <div className="mb-6 max-h-screen overflow-auto rounded-md bg-gray-100 p-4 dark:bg-gray-700 dark:text-gray-300 md:max-h-80">
+        <div className="mb-6 max-h-screen overflow-auto rounded-md bg-gray-100 p-4 dark:bg-gray-700/50 dark:text-gray-300 md:max-h-80">
           <p className="text-md whitespace-pre-wrap">{generateHighlightedText()}</p>
         </div>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
