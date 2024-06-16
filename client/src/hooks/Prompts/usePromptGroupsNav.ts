@@ -1,10 +1,10 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { usePromptGroupsInfiniteQuery } from '~/data-provider';
 
-export default function usePromptGroupsNav() {
+export default function usePromptGroupsNav({ initialPageSize = 10, initialPageNumber = 1 } = {}) {
   const [name, setName] = useState('');
-  const [pageSize, setPageSize] = useState(10);
-  const [pageNumber, setPageNumber] = useState(1);
+  const [pageSize, setPageSize] = useState(initialPageSize);
+  const [pageNumber, setPageNumber] = useState(initialPageNumber);
 
   const maxPageNumberReached = useRef(1);
 
@@ -27,6 +27,7 @@ export default function usePromptGroupsNav() {
   useEffect(() => {
     maxPageNumberReached.current = 1;
     setPageNumber(1);
+    groupsQuery.refetch();
   }, [pageSize]);
 
   const promptGroups = useMemo(() => {
@@ -53,6 +54,7 @@ export default function usePromptGroupsNav() {
     nextPage,
     prevPage,
     isFetching,
+    pageSize,
     setPageSize,
     hasNextPage,
     groupsQuery,

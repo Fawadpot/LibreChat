@@ -70,7 +70,7 @@ const CreatePromptForm = ({
                   <Input
                     {...field}
                     type="text"
-                    className="mr-2 w-full border border-gray-300 p-2 text-2xl"
+                    className="mr-2 w-full border border-gray-300 p-2 text-2xl dark:border-gray-600"
                     placeholder={`${localize('com_ui_prompt_name')}*`}
                   />
                   <div
@@ -89,10 +89,10 @@ const CreatePromptForm = ({
         </div>
         <div className="w-full md:mt-[1.075rem]">
           <div>
-            <h2 className="flex items-center justify-between rounded-t-lg border border-gray-300 py-2 pl-4 pr-1 text-base font-semibold">
+            <h2 className="flex items-center justify-between rounded-t-lg border border-gray-300 py-2 pl-4 pr-1 text-base font-semibold dark:border-gray-600 dark:text-gray-200">
               {localize('com_ui_text_prompt')}*
             </h2>
-            <div className="mb-4 min-h-32 rounded-b-lg border border-gray-300 p-4 transition-all duration-150">
+            <div className="mb-4 min-h-32 rounded-b-lg border border-gray-300 p-4 transition-all duration-150 dark:border-gray-600">
               <Controller
                 name="prompt"
                 control={control}
@@ -101,7 +101,7 @@ const CreatePromptForm = ({
                   <div>
                     <TextareaAutosize
                       {...field}
-                      className="w-full rounded border border-gray-300 px-2 py-1"
+                      className="w-full rounded border border-gray-300 px-2 py-1 focus:outline-none dark:border-gray-600 dark:bg-transparent dark:text-gray-200"
                       minRows={6}
                     />
                     <div

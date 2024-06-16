@@ -18,7 +18,7 @@ const PromptVersions = ({
 }) => {
   return (
     <>
-      <h2 className="mb-4 flex gap-2 text-base font-semibold">
+      <h2 className="mb-4 flex gap-2 text-base font-semibold dark:text-gray-200">
         <Layers3 className="icon-lg text-green-500" />
         Versions
       </h2>
@@ -37,13 +37,13 @@ const PromptVersions = ({
             <li
               key={index}
               className={cn(
-                'relative cursor-pointer rounded-lg border p-4',
-                index === selectionIndex ? 'bg-gray-100' : 'bg-white',
+                'relative cursor-pointer rounded-lg border p-4 dark:border-gray-600 dark:bg-transparent',
+                index === selectionIndex ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white',
               )}
               onClick={() => setSelectionIndex(index)}
             >
-              <p className="font-bold">Version: {prompts.length - index}</p>
-              <p className="absolute right-4 top-5 whitespace-nowrap text-xs text-gray-600">
+              <p className="font-bold dark:text-gray-200">Version: {prompts.length - index}</p>
+              <p className="absolute right-4 top-5 whitespace-nowrap text-xs text-gray-600 dark:text-gray-400">
                 {format(new Date(prompt.createdAt), 'yyyy-MM-dd HH:mm')}
               </p>
               {tags.length > 0 && (
@@ -54,8 +54,9 @@ const PromptVersions = ({
                         key={`${tag}-${i}`}
                         label={tag}
                         className={cn(
-                          'w-fit border-none bg-blue-100 text-blue-500',
-                          tag === 'production' && 'bg-green-100 text-green-500',
+                          'w-fit border border-transparent bg-blue-100 text-blue-500 dark:border-blue-500 dark:bg-transparent dark:text-blue-500',
+                          tag === 'production' &&
+                            'bg-green-100 text-green-500 dark:border-green-500 dark:bg-transparent dark:text-green-500',
                         )}
                         labelClassName="flex m-0 justify-center gap-1"
                         LabelNode={
@@ -70,7 +71,9 @@ const PromptVersions = ({
                   })}
                 </span>
               )}
-              {group?.authorName && <p className="text-xs text-gray-600">by {group.authorName}</p>}
+              {group?.authorName && (
+                <p className="text-xs text-gray-600 dark:text-gray-400">by {group.authorName}</p>
+              )}
             </li>
           );
         })}

@@ -515,3 +515,9 @@ export function deletePromptGroup(id: string): Promise<t.TDeletePromptGroupRespo
 export function getCategories(): Promise<t.TGetCategoriesResponse> {
   return request.get(endpoints.getCategories());
 }
+
+export function getRandomPrompts(
+  variables: t.TGetRandomPromptsRequest,
+): Promise<t.TGetRandomPromptsResponse> {
+  return request.get(endpoints.getRandomPrompts(variables.limit, variables.skip));
+}
