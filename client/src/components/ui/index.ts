@@ -8,6 +8,7 @@ export * from './HoverCard';
 export * from './Input';
 export * from './InputNumber';
 export * from './Label';
+export * from './OriginalDialog';
 export * from './Prompt';
 export * from './QuestionMark';
 export * from './Slider';
