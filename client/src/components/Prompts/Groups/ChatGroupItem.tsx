@@ -10,17 +10,27 @@ import {
   DropdownMenuTrigger,
 } from '~/components/ui';
 import ListCard from '~/components/Prompts/Groups/ListCard';
-import { useLocalize } from '~/hooks';
+import { useLocalize, useSubmitMessage } from '~/hooks';
 import { getSnippet } from '~/utils';
 
 export default function ChatGroupItem({ group }: { group: TPromptGroup }) {
   const localize = useLocalize();
   const navigate = useNavigate();
+  const submitMessage = useSubmitMessage();
+
+  const onClickHandler = () => {
+    const text = group.productionPrompt?.prompt ?? '';
+    if (!text) {
+      return;
+    }
+    submitMessage({ text });
+  };
 
   return (
     <ListCard
       name={group.name}
       category={group.category ?? ''}
+      onClick={onClickHandler}
       snippet={
         group.oneliner ? group.oneliner : getSnippet(group?.productionPrompt?.prompt ?? '', 40)
       }
