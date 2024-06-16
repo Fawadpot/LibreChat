@@ -1,14 +1,19 @@
-export function extractUniqueVariables(input: string): string[] {
+export const detectVariables = (text: string): boolean => {
   const regex = /{{(.*?)}}/g;
-  const variablesSet = new Set<string>();
-  let match: RegExpExecArray | null = null;
+  return regex.test(text);
+};
 
-  while ((match = regex.exec(input)) !== null) {
-    variablesSet.add(match[1]);
+export const wrapVariable = (variable: string) => `{{${variable}}}`;
+
+export const extractUniqueVariables = (text: string): string[] => {
+  const regex = /{{(.*?)}}/g;
+  let match: RegExpExecArray | null;
+  const variables = new Set<string>();
+  while ((match = regex.exec(text)) !== null) {
+    variables.add(match[1]);
   }
-
-  return Array.from(variablesSet);
-}
+  return Array.from(variables);
+};
 
 export function formatDateTime(dateTimeString: string) {
   const date = new Date(dateTimeString);

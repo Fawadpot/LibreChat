@@ -33,24 +33,16 @@ router.get('/groups/:groupId', async (req, res) => {
  * GET /groups
  */
 router.get('/groups', async (req, res) => {
-  let pageNumber = req.query.pageNumber || '1';
-  pageNumber = pageNumber.toString();
-
-  let pageSize = req.query.pageSize || '25';
-  pageSize = pageSize.toString();
-
-  let filter = req.query;
-
-  if (filter) {
-    filter.author = req.user.id;
-  } else {
-    filter = { author: req.user.id };
+  try {
+    const filter = req.query;
+    /* Note: The aggregation requires an ObjectId */
+    filter.author = req.user._id;
+    const groups = await getPromptGroups(filter);
+    res.status(200).send(groups);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: 'Error getting prompt groups' });
   }
-
-  filter.pageNumber = pageNumber;
-  filter.pageSize = pageSize;
-
-  res.status(200).send(await getPromptGroups(filter));
 });
 
 /**

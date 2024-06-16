@@ -25,7 +25,6 @@ export default function usePromptGroupsNav({ initialPageSize = 10, initialPageNu
   // }, [groupsQuery.data?.pages]);
 
   useEffect(() => {
-    console.log('Page Size Changed:', pageSize);
     maxPageNumberReached.current = 1;
     setPageNumber(1);
     groupsQuery.refetch();
