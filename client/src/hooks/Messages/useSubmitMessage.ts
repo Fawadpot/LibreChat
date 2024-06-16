@@ -1,15 +1,14 @@
 import { useCallback } from 'react';
-import { useRecoilValue } from 'recoil';
 import { useFormContext } from 'react-hook-form';
-import { forceResize, insertTextAtCursor } from '~/utils';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { useChatContext } from '~/Providers';
-import { mainTextareaId } from '~/common';
 import store from '~/store';
 
 export default function useSubmitMessage(helpers?: { clearDraft?: () => void }) {
-  const { ask } = useChatContext();
+  const { ask, index } = useChatContext();
   const methods = useFormContext<{ text: string }>();
   const autoSendPrompts = useRecoilValue(store.autoSendPrompts);
+  const setActivePrompt = useSetRecoilState(store.activePromptByIndex(index));
 
   const submitMessage = useCallback(
     (data?: { text: string }) => {
@@ -27,17 +26,14 @@ export default function useSubmitMessage(helpers?: { clearDraft?: () => void }) 
     (text: string) => {
       if (autoSendPrompts) {
         submitMessage({ text });
-      } else {
-        const currentText = methods.getValues('text');
-        const newText = currentText ? `\n${text}` : text;
-        const textarea = document.getElementById(mainTextareaId) as HTMLTextAreaElement | null;
-        if (textarea) {
-          insertTextAtCursor(textarea, newText);
-          forceResize(textarea);
-        }
+        return;
       }
+
+      const currentText = methods.getValues('text');
+      const newText = currentText ? `\n${text}` : text;
+      setActivePrompt(newText);
     },
-    [autoSendPrompts, submitMessage, methods],
+    [autoSendPrompts, submitMessage, setActivePrompt, methods],
   );
 
   return { submitMessage, submitPrompt };

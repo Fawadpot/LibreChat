@@ -1,8 +1,8 @@
 import { useForm, useFieldArray, Controller, useWatch } from 'react-hook-form';
 import type { TPromptGroup } from 'librechat-data-provider';
 import { extractUniqueVariables, wrapVariable } from '~/utils';
+import { useLocalize, useSubmitMessage } from '~/hooks';
 import { Input } from '~/components/ui';
-import { useLocalize } from '~/hooks';
 
 type FormValues = {
   fields: { variable: string; value: string }[];
@@ -20,6 +20,7 @@ export default function VariableForm({
   const mainText = group.productionPrompt?.prompt ?? '';
   const variables = extractUniqueVariables(mainText);
 
+  const { submitPrompt } = useSubmitMessage();
   const { control, handleSubmit } = useForm<FormValues>({
     defaultValues: {
       fields: variables.map((variable) => ({ variable: wrapVariable(variable), value: '' })),
@@ -73,9 +74,9 @@ export default function VariableForm({
       }
       return acc.replace(wrapVariable(variable), value);
     }, mainText);
-    console.log(text);
+
+    submitPrompt(text);
     onClose();
-    // submitPrompt(text);
   };
 
   return (
