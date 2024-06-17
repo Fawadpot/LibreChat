@@ -125,11 +125,10 @@ export type UpdatePromptGroupOptions = MutationOptions<
 
 export type CreatePromptOptions = MutationOptions<types.TCreatePromptResponse, types.TCreatePrompt>;
 
-export type DeletePromptVariables = {
-  _id: string;
-};
-
-export type DeletePromptOptions = MutationOptions<unknown, DeletePromptVariables>;
+export type DeletePromptOptions = MutationOptions<
+  types.TDeletePromptResponse,
+  types.TDeletePromptVariables
+>;
 
 export type DeletePromptGroupOptions = MutationOptions<
   types.TDeletePromptGroupResponse,

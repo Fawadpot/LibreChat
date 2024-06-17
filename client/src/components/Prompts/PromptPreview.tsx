@@ -5,7 +5,7 @@ import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import type { TCreatePrompt } from 'librechat-data-provider';
 import {
   useCreatePrompt,
-  useDeletePromptGroup,
+  useDeletePrompt,
   useUpdatePromptGroup,
   useMakePromptProduction,
 } from '~/data-provider/mutations';
@@ -59,9 +59,13 @@ const PromptPreview = () => {
       setSelectionIndex(productionIndex);
     },
   });
-  const deletePromptGroupMutation = useDeletePromptGroup({
-    onSuccess: () => {
-      navigate('/d/prompts');
+  const deletePromptMutation = useDeletePrompt({
+    onSuccess: (response) => {
+      if (response.promptGroup) {
+        navigate('/d/prompts');
+      } else {
+        setSelectionIndex(0);
+      }
     },
   });
 
@@ -165,7 +169,12 @@ const PromptPreview = () => {
                 size={'sm'}
                 className="h-10 w-10 border border-transparent bg-red-100 text-red-500 transition-all hover:bg-red-500 hover:text-white dark:border-red-600 dark:bg-transparent dark:hover:bg-red-950"
                 disabled={isLoadingGroup}
-                onClick={() => deletePromptGroupMutation.mutate({ id: group?._id || '' })}
+                onClick={() =>
+                  deletePromptMutation.mutate({
+                    _id: selectedPrompt?._id || '',
+                    groupId: group?._id || '',
+                  })
+                }
               >
                 <TrashIcon className="icon-lg cursor-pointer dark:text-red-600" />
               </Button>

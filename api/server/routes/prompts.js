@@ -156,11 +156,27 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.delete('/:promptId', async (req, res) => {
-  const { promptId } = req.params;
-  const author = req.user.id;
-  res.status(200).send(await deletePrompt({ promptId, author }));
-});
+/**
+ * Deletes a prompt
+ *
+ * @param {Express.Request} req - The request object.
+ * @param {TDeletePromptVariables} req.params - The request parameters
+ * @param {import('mongoose').ObjectId} req.params.promptId - The prompt ID
+ * @param {Express.Response} res - The response object.
+ * @return {TDeletePromptResponse} A promise that resolves when the prompt is deleted.
+ */
+const deletePromptController = async (req, res) => {
+  try {
+    const { promptId } = req.params;
+    const author = req.user.id;
+    res.status(200).send(await deletePrompt({ promptId, author }));
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: 'Error deleting prompt' });
+  }
+};
+
+router.delete('/:promptId', deletePromptController);
 
 router.delete('/groups/:groupId', async (req, res) => {
   const { groupId } = req.params;

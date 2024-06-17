@@ -313,6 +313,18 @@
  * @memberof typedefs
  */
 
+/**
+ * @exports TDeletePromptVariables
+ * @typedef {import('librechat-data-provider').TDeletePromptVariables } TDeletePromptVariables
+ * @memberof typedefs
+ */
+
+/**
+ * @exports TDeletePromptResponse
+ * @typedef {import('librechat-data-provider').TDeletePromptResponse } TDeletePromptResponse
+ * @memberof typedefs
+ */
+
 /** Assistants */
 /**
  * @exports Assistant

@@ -409,7 +409,13 @@ export type TUpdatePromptGroupVariables = {
 export type TUpdatePromptGroupResponse = TPromptGroup;
 
 export type TDeletePromptResponse = {
-  message: string;
+  prompt: string;
+  promptGroup?: { message: string; id: string };
+};
+
+export type TDeletePromptVariables = {
+  _id: string;
+  groupId: string;
 };
 
 export type TMakePromptProductionResponse = {
