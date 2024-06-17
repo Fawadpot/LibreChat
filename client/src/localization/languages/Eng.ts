@@ -120,9 +120,11 @@ export default {
   com_ui_prompt: 'Prompt',
   com_ui_prompts: 'Prompts',
   com_ui_prompt_name: 'Prompt Name',
+  com_ui_prompt_preview_not_shared: 'The author has not allowed collaboration for this prompt.',
   com_ui_is_required: '{0} is required',
   com_ui_text_prompt: 'Text',
   com_ui_back_to_chat: 'Back to Chat',
+  com_ui_back_to_var: 'Back to {0}',
   com_ui_manage_prompts: 'Manage Prompts',
   com_ui_variables: 'Variables',
   com_ui_variables_info:

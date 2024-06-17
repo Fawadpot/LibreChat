@@ -22,13 +22,13 @@ export default function ListCard({
       <div className="flex w-full justify-between">
         <div className="flex flex-row gap-2">
           <CategoryIcon category={category} className="icon-md" />
-          <h3 className="break-word text-balance text-sm font-semibold text-gray-800 dark:text-gray-200">
+          <h3 className="break-word select-none text-balance text-sm font-semibold text-gray-800 dark:text-gray-200">
             {name}
           </h3>
         </div>
         <div>{children}</div>
       </div>
-      <div className="break-word line-clamp-3 text-balance text-sm text-gray-600 dark:text-gray-400">
+      <div className="break-word line-clamp-3 select-none text-balance text-sm text-gray-600 dark:text-gray-400">
         {snippet}
       </div>
     </div>

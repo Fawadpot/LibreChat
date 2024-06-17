@@ -11,6 +11,7 @@ import {
 } from '~/data-provider/mutations';
 import { useGetPromptGroup, useGetPrompts } from '~/data-provider';
 import CategorySelector from './Groups/CategorySelector';
+import { useLocalize, useAuthContext } from '~/hooks';
 import { Button, Skeleton } from '~/components/ui';
 import PromptVariables from './PromptVariables';
 import PromptVersions from './PromptVersions';
@@ -22,6 +23,8 @@ import PromptName from './PromptName';
 const PromptPreview = () => {
   const params = useParams();
   const navigate = useNavigate();
+  const localize = useLocalize();
+  const { user } = useAuthContext();
   const { data: group, isLoading: isLoadingGroup } = useGetPromptGroup(params.promptId || '');
   const { data: prompts = [], isLoading: isLoadingPrompts } = useGetPrompts(
     { groupId: params.promptId ?? '' },
@@ -31,6 +34,7 @@ const PromptPreview = () => {
   const prevIsEditingRef = useRef(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectionIndex, setSelectionIndex] = useState<number>(0);
+  const isOwner = useMemo(() => user?.id === group?.author, [user, group]);
   const selectedPrompt = useMemo(() => prompts[selectionIndex], [prompts, selectionIndex]);
 
   const methods = useForm({
@@ -104,6 +108,32 @@ const PromptPreview = () => {
     setValue('prompt', selectedPrompt?.prompt || '', { shouldDirty: false });
     setValue('category', group?.category || '', { shouldDirty: false });
   }, [selectedPrompt, group?.category, setValue]);
+
+  if (!isOwner) {
+    return (
+      <div className="relative min-h-full w-full px-4">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center font-bold dark:text-gray-200">
+            <h1 className="text-lg font-bold dark:text-gray-200 md:text-2xl">
+              {localize('com_ui_prompt_preview_not_shared')}
+            </h1>
+            <Button
+              className="mt-4"
+              onClick={() => {
+                navigate('/d/prompts');
+              }}
+            >
+              {localize('com_ui_back_to_var', localize('com_ui_prompts'))}
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!group) {
+    return null;
+  }
 
   return (
     <FormProvider {...methods}>

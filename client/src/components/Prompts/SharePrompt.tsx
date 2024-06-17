@@ -13,7 +13,7 @@ type FormValues = {
   shareGlobal: boolean;
 };
 
-const PromptPreview = ({ group, disabled }: { group?: TPromptGroup; disabled: boolean }) => {
+const SharePrompt = ({ group, disabled }: { group?: TPromptGroup; disabled: boolean }) => {
   const localize = useLocalize();
   const { showToast } = useToastContext();
   const updateGroup = useUpdatePromptGroup();
@@ -131,4 +131,4 @@ const PromptPreview = ({ group, disabled }: { group?: TPromptGroup; disabled: bo
   );
 };
 
-export default PromptPreview;
+export default SharePrompt;
