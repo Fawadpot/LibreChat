@@ -1,6 +1,6 @@
 const { ObjectId } = require('mongodb');
+const { getProjectByName, addGroupIdsToProject } = require('./Project');
 const { Prompt, PromptGroup } = require('./schema/promptSchema');
-const { getProjectByName } = require('./Project');
 const { logger } = require('~/config');
 
 module.exports = {
@@ -356,6 +356,11 @@ module.exports = {
    */
   updatePromptGroup: async (filter, data) => {
     try {
+      if (data.projectIds) {
+        for (const projectId of data.projectIds) {
+          await addGroupIdsToProject(projectId, [filter._id]);
+        }
+      }
       const updatedDoc = await PromptGroup.findOneAndUpdate(filter, data, {
         new: true,
         upsert: false,

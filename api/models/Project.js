@@ -41,7 +41,23 @@ const getProjectByName = async function (projectName, fieldsToSelect = null) {
   return await Project.findOneAndUpdate(query, update, options);
 };
 
+/**
+ * Add an array of prompt group IDs to a project's promptGroupIds array, ensuring uniqueness.
+ *
+ * @param {string} projectId - The ID of the project to update.
+ * @param {string[]} promptGroupIds - The array of prompt group IDs to add to the project.
+ * @returns {Promise<MongoProject>} The updated project document.
+ */
+const addGroupIdsToProject = async function (projectId, promptGroupIds) {
+  return await Project.findByIdAndUpdate(
+    projectId,
+    { $addToSet: { promptGroupIds: { $each: promptGroupIds } } },
+    { new: true },
+  );
+};
+
 module.exports = {
   getProjectById,
   getProjectByName,
+  addGroupIdsToProject,
 };

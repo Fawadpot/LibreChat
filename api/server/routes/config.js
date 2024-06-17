@@ -1,5 +1,6 @@
 const express = require('express');
 const { defaultSocialLogins } = require('librechat-data-provider');
+const { getProjectByName } = require('~/models/Project');
 const { isEnabled } = require('~/server/utils');
 const { logger } = require('~/config');
 
@@ -21,6 +22,8 @@ router.get('/', async function (req, res) {
     const today = new Date();
     return today.getMonth() === 1 && today.getDate() === 11;
   };
+
+  const instanceProject = await getProjectByName('instance', '_id');
 
   const ldapLoginEnabled =
     !!process.env.LDAP_URL && !!process.env.LDAP_BIND_DN && !!process.env.LDAP_USER_SEARCH_BASE;
@@ -63,6 +66,7 @@ router.get('/', async function (req, res) {
       sharedLinksEnabled,
       publicSharedLinksEnabled,
       analyticsGtmId: process.env.ANALYTICS_GTM_ID,
+      instanceProjectId: instanceProject._id.toString(),
     };
 
     if (typeof process.env.CUSTOM_FOOTER === 'string') {
