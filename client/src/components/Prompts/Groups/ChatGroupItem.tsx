@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Menu as MenuIcon, Edit as EditIcon, EarthIcon } from 'lucide-react';
+import { Menu as MenuIcon, Edit as EditIcon, EarthIcon, TextSearch } from 'lucide-react';
 import type { TPromptGroup } from 'librechat-data-provider';
 import {
   Button,
@@ -9,8 +9,9 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '~/components/ui';
-import VariableDialog from '~/components/Prompts/Groups/VariableDialog';
 import { useLocalize, useSubmitMessage, useCustomLink, useAuthContext } from '~/hooks';
+import VariableDialog from '~/components/Prompts/Groups/VariableDialog';
+import PreviewPrompt from '~/components/Prompts/PreviewPrompt';
 import ListCard from '~/components/Prompts/Groups/ListCard';
 import { getSnippet, detectVariables } from '~/utils';
 
@@ -24,7 +25,8 @@ export default function ChatGroupItem({
   const localize = useLocalize();
   const { user } = useAuthContext();
   const { submitPrompt } = useSubmitMessage();
-  const [isDialogOpen, setDialogOpen] = useState(false);
+  const [isPreviewDialogOpen, setPreviewDialogOpen] = useState(false);
+  const [isVariableDialogOpen, setVariableDialogOpen] = useState(false);
   const onEditClick = useCustomLink<HTMLDivElement>(`/d/prompts/${group._id}`);
   const groupIsGlobal = useMemo(
     () => instanceProjectId && group?.projectIds?.includes(instanceProjectId),
@@ -39,7 +41,7 @@ export default function ChatGroupItem({
     }
     const hasVariables = detectVariables(text);
     if (hasVariables) {
-      return setDialogOpen(true);
+      return setVariableDialogOpen(true);
     }
 
     submitPrompt(text);
@@ -66,25 +68,46 @@ export default function ChatGroupItem({
                 <MenuIcon className="icon-md dark:text-gray-300" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="mt-2 w-36 rounded-lg" collisionPadding={2} align="end">
-              <DropdownMenuGroup>
-                <DropdownMenuItem
-                  disabled={!isOwner}
-                  className="cursor-pointer rounded-lg disabled:cursor-not-allowed dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:bg-gray-700"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEditClick(e);
-                  }}
-                >
-                  <EditIcon className="mr-2 h-4 w-4" />
-                  <span>{localize('com_ui_edit')}</span>
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
+            <DropdownMenuContent
+              className="z-50 mt-2 w-36 rounded-lg"
+              collisionPadding={2}
+              align="end"
+            >
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setPreviewDialogOpen(true);
+                }}
+                className="w-full cursor-pointer rounded-lg disabled:cursor-not-allowed dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:bg-gray-700"
+              >
+                <TextSearch className="mr-2 h-4 w-4" />
+                <span>{localize('com_ui_preview')}</span>
+              </DropdownMenuItem>
+              {isOwner && (
+                <DropdownMenuGroup>
+                  <DropdownMenuItem
+                    disabled={!isOwner}
+                    className="cursor-pointer rounded-lg disabled:cursor-not-allowed dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:bg-gray-700"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditClick(e);
+                    }}
+                  >
+                    <EditIcon className="mr-2 h-4 w-4" />
+                    <span>{localize('com_ui_edit')}</span>
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </ListCard>
-      <VariableDialog open={isDialogOpen} onClose={() => setDialogOpen(false)} group={group} />
+      <PreviewPrompt group={group} open={isPreviewDialogOpen} onOpenChange={setPreviewDialogOpen} />
+      <VariableDialog
+        open={isVariableDialogOpen}
+        onClose={() => setVariableDialogOpen(false)}
+        group={group}
+      />
     </>
   );
 }
