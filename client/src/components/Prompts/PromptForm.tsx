@@ -12,11 +12,11 @@ import {
 import { useGetPromptGroup, useGetPrompts } from '~/data-provider';
 import { useAuthContext, usePromptGroupsNav } from '~/hooks';
 import CategorySelector from './Groups/CategorySelector';
+import NoPromptGroup from './Groups/NoPromptGroup';
 import { Button, Skeleton } from '~/components/ui';
 import PromptVariables from './PromptVariables';
 import PromptVersions from './PromptVersions';
 import { TrashIcon } from '~/components/svg';
-import NoPromptGroup from './NoPromptGroup';
 import PromptDetails from './PromptDetails';
 import { findPromptGroup } from '~/utils';
 import PromptEditor from './PromptEditor';
