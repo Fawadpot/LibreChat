@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Share2Icon } from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
 import { useGetStartupConfig } from 'librechat-data-provider/react-query';
@@ -6,14 +6,16 @@ import type { TPromptGroup, TStartupConfig } from 'librechat-data-provider';
 import { OGDialog, OGDialogTitle, OGDialogContent, OGDialogTrigger } from '~/components/ui';
 import { useUpdatePromptGroup } from '~/data-provider';
 import { Button, Checkbox } from '~/components/ui';
+import { useToastContext } from '~/Providers';
 import { useLocalize } from '~/hooks';
 
 type FormValues = {
   shareGlobal: boolean;
 };
 
-const SharePrompt = ({ group, disabled }: { group?: TPromptGroup; disabled: boolean }) => {
+const PromptPreview = ({ group, disabled }: { group?: TPromptGroup; disabled: boolean }) => {
   const localize = useLocalize();
+  const { showToast } = useToastContext();
   const updateGroup = useUpdatePromptGroup();
   const { data: startupConfig = {} as TStartupConfig, isFetching } = useGetStartupConfig();
   const {
@@ -21,7 +23,7 @@ const SharePrompt = ({ group, disabled }: { group?: TPromptGroup; disabled: bool
     setValue,
     getValues,
     handleSubmit,
-    formState: { isSubmitting, errors },
+    formState: { isSubmitting },
   } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: {
@@ -34,6 +36,7 @@ const SharePrompt = ({ group, disabled }: { group?: TPromptGroup; disabled: bool
     () => group?.projectIds?.includes(instanceProjectId),
     [group, instanceProjectId],
   );
+
   if (!group || !instanceProjectId) {
     return null;
   }
@@ -77,7 +80,18 @@ const SharePrompt = ({ group, disabled }: { group?: TPromptGroup; disabled: bool
               name={'shareGlobal'}
               control={control}
               disabled={isFetching || updateGroup.isLoading || !instanceProjectId}
-              rules={{ validate: (value) => (value ? !groupIsGlobal : true) }}
+              rules={{
+                validate: (value) => {
+                  const isValid = !(value && groupIsGlobal);
+                  if (!isValid) {
+                    showToast({
+                      message: localize('com_ui_prompt_shared_to_all'),
+                      status: 'error',
+                    });
+                  }
+                  return isValid;
+                },
+              }}
               render={({ field }) => (
                 <Checkbox
                   {...field}
@@ -97,7 +111,9 @@ const SharePrompt = ({ group, disabled }: { group?: TPromptGroup; disabled: bool
               }
             >
               {localize('com_ui_share_to_all_users')}
-              {groupIsGlobal && localize('com_ui_prompt_shared_to_all')}
+              {groupIsGlobal && (
+                <span className="ml-2 text-xs">{localize('com_ui_prompt_shared_to_all')}</span>
+              )}
             </label>
           </div>
           <div className="flex justify-end">
@@ -115,4 +131,4 @@ const SharePrompt = ({ group, disabled }: { group?: TPromptGroup; disabled: bool
   );
 };
 
-export default SharePrompt;
+export default PromptPreview;
