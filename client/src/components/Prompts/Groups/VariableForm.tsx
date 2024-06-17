@@ -101,7 +101,7 @@ export default function VariableForm({
                   <Input
                     {...field}
                     id={`fields.${index}.value`}
-                    className="input text-grey-darker rounded border px-3 py-2 focus:bg-white dark:border-gray-500 dark:focus:bg-gray-600"
+                    className="input text-grey-darker rounded border px-3 py-2 focus:bg-white dark:border-gray-500 dark:focus:bg-gray-700"
                     placeholder={uniqueVariables[index]}
                   />
                 )}

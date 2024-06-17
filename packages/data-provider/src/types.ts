@@ -350,7 +350,7 @@ export type TPromptGroup = {
   numberOfGenerations?: number;
   oneliner?: string;
   category?: string;
-  projectId?: string | null;
+  projectIds?: string[];
   productionId?: string | null;
   productionPrompt?: Pick<TPrompt, 'prompt'> | null;
   author: string;
@@ -397,10 +397,7 @@ export type TCreatePromptResponse = {
   group?: TPromptGroup;
 };
 
-export type TUpdatePromptGroupPayload = {
-  name: string;
-  category?: string;
-};
+export type TUpdatePromptGroupPayload = Partial<TPromptGroup>;
 
 export type TUpdatePromptGroupVariables = {
   id: string;
