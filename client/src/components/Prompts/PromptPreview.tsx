@@ -1,4 +1,4 @@
-import { Share2Icon, Rocket } from 'lucide-react';
+import { Rocket } from 'lucide-react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
@@ -10,12 +10,13 @@ import {
   useMakePromptProduction,
 } from '~/data-provider/mutations';
 import { useGetPromptGroup, useGetPrompts } from '~/data-provider';
-import { Button, Skeleton } from '~/components/ui';
 import CategorySelector from './Groups/CategorySelector';
+import { Button, Skeleton } from '~/components/ui';
 import PromptVariables from './PromptVariables';
 import PromptVersions from './PromptVersions';
 import { TrashIcon } from '~/components/svg';
 import PromptEditor from './PromptEditor';
+import SharePrompt from './SharePrompt';
 import PromptName from './PromptName';
 
 const PromptPreview = () => {
@@ -133,14 +134,7 @@ const PromptPreview = () => {
                   })
                 }
               />
-              <Button
-                variant={'default'}
-                size={'sm'}
-                className="h-10 w-10 border border-transparent bg-blue-500/90 transition-all hover:bg-blue-600 dark:border-blue-600 dark:bg-transparent dark:hover:bg-blue-950"
-                disabled={isLoadingGroup}
-              >
-                <Share2Icon className="cursor-pointer dark:text-blue-600" />
-              </Button>
+              <SharePrompt group={group} disabled={isLoadingGroup} />
               <Button
                 size={'sm'}
                 className="h-10 border border-transparent bg-green-400 transition-all hover:bg-green-500 dark:border-green-600 dark:bg-transparent dark:hover:bg-green-900"
