@@ -12,12 +12,16 @@ import { cn } from '~/utils';
 export default function GroupSidePanel({
   isDetailView,
   className = '',
+  nextPage,
+  prevPage,
+  isFetching,
+  hasNextPage,
+  promptGroups,
+  hasPreviousPage,
 }: {
   isDetailView?: boolean;
   className?: string;
-}) {
-  const { prevPage, nextPage, isFetching, hasNextPage, promptGroups, hasPreviousPage } =
-    usePromptGroupsNav();
+} & ReturnType<typeof usePromptGroupsNav>) {
   const location = useLocation();
   const isChatRoute = useMemo(() => location.pathname.startsWith('/c/'), [location.pathname]);
   const isSmallerScreen = useMediaQuery('(max-width: 1024px)');

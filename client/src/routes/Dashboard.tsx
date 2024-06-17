@@ -1,7 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import {
   PromptsView,
-  PromptPreview,
+  PromptForm,
   CreatePromptForm,
   EmptyPromptPreview,
 } from '~/components/Prompts';
@@ -68,7 +68,7 @@ const dashboardRoutes = {
         },
         {
           path: ':promptId',
-          element: <PromptPreview />,
+          element: <PromptForm />,
         },
       ],
     },

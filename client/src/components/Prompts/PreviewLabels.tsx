@@ -4,7 +4,7 @@ import type { TPrompt } from 'librechat-data-provider';
 import { useUpdatePromptLabels } from '~/data-provider/mutations';
 import { Input } from '~/components/ui';
 
-const PromptPreview = ({ selectedPrompt }: { selectedPrompt?: TPrompt }) => {
+const PromptForm = ({ selectedPrompt }: { selectedPrompt?: TPrompt }) => {
   const [labelInput, setLabelInput] = useState<string>('');
   const [labels, setLabels] = useState<string[]>([]);
   const updatePromptLabelsMutation = useUpdatePromptLabels();
@@ -66,4 +66,4 @@ const PromptPreview = ({ selectedPrompt }: { selectedPrompt?: TPrompt }) => {
   );
 };
 
-export default PromptPreview;
+export default PromptForm;

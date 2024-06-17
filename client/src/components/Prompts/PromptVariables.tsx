@@ -1,18 +1,14 @@
 import { useMemo } from 'react';
 import { Variable } from 'lucide-react';
-import { useFormContext } from 'react-hook-form';
 import { extractUniqueVariables } from '~/utils';
 import { useLocalize } from '~/hooks';
 
-const PromptVariables = () => {
+const PromptVariables = ({ promptText }: { promptText: string }) => {
   const localize = useLocalize();
-  const methods = useFormContext();
-  const { watch } = methods;
-  const watchedPrompt = watch('prompt');
 
   const variables = useMemo(() => {
-    return extractUniqueVariables(watchedPrompt || '');
-  }, [watchedPrompt]);
+    return extractUniqueVariables(promptText || '');
+  }, [promptText]);
 
   return (
     <>

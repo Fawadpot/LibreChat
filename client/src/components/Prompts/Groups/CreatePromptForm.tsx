@@ -37,6 +37,7 @@ const CreatePromptForm = ({
   });
 
   const {
+    watch,
     control,
     handleSubmit,
     formState: { isDirty, isSubmitting, errors, isValid },
@@ -47,6 +48,8 @@ const CreatePromptForm = ({
       navigate(`/d/prompts/${response.prompt.groupId}`, { replace: true });
     },
   });
+
+  const promptText = watch('prompt');
 
   const onSubmit = (data: CreateFormValues) => {
     const { name, category, ...rest } = data;
@@ -116,7 +119,7 @@ const CreatePromptForm = ({
               />
             </div>
           </div>
-          <PromptVariables />
+          <PromptVariables promptText={promptText} />
           <div className="flex justify-end">
             <Button type="submit" variant="default" disabled={!isDirty || isSubmitting || !isValid}>
               {localize('com_ui_create_var', localize('com_ui_prompt'))}

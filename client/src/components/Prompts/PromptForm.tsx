@@ -1,6 +1,6 @@
 import { Rocket } from 'lucide-react';
 import { useForm, FormProvider } from 'react-hook-form';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import type { TCreatePrompt } from 'librechat-data-provider';
 import {
@@ -10,20 +10,22 @@ import {
   useMakePromptProduction,
 } from '~/data-provider/mutations';
 import { useGetPromptGroup, useGetPrompts } from '~/data-provider';
+import { useAuthContext, usePromptGroupsNav } from '~/hooks';
 import CategorySelector from './Groups/CategorySelector';
-import { useLocalize, useAuthContext } from '~/hooks';
 import { Button, Skeleton } from '~/components/ui';
 import PromptVariables from './PromptVariables';
 import PromptVersions from './PromptVersions';
 import { TrashIcon } from '~/components/svg';
+import NoPromptGroup from './NoPromptGroup';
+import PromptDetails from './PromptDetails';
+import { findPromptGroup } from '~/utils';
 import PromptEditor from './PromptEditor';
 import SharePrompt from './SharePrompt';
 import PromptName from './PromptName';
 
-const PromptPreview = () => {
+const PromptForm = () => {
   const params = useParams();
   const navigate = useNavigate();
-  const localize = useLocalize();
   const { user } = useAuthContext();
   const { data: group, isLoading: isLoadingGroup } = useGetPromptGroup(params.promptId || '');
   const { data: prompts = [], isLoading: isLoadingPrompts } = useGetPrompts(
@@ -45,7 +47,8 @@ const PromptPreview = () => {
     },
   });
 
-  const { handleSubmit, setValue, reset } = methods;
+  const { handleSubmit, setValue, reset, watch } = methods;
+  const promptText = watch('prompt');
 
   const createPromptMutation = useCreatePrompt({
     onSuccess(data) {
@@ -109,26 +112,17 @@ const PromptPreview = () => {
     setValue('category', group?.category || '', { shouldDirty: false });
   }, [selectedPrompt, group?.category, setValue]);
 
-  if (!isOwner) {
-    return (
-      <div className="relative min-h-full w-full px-4">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center font-bold dark:text-gray-200">
-            <h1 className="text-lg font-bold dark:text-gray-200 md:text-2xl">
-              {localize('com_ui_prompt_preview_not_shared')}
-            </h1>
-            <Button
-              className="mt-4"
-              onClick={() => {
-                navigate('/d/prompts');
-              }}
-            >
-              {localize('com_ui_back_to_var', localize('com_ui_prompts'))}
-            </Button>
-          </div>
-        </div>
-      </div>
+  const { groupsQuery } = useOutletContext<ReturnType<typeof usePromptGroupsNav>>();
+  if (!isOwner && groupsQuery.data) {
+    const fetchedPrompt = findPromptGroup(
+      groupsQuery.data,
+      (group) => group._id === params.promptId,
     );
+    if (!fetchedPrompt) {
+      return <NoPromptGroup />;
+    }
+
+    return <PromptDetails group={fetchedPrompt} />;
   }
 
   if (!group) {
@@ -209,7 +203,7 @@ const PromptPreview = () => {
                     type={selectedPrompt?.type || ''}
                     prompt={selectedPrompt?.prompt || ''}
                   />
-                  <PromptVariables />
+                  <PromptVariables promptText={promptText} />
                 </>
               )}
             </div>
@@ -235,4 +229,4 @@ const PromptPreview = () => {
   );
 };
 
-export default PromptPreview;
+export default PromptForm;

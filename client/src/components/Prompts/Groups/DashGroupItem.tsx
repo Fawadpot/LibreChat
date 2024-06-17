@@ -70,7 +70,7 @@ export default function DashGroupItem({
     <div
       className={cn(
         'w-100 mx-2 my-3 flex cursor-pointer flex-row rounded-md border-0 bg-white p-4 transition-all duration-300 ease-in-out hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-800',
-        params.promptId === group._id && 'bg-gray-100/50',
+        params.promptId === group._id && 'bg-gray-100/50 dark:bg-gray-600',
       )}
       onClick={() => {
         if (nameEditFlag) {
@@ -132,6 +132,7 @@ export default function DashGroupItem({
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
+                        disabled={!isOwner}
                         variant="outline"
                         className="h-7 w-7 p-0 hover:bg-gray-200 dark:bg-gray-800/50 dark:text-gray-400 dark:hover:border-gray-400 dark:focus:border-gray-500"
                       >
@@ -151,16 +152,26 @@ export default function DashGroupItem({
                             setNameEditFlag(true);
                           }}
                           appendLabel={true}
-                          className="m-0 w-full p-2"
+                          className={cn(
+                            'm-0 w-full p-2',
+                            !isOwner && 'cursor-not-allowed opacity-50',
+                          )}
                         />
                       </DropdownMenuGroup>
                     </DropdownMenuContent>
                   </DropdownMenu>
                   <Button
                     variant="outline"
-                    className="h-7 w-7 p-0 hover:bg-gray-200 dark:bg-gray-800/50 dark:text-gray-400 dark:hover:border-gray-400 dark:focus:border-gray-500"
+                    disabled={!isOwner}
+                    className={cn(
+                      'h-7 w-7 p-0 hover:bg-gray-200 dark:bg-gray-800/50 dark:text-gray-400 dark:hover:border-gray-400 dark:focus:border-gray-500',
+                      !isOwner && 'cursor-not-allowed opacity-50',
+                    )}
                     onClick={(e) => {
                       e.stopPropagation();
+                      if (!isOwner) {
+                        return;
+                      }
                       deletePromptGroupMutation.mutate({ id: group?._id || '' });
                     }}
                   >
