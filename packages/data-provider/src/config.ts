@@ -629,6 +629,10 @@ export enum CacheKeys {
    */
   MODEL_QUERIES = 'modelQueries',
   /**
+   * Key for the default startup config cache.
+   */
+  STARTUP_CONFIG = 'startupConfig',
+  /**
    * Key for the default endpoint config cache.
    */
   ENDPOINT_CONFIG = 'endpointsConfig',
