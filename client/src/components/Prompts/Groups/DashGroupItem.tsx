@@ -1,7 +1,7 @@
-import { useState, useRef } from 'react';
-import { MenuIcon } from 'lucide-react';
+import { useState, useRef, useMemo } from 'react';
+import { MenuIcon, EarthIcon } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
-import type { TPromptGroup } from 'librechat-data-provider';
+import { SystemRoles, type TPromptGroup } from 'librechat-data-provider';
 import { useDeletePromptGroup, useUpdatePromptGroup } from '~/data-provider';
 import {
   Input,
@@ -13,18 +13,30 @@ import {
 } from '~/components/ui';
 import CategoryIcon from '~/components/Prompts/Groups/CategoryIcon';
 import { RenameButton } from '~/components/Conversations';
+import { useLocalize, useAuthContext } from '~/hooks';
 import { NewTrashIcon } from '~/components/svg';
-import { cn, getSnippet } from '~/utils';
-import { useLocalize } from '~/hooks';
+import { cn } from '~/utils';
 
-export default function DashGroupItem({ group }: { group: TPromptGroup }) {
+export default function DashGroupItem({
+  group,
+  instanceProjectId,
+}: {
+  group: TPromptGroup;
+  instanceProjectId?: string;
+}) {
   const params = useParams();
   const navigate = useNavigate();
   const localize = useLocalize();
 
+  const { user } = useAuthContext();
   const blurTimeoutRef = useRef<NodeJS.Timeout>();
   const [nameEditFlag, setNameEditFlag] = useState(false);
   const [nameInputField, setNameInputField] = useState(group.name);
+  const isOwner = useMemo(() => user?.id === group?.author, [user, group]);
+  const groupIsGlobal = useMemo(
+    () => instanceProjectId && group?.projectIds?.includes(instanceProjectId),
+    [group, instanceProjectId],
+  );
 
   const updateGroup = useUpdatePromptGroup({
     onMutate: () => {
@@ -58,7 +70,7 @@ export default function DashGroupItem({ group }: { group: TPromptGroup }) {
     <div
       className={cn(
         'w-100 mx-2 my-3 flex cursor-pointer flex-row rounded-md border-0 bg-white p-4 transition-all duration-300 ease-in-out hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-800',
-        params.promptId === group._id && 'bg-gray-100/50',
+        params.promptId === group._id && 'bg-gray-100/50 dark:bg-gray-600',
       )}
       onClick={() => {
         if (nameEditFlag) {
@@ -115,46 +127,51 @@ export default function DashGroupItem({ group }: { group: TPromptGroup }) {
                     {group.name}
                   </h3>
                 </div>
-                <div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
+                <div className="flex flex-row items-center gap-1">
+                  {groupIsGlobal && <EarthIcon className="icon-md text-green-400" />}
+                  {(isOwner || user?.role === SystemRoles.ADMIN) && (
+                    <>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="h-7 w-7 p-0 hover:bg-gray-200 dark:bg-gray-800/50 dark:text-gray-400 dark:hover:border-gray-400 dark:focus:border-gray-500"
+                          >
+                            <MenuIcon className="icon-md dark:text-gray-300" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="mt-2 w-36 rounded-lg" collisionPadding={2}>
+                          <DropdownMenuGroup>
+                            <RenameButton
+                              renaming={false}
+                              renameHandler={(e) => {
+                                e.stopPropagation();
+                                setNameEditFlag(true);
+                              }}
+                              appendLabel={true}
+                              className={cn('m-0 w-full p-2')}
+                            />
+                          </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                       <Button
                         variant="outline"
-                        className="mr-1 h-7 w-7 p-0 hover:bg-gray-200 dark:bg-gray-800/50 dark:text-gray-400 dark:hover:border-gray-400 dark:focus:border-gray-500"
+                        className={cn(
+                          'h-7 w-7 p-0 hover:bg-gray-200 dark:bg-gray-800/50 dark:text-gray-400 dark:hover:border-gray-400 dark:focus:border-gray-500',
+                        )}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deletePromptGroupMutation.mutate({ id: group?._id || '' });
+                        }}
                       >
-                        <MenuIcon className="icon-md dark:text-gray-300" />
+                        <NewTrashIcon />
                       </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="mt-2 w-36 rounded-lg" collisionPadding={2}>
-                      <DropdownMenuGroup>
-                        <RenameButton
-                          renaming={false}
-                          renameHandler={(e) => {
-                            e.stopPropagation();
-                            setNameEditFlag(true);
-                          }}
-                          appendLabel={true}
-                          className="m-0 w-full p-2"
-                        />
-                      </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                  <Button
-                    variant="outline"
-                    className="mr-1 h-7 w-7 p-0 hover:bg-gray-200 dark:bg-gray-800/50 dark:text-gray-400 dark:hover:border-gray-400 dark:focus:border-gray-500"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deletePromptGroupMutation.mutate({ id: group?._id || '' });
-                    }}
-                  >
-                    <NewTrashIcon />
-                  </Button>
+                    </>
+                  )}
                 </div>
               </div>
-              <div className="break-word line-clamp-3 text-balance text-sm text-gray-600 dark:text-gray-400">
-                {group.oneliner
-                  ? group.oneliner
-                  : getSnippet(group?.productionPrompt?.prompt ?? '', 40)}
+              <div className="ellipsis text-balance text-sm text-gray-600 dark:text-gray-400">
+                {group.oneliner ? group.oneliner : group?.productionPrompt?.prompt ?? ''}
               </div>
             </>
           )}

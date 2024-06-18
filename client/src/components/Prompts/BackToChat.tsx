@@ -1,15 +1,26 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { Button } from '~/components/ui';
+import { buttonVariants } from '~/components/ui';
 import { useLocalize } from '~/hooks';
+import { cn } from '~/utils';
 
 export default function BackToChat({ className }: { className?: string }) {
   const navigate = useNavigate();
   const localize = useLocalize();
+  const clickHandler = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (event.button === 0 && !(event.ctrlKey || event.metaKey)) {
+      event.preventDefault();
+      navigate('/c/new');
+    }
+  };
   return (
-    <Button variant="outline" className={className} onClick={() => navigate('/c/new')}>
+    <a
+      className={cn(buttonVariants({ variant: 'outline' }), className)}
+      href="/"
+      onClick={clickHandler}
+    >
       <ArrowLeft className="icon-xs mr-2" />
       {localize('com_ui_back_to_chat')}
-    </Button>
+    </a>
   );
 }

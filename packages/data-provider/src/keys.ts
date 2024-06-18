@@ -33,6 +33,7 @@ export enum QueryKeys {
   promptGroup = 'promptGroup',
   categories = 'categories',
   randomPrompts = 'randomPrompts',
+  roles = 'roles',
 }
 
 export enum MutationKeys {
@@ -48,4 +49,5 @@ export enum MutationKeys {
   updateAction = 'updateAction',
   deleteAction = 'deleteAction',
   deleteUser = 'deleteUser',
+  updateRole = 'updateRole',
 }

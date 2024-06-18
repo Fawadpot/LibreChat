@@ -1,4 +1,5 @@
 export * from './AlertDialog';
+export * from './Breadcrumb';
 export * from './Button';
 export * from './Checkbox';
 export * from './DataTableColumnHeader';
@@ -8,6 +9,7 @@ export * from './HoverCard';
 export * from './Input';
 export * from './InputNumber';
 export * from './Label';
+export * from './OriginalDialog';
 export * from './Prompt';
 export * from './QuestionMark';
 export * from './Slider';

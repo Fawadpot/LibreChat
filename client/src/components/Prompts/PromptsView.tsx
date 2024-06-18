@@ -1,43 +1,46 @@
-import { useMemo } from 'react';
-import { MessageSquareQuote } from 'lucide-react';
-import { Outlet, useNavigate, useParams } from 'react-router-dom';
-import BackToChat from '~/components/Prompts/BackToChat';
+import { useMemo, useEffect } from 'react';
+import { Outlet, useParams, useNavigate } from 'react-router-dom';
+import { PermissionTypes, Permissions } from 'librechat-data-provider';
+import AutoSendSwitch from '~/components/Prompts/Groups/AutoSendSwitch';
+import DashBreadcrumb from '~/routes/Layouts/DashBreadcrumb';
+import { usePromptGroupsNav, useHasAccess } from '~/hooks';
 import GroupSidePanel from './Groups/GroupSidePanel';
-import { Button } from '~/components/ui';
 import { cn } from '~/utils';
 
 export default function PromptsView() {
   const params = useParams();
   const navigate = useNavigate();
+  const groupsNav = usePromptGroupsNav();
   const isDetailView = useMemo(() => !!(params.promptId || params['*'] === 'new'), [params]);
+  const hasAccess = useHasAccess({
+    permissionType: PermissionTypes.PROMPTS,
+    permission: Permissions.USE,
+  });
+
+  useEffect(() => {
+    if (!hasAccess) {
+      navigate('/c/new');
+    }
+  }, [hasAccess, navigate]);
+
+  if (!hasAccess) {
+    return null;
+  }
 
   return (
     <div className="flex h-screen w-full flex-col bg-[#f9f9f9] p-0 dark:bg-transparent lg:p-2">
-      {isDetailView && (
-        <div className="flex w-full flex-row p-2 lg:hidden">
-          <Button
-            className="mx-2 flex gap-2 lg:hidden"
-            variant={'outline'}
-            size={'sm'}
-            onClick={() => {
-              navigate('/d/prompts');
-            }}
-          >
-            <MessageSquareQuote className="h-5 w-5 text-gray-500" />
-            Prompts
-          </Button>
-          <BackToChat className="h-9 lg:hidden" />
-        </div>
-      )}
+      <DashBreadcrumb />
       <div className="flex w-full flex-grow flex-row divide-x overflow-hidden dark:divide-gray-600">
-        <GroupSidePanel isDetailView={isDetailView} showHeader={true} />
+        <GroupSidePanel isDetailView={isDetailView} {...groupsNav}>
+          <AutoSendSwitch className="px-2 pt-2 dark:text-white" />
+        </GroupSidePanel>
         <div
           className={cn(
             'w-full overflow-y-auto lg:w-3/4 xl:w-3/4',
             isDetailView ? 'block' : 'hidden md:block',
           )}
         >
-          <Outlet />
+          <Outlet context={groupsNav} />
         </div>
       </div>
     </div>

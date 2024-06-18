@@ -1,4 +1,5 @@
 import * as types from '../types';
+import * as r from '../roles';
 import {
   Assistant,
   AssistantCreateParams,
@@ -155,6 +156,20 @@ export type ResendVerifcationOptions = MutationOptions<
 export type RegistrationOptions = MutationOptions<
   types.TRegisterUserResponse,
   types.TRegisterUser,
+  unknown,
+  types.TError
+>;
+
+export type UpdatePromptPermVars = {
+  roleName: string;
+  updates: Partial<r.TPromptPermissions>;
+};
+
+export type UpdatePromptPermResponse = r.TRole;
+
+export type UpdatePromptPermOptions = MutationOptions<
+  UpdatePromptPermResponse,
+  UpdatePromptPermVars,
   unknown,
   types.TError
 >;

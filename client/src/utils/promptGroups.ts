@@ -4,7 +4,7 @@ import type {
   PromptGroupListData,
   TPromptGroup,
 } from 'librechat-data-provider';
-import { addData, deleteData, updateData, updateFields } from './collection';
+import { addData, deleteData, updateData, updateFields, getRecordByProperty } from './collection';
 import { InfiniteData } from '@tanstack/react-query';
 
 export const addPromptGroup = (
@@ -58,4 +58,15 @@ export const updateGroupFields = (
 
 export const getSnippet = (promptText: string, length = 56) => {
   return promptText.length > length ? `${promptText.slice(0, length - 3)}...` : promptText;
+};
+
+export const findPromptGroup = (
+  data: InfiniteData<PromptGroupListResponse>,
+  findProperty: (group: TPromptGroup) => boolean,
+): TPromptGroup | undefined => {
+  return getRecordByProperty<PromptGroupListResponse, TPromptGroup>(
+    data,
+    InfiniteCollections.PROMPT_GROUPS,
+    findProperty,
+  );
 };

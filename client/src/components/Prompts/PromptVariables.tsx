@@ -1,23 +1,19 @@
 import { useMemo } from 'react';
-import { Braces } from 'lucide-react';
-import { useFormContext } from 'react-hook-form';
-import { useLocalize } from '~/hooks';
+import { Variable } from 'lucide-react';
 import { extractUniqueVariables } from '~/utils';
+import { useLocalize } from '~/hooks';
 
-const PromptPreview = () => {
+const PromptVariables = ({ promptText }: { promptText: string }) => {
   const localize = useLocalize();
-  const methods = useFormContext();
-  const { watch } = methods;
-  const watchedPrompt = watch('prompt');
 
   const variables = useMemo(() => {
-    return extractUniqueVariables(watchedPrompt || '');
-  }, [watchedPrompt]);
+    return extractUniqueVariables(promptText || '');
+  }, [promptText]);
 
   return (
     <>
       <h3 className="flex items-center gap-2 rounded-t-lg border border-gray-300 py-2 pl-4 text-base font-semibold dark:border-gray-600 dark:text-gray-300">
-        <Braces className="icon-sm" />
+        <Variable className="icon-sm" />
         {localize('com_ui_variables')}
       </h3>
       <div className="mb-4 flex w-full flex-row flex-wrap rounded-b-lg border border-gray-300 p-4 dark:border-gray-600 dark:text-gray-300 md:min-h-16">
@@ -35,4 +31,4 @@ const PromptPreview = () => {
   );
 };
 
-export default PromptPreview;
+export default PromptVariables;

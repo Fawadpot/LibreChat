@@ -608,6 +608,10 @@ export enum CacheKeys {
    */
   CONFIG_STORE = 'configStore',
   /**
+   * Key for the config store namespace.
+   */
+  ROLES = 'roles',
+  /**
    * Key for the plugins cache.
    */
   PLUGINS = 'plugins',
@@ -628,6 +632,10 @@ export enum CacheKeys {
    * Key for the model queries cache.
    */
   MODEL_QUERIES = 'modelQueries',
+  /**
+   * Key for the default startup config cache.
+   */
+  STARTUP_CONFIG = 'startupConfig',
   /**
    * Key for the default endpoint config cache.
    */

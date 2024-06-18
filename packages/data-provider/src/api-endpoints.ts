@@ -174,3 +174,9 @@ export const deletePromptGroup = getPromptGroup;
 export const deletePrompt = getPrompt;
 
 export const getCategories = () => '/api/categories';
+
+/* Roles */
+export const roles = () => '/api/roles';
+export const getRole = (roleName: string) => `${roles()}/${roleName.toLowerCase()}`;
+export const updatePromptPermissions = (roleName: string) =>
+  `${roles()}/${roleName.toLowerCase()}/prompts`;

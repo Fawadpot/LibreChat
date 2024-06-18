@@ -20,6 +20,25 @@ export const addData = <TCollection, TData>(
   return dataJson;
 };
 
+export const getRecordByProperty = <TCollection, TData>(
+  data: InfiniteData<TCollection>,
+  collectionName: string,
+  findProperty: (item: TData) => boolean,
+): TData | undefined => {
+  // Find the page and the index of the record in that page
+  const { pageIndex, index } = findPage<TCollection>(data, (page) =>
+    page[collectionName].findIndex(findProperty),
+  );
+
+  // If found, return the record
+  if (pageIndex !== -1 && index !== -1) {
+    return data.pages[pageIndex][collectionName][index];
+  }
+
+  // Return undefined if the record is not found
+  return undefined;
+};
+
 export function findPage<TData>(data: InfiniteData<TData>, findIndex: (page: TData) => number) {
   for (let pageIndex = 0; pageIndex < data.pages.length; pageIndex++) {
     const page = data.pages[pageIndex];
