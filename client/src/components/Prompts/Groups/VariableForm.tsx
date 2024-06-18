@@ -1,6 +1,7 @@
+import { useMemo } from 'react';
 import { useForm, useFieldArray, Controller, useWatch } from 'react-hook-form';
 import type { TPromptGroup } from 'librechat-data-provider';
-import { extractUniqueVariables, wrapVariable } from '~/utils';
+import { extractVariableInfo, wrapVariable } from '~/utils';
 import { useLocalize, useSubmitMessage } from '~/hooks';
 import { Input } from '~/components/ui';
 
@@ -18,12 +19,15 @@ export default function VariableForm({
   const localize = useLocalize();
 
   const mainText = group.productionPrompt?.prompt ?? '';
-  const variables = extractUniqueVariables(mainText);
+  const { allVariables, uniqueVariables, variableIndexMap } = useMemo(
+    () => extractVariableInfo(mainText),
+    [mainText],
+  );
 
   const { submitPrompt } = useSubmitMessage();
   const { control, handleSubmit } = useForm<FormValues>({
     defaultValues: {
-      fields: variables.map((variable) => ({ variable: wrapVariable(variable), value: '' })),
+      fields: uniqueVariables.map((variable) => ({ variable: wrapVariable(variable), value: '' })),
     },
   });
 
@@ -37,7 +41,7 @@ export default function VariableForm({
     name: 'fields',
   });
 
-  if (!variables.length) {
+  if (!uniqueVariables.length) {
     return null;
   }
 
@@ -45,16 +49,18 @@ export default function VariableForm({
     let tempText = mainText;
     const parts: JSX.Element[] = [];
 
-    fieldValues.forEach((field, index) => {
-      const placeholder = `{{${variables[index]}}}`;
+    allVariables.forEach((variable, index) => {
+      const placeholder = `{{${variable}}}`;
       const partsBeforePlaceholder = tempText.split(placeholder);
+      const fieldIndex = variableIndexMap.get(variable) as string | number;
+      const fieldValue = fieldValues[fieldIndex].value as string;
       parts.push(
         <span key={`before-${index}`}>{partsBeforePlaceholder[0]}</span>,
         <span
           key={`highlight-${index}`}
           className="rounded bg-yellow-100 p-1 font-medium dark:text-gray-800"
         >
-          {field?.value !== '' ? field?.value : placeholder}
+          {fieldValue !== '' ? fieldValue : placeholder}
         </span>,
       );
 
@@ -67,13 +73,13 @@ export default function VariableForm({
   };
 
   const onSubmit = (data: FormValues) => {
-    const text = variables.reduce((acc, variable, index) => {
-      const value = data.fields[index].value;
-      if (!value) {
-        return acc;
+    let text = mainText;
+    data.fields.forEach(({ variable, value }) => {
+      if (value) {
+        const regex = new RegExp(variable, 'g');
+        text = text.replace(regex, value);
       }
-      return acc.replace(wrapVariable(variable), value);
-    }, mainText);
+    });
 
     submitPrompt(text);
     onClose();
@@ -95,8 +101,8 @@ export default function VariableForm({
                   <Input
                     {...field}
                     id={`fields.${index}.value`}
-                    className="input text-grey-darker rounded border px-3 py-2 focus:bg-white dark:border-gray-500 dark:focus:bg-gray-600"
-                    placeholder={variables[index]}
+                    className="input text-grey-darker rounded border px-3 py-2 focus:bg-white dark:border-gray-500 dark:focus:bg-gray-700"
+                    placeholder={uniqueVariables[index]}
                   />
                 )}
               />

@@ -313,6 +313,33 @@
  * @memberof typedefs
  */
 
+/**
+ * @exports TUpdatePromptGroupPayload
+ * @typedef {import('librechat-data-provider').TUpdatePromptGroupPayload } TUpdatePromptGroupPayload
+ * @memberof typedefs
+ */
+
+/* Roles */
+
+/**
+ * @exports TRole
+ * @typedef {import('librechat-data-provider').TRole } TRole
+ * @memberof typedefs
+ */
+
+// , PermissionTypes, Permissions
+/**
+ * @exports PermissionTypes
+ * @typedef {import('librechat-data-provider').PermissionTypes } PermissionTypes
+ * @memberof typedefs
+ */
+
+/**
+ * @exports Permissions
+ * @typedef {import('librechat-data-provider').Permissions } Permissions
+ * @memberof typedefs
+ */
+
 /** Assistants */
 /**
  * @exports Assistant
@@ -563,6 +590,12 @@
 /**
  * @exports MongoUser
  * @typedef {import('~/models/schema/userSchema.js').MongoUser} MongoUser
+ * @memberof typedefs
+ */
+
+/**
+ * @exports MongoProject
+ * @typedef {import('~/models/schema/projectSchema.js').MongoProject} MongoProject
  * @memberof typedefs
  */
 

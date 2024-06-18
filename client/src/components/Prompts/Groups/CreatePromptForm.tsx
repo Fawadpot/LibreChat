@@ -1,11 +1,12 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LocalStorageKeys } from 'librechat-data-provider';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
+import { LocalStorageKeys, PermissionTypes, Permissions } from 'librechat-data-provider';
 import CategorySelector from '~/components/Prompts/Groups/CategorySelector';
 import PromptVariables from '~/components/Prompts/PromptVariables';
 import { Button, TextareaAutosize, Input } from '~/components/ui';
 import { useCreatePrompt } from '~/data-provider';
-import { useLocalize } from '~/hooks';
+import { useLocalize, useHasAccess } from '~/hooks';
 import { cn } from '~/utils';
 
 type CreateFormValues = {
@@ -29,6 +30,17 @@ const CreatePromptForm = ({
 }) => {
   const localize = useLocalize();
   const navigate = useNavigate();
+  const hasAccess = useHasAccess({
+    permissionType: PermissionTypes.PROMPTS,
+    permission: Permissions.CREATE,
+  });
+
+  useEffect(() => {
+    if (!hasAccess) {
+      navigate('/c/new');
+    }
+  }, [hasAccess, navigate]);
+
   const methods = useForm({
     defaultValues: {
       ...defaultValues,
@@ -37,6 +49,7 @@ const CreatePromptForm = ({
   });
 
   const {
+    watch,
     control,
     handleSubmit,
     formState: { isDirty, isSubmitting, errors, isValid },
@@ -48,6 +61,8 @@ const CreatePromptForm = ({
     },
   });
 
+  const promptText = watch('prompt');
+
   const onSubmit = (data: CreateFormValues) => {
     const { name, category, ...rest } = data;
     createPromptMutation.mutate({
@@ -55,6 +70,10 @@ const CreatePromptForm = ({
       group: { name, category },
     });
   };
+
+  if (!hasAccess) {
+    return null;
+  }
 
   return (
     <FormProvider {...methods}>
@@ -116,7 +135,7 @@ const CreatePromptForm = ({
               />
             </div>
           </div>
-          <PromptVariables />
+          <PromptVariables promptText={promptText} />
           <div className="flex justify-end">
             <Button type="submit" variant="default" disabled={!isDirty || isSubmitting || !isValid}>
               {localize('com_ui_create_var', localize('com_ui_prompt'))}

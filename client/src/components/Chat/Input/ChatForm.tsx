@@ -1,5 +1,4 @@
 import { memo, useRef, useMemo } from 'react';
-import { useFormContext } from 'react-hook-form';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import {
   supportsFiles,
@@ -7,8 +6,8 @@ import {
   isAssistantsEndpoint,
   fileConfig as defaultFileConfig,
 } from 'librechat-data-provider';
+import { useChatContext, useAssistantsMapContext, useChatFormContext } from '~/Providers';
 import { useRequiresKey, useTextarea, useSubmitMessage } from '~/hooks';
-import { useChatContext, useAssistantsMapContext } from '~/Providers';
 import { useAutoSave } from '~/hooks/Input/useAutoSave';
 import { TextareaAutosize } from '~/components/ui';
 import { useGetFileConfig } from '~/data-provider';
@@ -51,7 +50,7 @@ const ChatForm = ({ index = 0 }) => {
     setFilesLoading,
     handleStopGenerating,
   } = useChatContext();
-  const methods = useFormContext<{ text: string }>();
+  const methods = useChatFormContext();
 
   const { clearDraft } = useAutoSave({
     conversationId: useMemo(() => conversation?.conversationId, [conversation]),

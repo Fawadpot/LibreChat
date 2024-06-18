@@ -1,4 +1,5 @@
 const { ObjectId } = require('mongodb');
+const { getProjectByName, addGroupIdsToProject, removeGroupIdsFromProject } = require('./Project');
 const { Prompt, PromptGroup } = require('./schema/promptSchema');
 const { logger } = require('~/config');
 
@@ -167,7 +168,7 @@ module.exports = {
    * @param {TPromptGroupsWithFilterRequest} filter
    * @returns {Promise<PromptGroupListResponse>}
    */
-  getPromptGroups: async (filter) => {
+  getPromptGroupsOld: async (filter) => {
     try {
       const { pageNumber = 1, pageSize = 10, name, ...query } = filter;
       if (name) {
@@ -232,6 +233,84 @@ module.exports = {
       return { message: 'Error getting prompt groups' };
     }
   },
+  /**
+   * Get prompt groups with filters
+   * @param {Object} req
+   * @param {TPromptGroupsWithFilterRequest} filter
+   * @returns {Promise<PromptGroupListResponse>}
+   */
+  getPromptGroups: async (req, filter) => {
+    try {
+      const { pageNumber = 1, pageSize = 10, name, ...query } = filter;
+      if (name) {
+        query.name = new RegExp(name, 'i');
+      }
+
+      // const projects = req.user.projects || [];
+      const skip = (parseInt(pageNumber, 10) - 1) * parseInt(pageSize, 10);
+      const limit = parseInt(pageSize, 10);
+
+      let projectQuery = [];
+      const project = await getProjectByName('instance', 'promptGroupIds');
+      if (project) {
+        projectQuery.push({ _id: { $in: project.promptGroupIds } });
+      }
+
+      const combinedQuery = { $or: [...projectQuery, query] };
+
+      const promptGroupsPipeline = [
+        { $match: combinedQuery },
+        { $sort: { createdAt: -1 } },
+        { $skip: skip },
+        { $limit: limit },
+        {
+          $lookup: {
+            from: 'prompts',
+            localField: 'productionId',
+            foreignField: '_id',
+            as: 'productionPrompt',
+          },
+        },
+        { $unwind: { path: '$productionPrompt', preserveNullAndEmptyArrays: true } },
+        {
+          $project: {
+            name: 1,
+            numberOfGenerations: 1,
+            oneliner: 1,
+            category: 1,
+            projectIds: 1,
+            productionId: 1,
+            author: 1,
+            authorName: 1,
+            createdAt: 1,
+            updatedAt: 1,
+            'productionPrompt.prompt': 1,
+          },
+        },
+      ];
+
+      const totalPromptGroupsPipeline = [{ $match: combinedQuery }, { $count: 'total' }];
+
+      const [promptGroupsResults, totalPromptGroupsResults] = await Promise.all([
+        PromptGroup.aggregate(promptGroupsPipeline).exec(),
+        PromptGroup.aggregate(totalPromptGroupsPipeline).exec(),
+      ]);
+
+      const promptGroups = promptGroupsResults;
+      const totalPromptGroups =
+        totalPromptGroupsResults.length > 0 ? totalPromptGroupsResults[0].total : 0;
+
+      return {
+        promptGroups,
+        pageNumber: pageNumber.toString(),
+        pageSize: pageSize.toString(),
+        pages: Math.ceil(totalPromptGroups / pageSize).toString(),
+      };
+    } catch (error) {
+      console.error('Error getting prompt groups', error);
+      return { message: 'Error getting prompt groups' };
+    }
+  },
   deletePrompt: async ({ promptId, author }) => {
     try {
       const prompt = await Prompt.findOne({ _id: promptId, author });
@@ -277,7 +356,27 @@ module.exports = {
    */
   updatePromptGroup: async (filter, data) => {
     try {
-      const updatedDoc = await PromptGroup.findOneAndUpdate(filter, data, {
+      const updateOps = {};
+      if (data.removeProjectIds) {
+        for (const projectId of data.removeProjectIds) {
+          await removeGroupIdsFromProject(projectId, [filter._id]);
+        }
+
+        updateOps.$pull = { projectIds: { $in: data.removeProjectIds } };
+        delete data.removeProjectIds;
+      }
+
+      if (data.projectIds) {
+        for (const projectId of data.projectIds) {
+          await addGroupIdsToProject(projectId, [filter._id]);
+        }
+
+        updateOps.$addToSet = { projectIds: { $each: data.projectIds } };
+        delete data.projectIds;
+      }
+
+      const updateData = { ...data, ...updateOps };
+      const updatedDoc = await PromptGroup.findOneAndUpdate(filter, updateData, {
         new: true,
         upsert: false,
       });

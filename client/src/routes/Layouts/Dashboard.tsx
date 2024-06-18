@@ -14,12 +14,6 @@ export default function DashboardRoute() {
   const [prevLocationPath, setPrevLocationPath] = useState('');
 
   useEffect(() => {
-    if (!prevLocationRef.current) {
-      return;
-    }
-    if (prevLocationRef.current.pathname.includes('/d')) {
-      return;
-    }
     setPrevLocationPath(prevLocationRef.current?.pathname || '');
   }, [prevLocationRef]);
 

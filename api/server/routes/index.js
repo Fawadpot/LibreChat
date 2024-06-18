@@ -20,6 +20,7 @@ const files = require('./files');
 const staticRoute = require('./static');
 const share = require('./share');
 const categories = require('./categories');
+const roles = require('./roles');
 
 module.exports = {
   search,
@@ -44,4 +45,5 @@ module.exports = {
   staticRoute,
   share,
   categories,
+  roles,
 };

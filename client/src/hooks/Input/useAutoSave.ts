@@ -1,10 +1,10 @@
 import debounce from 'lodash/debounce';
-import { useFormContext } from 'react-hook-form';
 import { SetterOrUpdater, useRecoilValue } from 'recoil';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { LocalStorageKeys, TFile } from 'librechat-data-provider';
+import type { ExtendedFile } from '~/common';
+import { useChatFormContext } from '~/Providers';
 import { useGetFiles } from '~/data-provider';
-import { ExtendedFile } from '~/common';
 import store from '~/store';
 
 export const useAutoSave = ({
@@ -19,7 +19,7 @@ export const useAutoSave = ({
   setFiles: SetterOrUpdater<Map<string, ExtendedFile>>;
 }) => {
   // setting for auto-save
-  const { setValue } = useFormContext<{ text: string }>();
+  const { setValue } = useChatFormContext();
   const saveDrafts = useRecoilValue<boolean>(store.saveDrafts);
 
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);

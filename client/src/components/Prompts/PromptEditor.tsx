@@ -3,6 +3,7 @@ import { EditIcon } from 'lucide-react';
 import { Controller, useFormContext, useFormState } from 'react-hook-form';
 import { SaveIcon, CrossIcon } from '~/components/svg';
 import { TextareaAutosize } from '~/components/ui';
+import { useLocalize } from '~/hooks';
 import { cn } from '~/utils';
 
 type Props = {
@@ -13,7 +14,8 @@ type Props = {
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const PromptEditor: React.FC<Props> = ({ type, name, isEditing, setIsEditing }) => {
+const PromptEditor: React.FC<Props> = ({ name, isEditing, setIsEditing }) => {
+  const localize = useLocalize();
   const { control } = useFormContext();
   const { dirtyFields } = useFormState({ control: control });
 
@@ -27,7 +29,7 @@ const PromptEditor: React.FC<Props> = ({ type, name, isEditing, setIsEditing }) 
   return (
     <div>
       <h2 className="flex items-center justify-between rounded-t-lg border border-gray-300 py-2 pl-4 text-base font-semibold dark:border-gray-600 dark:text-gray-200">
-        {type} prompt
+        {localize('com_ui_text_prompt')}
         <button type="button" onClick={() => setIsEditing((prev) => !prev)} className="mr-2">
           <EditorIcon
             className={cn(

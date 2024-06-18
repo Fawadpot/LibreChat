@@ -1,7 +1,8 @@
-import { Share2Icon, Rocket } from 'lucide-react';
+import { Rocket } from 'lucide-react';
 import { useForm, FormProvider } from 'react-hook-form';
-import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
+import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
+import { PermissionTypes, Permissions, SystemRoles } from 'librechat-data-provider';
 import type { TCreatePrompt } from 'librechat-data-provider';
 import {
   useCreatePrompt,
@@ -9,18 +10,24 @@ import {
   useUpdatePromptGroup,
   useMakePromptProduction,
 } from '~/data-provider/mutations';
+import { useAuthContext, usePromptGroupsNav, useHasAccess } from '~/hooks';
 import { useGetPromptGroup, useGetPrompts } from '~/data-provider';
-import { Button, Skeleton } from '~/components/ui';
 import CategorySelector from './Groups/CategorySelector';
+import NoPromptGroup from './Groups/NoPromptGroup';
+import { Button, Skeleton } from '~/components/ui';
 import PromptVariables from './PromptVariables';
 import PromptVersions from './PromptVersions';
 import { TrashIcon } from '~/components/svg';
+import PromptDetails from './PromptDetails';
+import { findPromptGroup } from '~/utils';
 import PromptEditor from './PromptEditor';
+import SharePrompt from './SharePrompt';
 import PromptName from './PromptName';
 
-const PromptPreview = () => {
+const PromptForm = () => {
   const params = useParams();
   const navigate = useNavigate();
+  const { user } = useAuthContext();
   const { data: group, isLoading: isLoadingGroup } = useGetPromptGroup(params.promptId || '');
   const { data: prompts = [], isLoading: isLoadingPrompts } = useGetPrompts(
     { groupId: params.promptId ?? '' },
@@ -30,7 +37,13 @@ const PromptPreview = () => {
   const prevIsEditingRef = useRef(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectionIndex, setSelectionIndex] = useState<number>(0);
+  const isOwner = useMemo(() => user?.id === group?.author, [user, group]);
   const selectedPrompt = useMemo(() => prompts[selectionIndex], [prompts, selectionIndex]);
+
+  const hasShareAccess = useHasAccess({
+    permissionType: PermissionTypes.PROMPTS,
+    permission: Permissions.SHARED_GLOBAL,
+  });
 
   const methods = useForm({
     defaultValues: {
@@ -40,7 +53,8 @@ const PromptPreview = () => {
     },
   });
 
-  const { handleSubmit, setValue, reset } = methods;
+  const { handleSubmit, setValue, reset, watch } = methods;
+  const promptText = watch('prompt');
 
   const createPromptMutation = useCreatePrompt({
     onSuccess(data) {
@@ -104,6 +118,23 @@ const PromptPreview = () => {
     setValue('category', group?.category || '', { shouldDirty: false });
   }, [selectedPrompt, group?.category, setValue]);
 
+  const { groupsQuery } = useOutletContext<ReturnType<typeof usePromptGroupsNav>>();
+  if (!isOwner && groupsQuery.data && user?.role !== SystemRoles.ADMIN) {
+    const fetchedPrompt = findPromptGroup(
+      groupsQuery.data,
+      (group) => group._id === params.promptId,
+    );
+    if (!fetchedPrompt) {
+      return <NoPromptGroup />;
+    }
+
+    return <PromptDetails group={fetchedPrompt} />;
+  }
+
+  if (!group) {
+    return null;
+  }
+
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit((data) => onSave(data.prompt))}>
@@ -133,14 +164,7 @@ const PromptPreview = () => {
                   })
                 }
               />
-              <Button
-                variant={'default'}
-                size={'sm'}
-                className="h-10 w-10 border border-transparent bg-blue-500/90 transition-all hover:bg-blue-600 dark:border-blue-600 dark:bg-transparent dark:hover:bg-blue-950"
-                disabled={isLoadingGroup}
-              >
-                <Share2Icon className="cursor-pointer dark:text-blue-600" />
-              </Button>
+              {hasShareAccess && <SharePrompt group={group} disabled={isLoadingGroup} />}
               <Button
                 size={'sm'}
                 className="h-10 border border-transparent bg-green-400 transition-all hover:bg-green-500 dark:border-green-600 dark:bg-transparent dark:hover:bg-green-900"
@@ -185,7 +209,7 @@ const PromptPreview = () => {
                     type={selectedPrompt?.type || ''}
                     prompt={selectedPrompt?.prompt || ''}
                   />
-                  <PromptVariables />
+                  <PromptVariables promptText={promptText} />
                 </>
               )}
             </div>
@@ -211,4 +235,4 @@ const PromptPreview = () => {
   );
 };
 
-export default PromptPreview;
+export default PromptForm;

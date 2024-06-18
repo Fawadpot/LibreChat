@@ -22,9 +22,7 @@ export default function AutoSendSwitch({
   };
 
   return (
-    <div
-      className={cn('flex select-none items-center justify-end gap-2 px-2 pt-2 text-sm', className)}
-    >
+    <div className={cn('flex select-none items-center justify-end gap-2 text-sm', className)}>
       <div> {localize('com_nav_auto_send_prompts')} </div>
       <Switch
         id="autoSendPrompts"

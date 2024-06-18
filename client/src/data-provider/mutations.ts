@@ -908,13 +908,19 @@ export const useUpdatePromptGroup = (
       ) as t.TPromptGroup;
       const groupData = queryClient.getQueryData<t.PromptGroupListData>([QueryKeys.promptGroups]);
       const previousListData = JSON.parse(JSON.stringify(groupData)) as t.PromptGroupListData;
+      let update = variables.payload;
+      if (update.removeProjectIds && group.projectIds) {
+        update = JSON.parse(JSON.stringify(update));
+        update.projectIds = group.projectIds.filter((id) => !update.removeProjectIds?.includes(id));
+        delete update.removeProjectIds;
+      }
 
       if (groupData) {
         const newData = updateGroupFields(
           /* Paginated Data */
           groupData,
           /* Update */
-          { _id: variables.id, ...variables.payload },
+          { _id: variables.id, ...update },
           /* Callback */
           (group) => queryClient.setQueryData([QueryKeys.promptGroup, variables.id], group),
         );
