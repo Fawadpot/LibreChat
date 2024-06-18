@@ -74,6 +74,7 @@ const localStorageAtoms = {
   playbackRate: atomWithLocalStorage<number | null>('playbackRate', null),
   saveDrafts: atomWithLocalStorage('saveDrafts', false),
   autoSendPrompts: atomWithLocalStorage('autoSendPrompts', true),
+  alwaysMakeProd: atomWithLocalStorage('alwaysMakeProd', true),
 };
 
 export default { ...staticAtoms, ...localStorageAtoms };

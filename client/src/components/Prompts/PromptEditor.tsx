@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { EditIcon } from 'lucide-react';
 import { Controller, useFormContext, useFormState } from 'react-hook-form';
+import AlwaysMakeProd from '~/components/Prompts/Groups/AlwaysMakeProd';
 import { SaveIcon, CrossIcon } from '~/components/svg';
 import { TextareaAutosize } from '~/components/ui';
 import { useLocalize } from '~/hooks';
@@ -30,14 +31,17 @@ const PromptEditor: React.FC<Props> = ({ name, isEditing, setIsEditing }) => {
     <div>
       <h2 className="flex items-center justify-between rounded-t-lg border border-gray-300 py-2 pl-4 text-base font-semibold dark:border-gray-600 dark:text-gray-200">
         {localize('com_ui_text_prompt')}
-        <button type="button" onClick={() => setIsEditing((prev) => !prev)} className="mr-2">
-          <EditorIcon
-            className={cn(
-              'icon-lg',
-              isEditing ? 'p-[0.05rem]' : 'text-gray-400 hover:text-gray-600',
-            )}
-          />
-        </button>
+        <div className="flex flex-row gap-6">
+          <AlwaysMakeProd />
+          <button type="button" onClick={() => setIsEditing((prev) => !prev)} className="mr-2">
+            <EditorIcon
+              className={cn(
+                'icon-lg',
+                isEditing ? 'p-[0.05rem]' : 'text-gray-400 hover:text-gray-600',
+              )}
+            />
+          </button>
+        </div>
       </h2>
       <div
         className={cn(

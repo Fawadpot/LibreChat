@@ -1,4 +1,5 @@
 import { Rocket } from 'lucide-react';
+import { useRecoilValue } from 'recoil';
 import { useForm, FormProvider } from 'react-hook-form';
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
@@ -23,11 +24,13 @@ import { findPromptGroup } from '~/utils';
 import PromptEditor from './PromptEditor';
 import SharePrompt from './SharePrompt';
 import PromptName from './PromptName';
+import store from '~/store';
 
 const PromptForm = () => {
   const params = useParams();
   const navigate = useNavigate();
   const { user } = useAuthContext();
+  const alwaysMakeProd = useRecoilValue(store.alwaysMakeProd);
   const { data: group, isLoading: isLoadingGroup } = useGetPromptGroup(params.promptId || '');
   const { data: prompts = [], isLoading: isLoadingPrompts } = useGetPrompts(
     { groupId: params.promptId ?? '' },
@@ -58,6 +61,13 @@ const PromptForm = () => {
 
   const createPromptMutation = useCreatePrompt({
     onSuccess(data) {
+      if (alwaysMakeProd && data.prompt._id && data.prompt.groupId) {
+        makeProductionMutation.mutate({
+          id: data.prompt._id,
+          groupId: data.prompt.groupId,
+          productionPrompt: { prompt: data.prompt.prompt },
+        });
+      }
       reset({
         prompt: data.prompt.prompt,
         promptName: data.group?.name || '',
