@@ -12,6 +12,7 @@ import {
   // DropdownMenuContent,
   DropdownMenuTrigger,
 } from '~/components/ui';
+import AdminSettings from '~/components/Prompts/AdminSettings';
 import { useLocalize, useCustomLink } from '~/hooks';
 import { useDashboardContext } from '~/Providers';
 
@@ -30,20 +31,21 @@ export default function DashBreadcrumb() {
   const chatLinkHandler = useCustomLink('/c/' + lastConversationId);
   const promptsLinkHandler = useCustomLink('/d/prompts');
   return (
-    <Breadcrumb className="mt-1 px-2 dark:text-gray-200">
-      <BreadcrumbList>
-        <BreadcrumbItem className="hover:dark:text-white">
-          <BreadcrumbLink
-            href="/"
-            className="flex flex-row items-center gap-1"
-            onClick={chatLinkHandler}
-          >
-            <ArrowLeft className="icon-xs" />
-            {localize('com_ui_back_to_chat')}
-          </BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        {/*
+    <div className="mr-4 flex items-center justify-between">
+      <Breadcrumb className="mt-1 px-2 dark:text-gray-200">
+        <BreadcrumbList>
+          <BreadcrumbItem className="hover:dark:text-white">
+            <BreadcrumbLink
+              href="/"
+              className="flex flex-row items-center gap-1"
+              onClick={chatLinkHandler}
+            >
+              <ArrowLeft className="icon-xs" />
+              {localize('com_ui_back_to_chat')}
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          {/*
         <BreadcrumbItem className="hover:dark:text-white">
           <DropdownMenu>
             <DropdownMenuTrigger className="flex cursor-default items-center gap-1">
@@ -62,17 +64,19 @@ export default function DashBreadcrumb() {
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         */}
-        <BreadcrumbItem className="hover:dark:text-white">
-          <BreadcrumbLink
-            href="/d/prompts"
-            className="flex flex-row items-center gap-1"
-            onClick={promptsLinkHandler}
-          >
-            <MessageSquareQuote className="h-4 w-4 dark:text-gray-300" />
-            {localize('com_ui_prompts')}
-          </BreadcrumbLink>
-        </BreadcrumbItem>
-      </BreadcrumbList>
-    </Breadcrumb>
+          <BreadcrumbItem className="hover:dark:text-white">
+            <BreadcrumbLink
+              href="/d/prompts"
+              className="flex flex-row items-center gap-1"
+              onClick={promptsLinkHandler}
+            >
+              <MessageSquareQuote className="h-4 w-4 dark:text-gray-300" />
+              {localize('com_ui_prompts')}
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+      <AdminSettings />
+    </div>
   );
 }
