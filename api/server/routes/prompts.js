@@ -11,7 +11,7 @@ const {
   deletePromptGroup,
   createPromptGroup,
   // updatePromptLabels,
-  // makePromptProduction,
+  makePromptProduction,
   getRandomPromptGroups,
 } = require('~/models/Prompt');
 const { requireJwtAuth, generateCheckAccess } = require('~/server/middleware');
@@ -118,16 +118,16 @@ const patchPromptGroup = async (req, res) => {
 
 router.patch('/groups/:groupId', checkGlobalPromptShare, patchPromptGroup);
 
-// router.patch('/:promptId/tags/production', async (req, res) => {
-//   try {
-//     const { promptId } = req.params;
-//     const result = await makePromptProduction(promptId);
-//     res.status(200).send(result);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).send({ error: 'Error updating prompt production' });
-//   }
-// });
+router.patch('/:promptId/tags/production', checkPromptCreate, async (req, res) => {
+  try {
+    const { promptId } = req.params;
+    const result = await makePromptProduction(promptId);
+    res.status(200).send(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: 'Error updating prompt production' });
+  }
+});
 
 // router.patch('/:promptId/labels', async (req, res) => {
 //   const { promptId } = req.params;
