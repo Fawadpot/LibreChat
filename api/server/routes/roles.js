@@ -1,11 +1,14 @@
 const express = require('express');
-const { promptPermissionsSchema, PermissionTypes } = require('librechat-data-provider');
+const {
+  promptPermissionsSchema,
+  PermissionTypes,
+  SystemRoles,
+} = require('librechat-data-provider');
 const { checkAdmin, requireJwtAuth } = require('~/server/middleware');
 const { updateRoleByName, getRoleByName } = require('~/models/Role');
 
 const router = express.Router();
 router.use(requireJwtAuth);
-router.use(checkAdmin);
 
 /**
  * GET /api/roles/:roleName
@@ -15,6 +18,10 @@ router.get('/:roleName', async (req, res) => {
   const { roleName: _r } = req.params;
   // TODO: TEMP, use a better parsing for roleName
   const roleName = _r.toUpperCase();
+
+  if (req.user.role !== SystemRoles.ADMIN && roleName !== SystemRoles.USER) {
+    return res.status(403).send({ message: 'Unauthorized' });
+  }
 
   try {
     const role = await getRoleByName(roleName, '-_id -__v');
@@ -32,7 +39,7 @@ router.get('/:roleName', async (req, res) => {
  * PUT /api/roles/:roleName/prompts
  * Update prompt permissions for a specific role
  */
-router.put('/:roleName/prompts', async (req, res) => {
+router.put('/:roleName/prompts', checkAdmin, async (req, res) => {
   const { roleName: _r } = req.params;
   // TODO: TEMP, use a better parsing for roleName
   const roleName = _r.toUpperCase();

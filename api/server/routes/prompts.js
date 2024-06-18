@@ -1,4 +1,5 @@
 const express = require('express');
+const { PermissionTypes, Permissions } = require('librechat-data-provider');
 const {
   getPrompt,
   getPrompts,
@@ -9,14 +10,22 @@ const {
   updatePromptGroup,
   deletePromptGroup,
   createPromptGroup,
-  updatePromptLabels,
-  makePromptProduction,
+  // updatePromptLabels,
+  // makePromptProduction,
   getRandomPromptGroups,
 } = require('~/models/Prompt');
-const { requireJwtAuth } = require('~/server/middleware');
+const { requireJwtAuth, generateCheckAccess } = require('~/server/middleware');
 
 const router = express.Router();
+
+const checkPromptAccess = generateCheckAccess(PermissionTypes.PROMPTS, [Permissions.USE]);
+const checkPromptCreate = generateCheckAccess(PermissionTypes.PROMPTS, [
+  Permissions.USE,
+  Permissions.CREATE,
+]);
+
 router.use(requireJwtAuth);
+router.use(checkPromptAccess);
 
 /**
  * Route to get single prompt group by its ID
@@ -100,24 +109,24 @@ const patchPromptGroup = async (req, res) => {
   }
 };
 
-router.patch('/groups/:groupId', patchPromptGroup);
+router.patch('/groups/:groupId', checkPromptCreate, patchPromptGroup);
 
-router.patch('/:promptId/tags/production', async (req, res) => {
-  try {
-    const { promptId } = req.params;
-    const result = await makePromptProduction(promptId);
-    res.status(200).send(result);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send({ error: 'Error updating prompt production' });
-  }
-});
+// router.patch('/:promptId/tags/production', async (req, res) => {
+//   try {
+//     const { promptId } = req.params;
+//     const result = await makePromptProduction(promptId);
+//     res.status(200).send(result);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).send({ error: 'Error updating prompt production' });
+//   }
+// });
 
-router.patch('/:promptId/labels', async (req, res) => {
-  const { promptId } = req.params;
-  const { labels } = req.body;
-  res.status(200).send(await updatePromptLabels(promptId, labels));
-});
+// router.patch('/:promptId/labels', async (req, res) => {
+//   const { promptId } = req.params;
+//   const { labels } = req.body;
+//   res.status(200).send(await updatePromptLabels(promptId, labels));
+// });
 
 router.get('/random', async (req, res) => {
   try {
@@ -148,13 +157,13 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.delete('/:promptId', async (req, res) => {
+router.delete('/:promptId', checkPromptCreate, async (req, res) => {
   const { promptId } = req.params;
   const author = req.user.id;
   res.status(200).send(await deletePrompt({ promptId, author }));
 });
 
-router.delete('/groups/:groupId', async (req, res) => {
+router.delete('/groups/:groupId', checkPromptCreate, async (req, res) => {
   const { groupId } = req.params;
   res.status(200).send(await deletePromptGroup(groupId));
 });

@@ -608,6 +608,10 @@ export enum CacheKeys {
    */
   CONFIG_STORE = 'configStore',
   /**
+   * Key for the config store namespace.
+   */
+  ROLES = 'roles',
+  /**
    * Key for the plugins cache.
    */
   PLUGINS = 'plugins',

@@ -7,6 +7,7 @@ export * from './Input';
 export * from './Messages';
 export * from './Plugins';
 export * from './Prompts';
+export * from './Roles';
 export * from './SSE';
 
 export * from './AuthContext';

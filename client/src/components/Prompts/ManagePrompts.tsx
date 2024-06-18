@@ -11,7 +11,7 @@ export default function ManagePrompts({ className }: { className?: string }) {
       href="/d/prompts"
       onClick={clickHandler}
     >
-      {localize('com_ui_manage_prompts')}
+      {localize('com_ui_manage')}
     </a>
   );
 }

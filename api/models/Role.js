@@ -1,4 +1,5 @@
-const { SystemRoles, roleDefaults } = require('librechat-data-provider');
+const { SystemRoles, CacheKeys, roleDefaults } = require('librechat-data-provider');
+const getLogStores = require('~/cache/getLogStores');
 const Role = require('~/models/schema/roleSchema');
 
 /**
@@ -11,6 +12,11 @@ const Role = require('~/models/schema/roleSchema');
  */
 const getRoleByName = async function (roleName, fieldsToSelect = null) {
   try {
+    const cache = getLogStores(CacheKeys.ROLES);
+    const cachedRole = await cache.get(roleName);
+    if (cachedRole) {
+      return cachedRole;
+    }
     let query = Role.findOne({ name: roleName });
     if (fieldsToSelect) {
       query = query.select(fieldsToSelect);
@@ -20,8 +26,10 @@ const getRoleByName = async function (roleName, fieldsToSelect = null) {
     if (!role && SystemRoles[roleName]) {
       role = roleDefaults[roleName];
       role = await new Role(role).save();
+      await cache.set(roleName, role);
       return role.toObject();
     }
+    await cache.set(roleName, role);
     return role;
   } catch (error) {
     throw new Error(`Failed to retrieve or create role: ${error.message}`);
@@ -37,11 +45,16 @@ const getRoleByName = async function (roleName, fieldsToSelect = null) {
  */
 const updateRoleByName = async function (roleName, updates) {
   try {
+    const cache = getLogStores(CacheKeys.ROLES);
     const role = await Role.findOneAndUpdate(
       { name: roleName },
       { $set: updates },
       { new: true, lean: true },
-    ).exec();
+    )
+      .select('-__v')
+      .lean()
+      .exec();
+    await cache.set(roleName, role);
     return role;
   } catch (error) {
     throw new Error(`Failed to update role: ${error.message}`);
