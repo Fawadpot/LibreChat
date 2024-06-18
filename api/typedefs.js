@@ -319,6 +319,18 @@
  * @memberof typedefs
  */
 
+/**
+ * @exports TDeletePromptVariables
+ * @typedef {import('librechat-data-provider').TDeletePromptVariables } TDeletePromptVariables
+ * @memberof typedefs
+ */
+
+/**
+ * @exports TDeletePromptResponse
+ * @typedef {import('librechat-data-provider').TDeletePromptResponse } TDeletePromptResponse
+ * @memberof typedefs
+ */
+
 /* Roles */
 
 /**
@@ -327,7 +339,6 @@
  * @memberof typedefs
  */
 
-// , PermissionTypes, Permissions
 /**
  * @exports PermissionTypes
  * @typedef {import('librechat-data-provider').PermissionTypes } PermissionTypes

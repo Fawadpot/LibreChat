@@ -985,17 +985,43 @@ export const useCreatePrompt = (
 };
 
 export const useDeletePrompt = (
-  options?: UseMutationOptions<unknown, unknown, t.DeletePromptVariables>,
-) => {
+  options?: t.DeletePromptOptions,
+): UseMutationResult<t.TDeletePromptResponse, unknown, t.TDeletePromptVariables, unknown> => {
   const queryClient = useQueryClient();
   const { onSuccess, ...rest } = options || {};
-  return useMutation<unknown, unknown, t.DeletePromptVariables>({
-    mutationFn: ({ _id }) => dataService.deletePrompt(_id),
+  return useMutation({
+    mutationFn: ({ _id }: t.TDeletePromptVariables) => dataService.deletePrompt(_id),
     ...rest,
     onSuccess: (response, variables, context) => {
-      queryClient.setQueryData<t.TPrompt[]>([QueryKeys.prompts], (oldData?: t.TPrompt[]) => {
-        return oldData ? oldData.filter((prompt) => prompt._id !== variables._id) : [];
-      });
+      if (response.promptGroup) {
+        const promptGroupId = response.promptGroup.id;
+        queryClient.setQueryData<t.PromptGroupListData>([QueryKeys.promptGroups], (data) => {
+          if (!data) {
+            return data;
+          }
+          return deletePromptGroup(data, promptGroupId);
+        });
+      } else {
+        queryClient.setQueryData<t.TPrompt[]>(
+          [QueryKeys.prompts, variables.groupId],
+          (oldData?: t.TPrompt[]) => {
+            const prompts = oldData ? oldData.filter((prompt) => prompt._id !== variables._id) : [];
+            queryClient.setQueryData<t.TPromptGroup>(
+              [QueryKeys.promptGroup, variables.groupId],
+              (data) => {
+                if (!data) {
+                  return data;
+                }
+                if (data.productionId === variables._id) {
+                  data.productionId = prompts[0]._id;
+                  data.productionPrompt = prompts[0];
+                }
+              },
+            );
+            return prompts;
+          },
+        );
+      }
       if (onSuccess) {
         onSuccess(response, variables, context);
       }

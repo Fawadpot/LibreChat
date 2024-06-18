@@ -311,6 +311,17 @@ module.exports = {
       return { message: 'Error getting prompt groups' };
     }
   },
+  /**
+   * Deletes a prompt and its corresponding prompt group if it is the last prompt in the group.
+   *
+   * @param {Object} options - The options for deleting the prompt.
+   * @param {ObjectId} options.promptId - The ID of the prompt to delete.
+   * @param {ObjectId} options.author - The author of the prompt.
+   * @return {Promise<TDeletePromptResponse>} An object containing the result of the deletion.
+   * If the prompt was deleted successfully, the object will have a property 'prompt' with the value 'Prompt deleted successfully'.
+   * If the prompt group was deleted successfully, the object will have a property 'promptGroup' with the message 'Prompt group deleted successfully' and id of the deleted group.
+   * If there was an error deleting the prompt, the object will have a property 'message' with the value 'Error deleting prompt'.
+   */
   deletePrompt: async ({ promptId, author }) => {
     try {
       const prompt = await Prompt.findOne({ _id: promptId, author });
@@ -318,31 +329,38 @@ module.exports = {
         throw new Error('Prompt not found');
       }
 
-      const groupId = prompt.groupId;
-      const hadLatestTags = prompt.tags.includes('latest');
-
       await Prompt.deleteOne({ _id: promptId });
+
+      const promptGroup = await PromptGroup.findById(prompt.groupId);
+
+      const groupId = prompt.groupId;
 
       const remainingPrompts = await Prompt.find({ groupId }).sort({ createdAt: 1 });
 
-      for (let i = 0; i < remainingPrompts.length; i++) {
-        remainingPrompts[i].version = i + 1;
-        await remainingPrompts[i].save();
-      }
-
-      if (hadLatestTags && remainingPrompts.length > 0) {
-        const highestVersionPrompt = remainingPrompts[remainingPrompts.length - 1];
-        if (!highestVersionPrompt.tags.includes('latest')) {
-          highestVersionPrompt.tags.push('latest');
-          await highestVersionPrompt.save();
-        }
-      }
-
       if (remainingPrompts.length === 0) {
         await PromptGroup.deleteOne({ _id: groupId });
+      } else {
+        for (let i = 0; i < remainingPrompts.length; i++) {
+          remainingPrompts[i].version = i + 1;
+          await remainingPrompts[i].save();
+        }
+
+        if (promptGroup.productionId.toString() === prompt.id) {
+          promptGroup.productionId = remainingPrompts[remainingPrompts.length - 1]._id;
+        }
+
+        await promptGroup.save();
+
+        return { prompt: 'Prompt deleted successfully' };
       }
 
-      return { message: 'Prompt deleted successfully' };
+      return {
+        prompt: 'Prompt deleted successfully',
+        promptGroup: {
+          message: 'Prompt group deleted successfully',
+          id: groupId,
+        },
+      };
     } catch (error) {
       logger.error('Error deleting prompt', error);
       return { message: 'Error deleting prompt' };
