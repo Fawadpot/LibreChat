@@ -314,6 +314,12 @@
  */
 
 /**
+ * @exports TRole
+ * @typedef {import('librechat-data-provider').TRole } TRole
+ * @memberof typedefs
+ */
+
+/**
  * @exports TUpdatePromptGroupPayload
  * @typedef {import('librechat-data-provider').TUpdatePromptGroupPayload } TUpdatePromptGroupPayload
  * @memberof typedefs

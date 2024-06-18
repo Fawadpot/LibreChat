@@ -521,3 +521,10 @@ export function getRandomPrompts(
 ): Promise<t.TGetRandomPromptsResponse> {
   return request.get(endpoints.getRandomPrompts(variables.limit, variables.skip));
 }
+
+/* Roles */
+export function updatePromptPermissions(
+  variables: m.UpdatePromptPermVars,
+): Promise<m.UpdatePromptPermResponse> {
+  return request.put(endpoints.updatePromptPermissions(variables.roleName), variables.updates);
+}

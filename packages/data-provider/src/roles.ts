@@ -59,6 +59,7 @@ export const roleSchema = z.object({
 });
 
 export type TRole = z.infer<typeof roleSchema>;
+export type TPromptPermissions = z.infer<typeof promptPermissionsSchema>;
 
 const defaultRolesSchema = z.object({
   [SystemRoles.ADMIN]: roleSchema.extend({

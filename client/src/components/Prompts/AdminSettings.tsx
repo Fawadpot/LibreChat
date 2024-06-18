@@ -1,10 +1,11 @@
 import { ShieldEllipsis } from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
-import { PromptPermissions } from 'librechat-data-provider';
+import { PromptPermissions, SystemRoles } from 'librechat-data-provider';
 import type { Control, UseFormSetValue, UseFormGetValues } from 'react-hook-form';
 import { OGDialog, OGDialogTitle, OGDialogContent, OGDialogTrigger } from '~/components/ui';
+import { useUpdatePromptPermissionsMutation } from '~/data-provider';
+import { useLocalize, useAuthContext } from '~/hooks';
 import { Button, Switch } from '~/components/ui';
-import { useLocalize } from '~/hooks';
 
 type FormValues = Record<PromptPermissions, boolean>;
 
@@ -52,6 +53,8 @@ const LabelController: React.FC<LabelControllerProps> = ({
 
 const AdminSettings = () => {
   const localize = useLocalize();
+  const { user } = useAuthContext();
+  const { mutate } = useUpdatePromptPermissionsMutation();
 
   const {
     control,
@@ -68,6 +71,10 @@ const AdminSettings = () => {
     },
   });
 
+  if (user?.role !== SystemRoles.ADMIN) {
+    return null;
+  }
+
   const labelControllerData = [
     {
       promptPerm: PromptPermissions.SHARED_GLOBAL,
@@ -82,6 +89,10 @@ const AdminSettings = () => {
       label: localize('com_ui_prompts_allow_create'),
     },
   ];
+
+  const onSubmit = (data: FormValues) => {
+    mutate({ roleName: SystemRoles.USER, updates: data });
+  };
 
   return (
     <OGDialog>
@@ -99,7 +110,7 @@ const AdminSettings = () => {
         <OGDialogTitle>{`${localize('com_ui_admin_settings')} - ${localize(
           'com_ui_prompts',
         )}`}</OGDialogTitle>
-        <form className="p-2" onSubmit={handleSubmit((data) => console.log(data))}>
+        <form className="p-2" onSubmit={handleSubmit(onSubmit)}>
           <div className="py-5">
             {labelControllerData.map(({ promptPerm, label }) => (
               <LabelController

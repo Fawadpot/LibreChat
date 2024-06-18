@@ -14,6 +14,7 @@ const requireJwtAuth = require('./requireJwtAuth');
 const validateModel = require('./validateModel');
 const moderateText = require('./moderateText');
 const setHeaders = require('./setHeaders');
+const checkAdmin = require('./checkAdmin');
 const limiters = require('./limiters');
 const uaParser = require('./uaParser');
 const checkBan = require('./checkBan');
@@ -25,6 +26,7 @@ module.exports = {
   noIndex,
   checkBan,
   uaParser,
+  checkAdmin,
   setHeaders,
   moderateText,
   validateModel,

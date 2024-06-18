@@ -32,8 +32,8 @@ const getRoleByName = async function (roleName, fieldsToSelect = null) {
  * Update role values by name.
  *
  * @param {string} roleName - The name of the role to update.
- * @param {Object} updates - The fields to update.
- * @returns {Promise<Object>} Updated role document.
+ * @param {Partial<TRole>} updates - The fields to update.
+ * @returns {Promise<TRole>} Updated role document.
  */
 const updateRoleByName = async function (roleName, updates) {
   try {
@@ -58,7 +58,7 @@ const initializeRoles = async function () {
   const defaultRoles = [SystemRoles.ADMIN, SystemRoles.USER];
 
   for (const roleName of defaultRoles) {
-    let role = await Role.findOne({ name: roleName });
+    let role = await Role.findOne({ name: roleName }).select('name').lean();
     if (!role) {
       role = new Role(roleDefaults[roleName]);
       await role.save();
