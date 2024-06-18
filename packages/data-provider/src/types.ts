@@ -397,7 +397,9 @@ export type TCreatePromptResponse = {
   group?: TPromptGroup;
 };
 
-export type TUpdatePromptGroupPayload = Partial<TPromptGroup>;
+export type TUpdatePromptGroupPayload = Partial<TPromptGroup> & {
+  removeProjectIds?: string[];
+};
 
 export type TUpdatePromptGroupVariables = {
   id: string;

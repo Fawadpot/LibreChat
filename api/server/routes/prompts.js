@@ -86,7 +86,7 @@ router.post('/', createPrompt);
  * @param {object} req
  * @param {object} req.params - The request parameters
  * @param {string} req.params.groupId - The group ID
- * @param {Partial<TPromptGroup>} req.body - The request body
+ * @param {TUpdatePromptGroupPayload} req.body - The request body
  * @param {Express.Response} res
  */
 const patchPromptGroup = async (req, res) => {

@@ -313,6 +313,12 @@
  * @memberof typedefs
  */
 
+/**
+ * @exports TUpdatePromptGroupPayload
+ * @typedef {import('librechat-data-provider').TUpdatePromptGroupPayload } TUpdatePromptGroupPayload
+ * @memberof typedefs
+ */
+
 /** Assistants */
 /**
  * @exports Assistant

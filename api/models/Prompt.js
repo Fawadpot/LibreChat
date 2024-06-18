@@ -1,5 +1,5 @@
 const { ObjectId } = require('mongodb');
-const { getProjectByName, addGroupIdsToProject } = require('./Project');
+const { getProjectByName, addGroupIdsToProject, removeGroupIdsFromProject } = require('./Project');
 const { Prompt, PromptGroup } = require('./schema/promptSchema');
 const { logger } = require('~/config');
 
@@ -356,12 +356,27 @@ module.exports = {
    */
   updatePromptGroup: async (filter, data) => {
     try {
+      const updateOps = {};
+      if (data.removeProjectIds) {
+        for (const projectId of data.removeProjectIds) {
+          await removeGroupIdsFromProject(projectId, [filter._id]);
+        }
+
+        updateOps.$pull = { projectIds: { $in: data.removeProjectIds } };
+        delete data.removeProjectIds;
+      }
+
       if (data.projectIds) {
         for (const projectId of data.projectIds) {
           await addGroupIdsToProject(projectId, [filter._id]);
         }
+
+        updateOps.$addToSet = { projectIds: { $each: data.projectIds } };
+        delete data.projectIds;
       }
-      const updatedDoc = await PromptGroup.findOneAndUpdate(filter, data, {
+
+      const updateData = { ...data, ...updateOps };
+      const updatedDoc = await PromptGroup.findOneAndUpdate(filter, updateData, {
         new: true,
         upsert: false,
       });

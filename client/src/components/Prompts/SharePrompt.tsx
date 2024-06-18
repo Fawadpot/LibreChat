@@ -1,16 +1,27 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Share2Icon } from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
+import { PromptPermissions } from 'librechat-data-provider';
 import { useGetStartupConfig } from 'librechat-data-provider/react-query';
-import type { TPromptGroup, TStartupConfig } from 'librechat-data-provider';
-import { OGDialog, OGDialogTitle, OGDialogContent, OGDialogTrigger } from '~/components/ui';
+import type {
+  TPromptGroup,
+  TStartupConfig,
+  TUpdatePromptGroupPayload,
+} from 'librechat-data-provider';
+import {
+  OGDialog,
+  OGDialogTitle,
+  OGDialogContent,
+  OGDialogTrigger,
+  OGDialogClose,
+} from '~/components/ui';
 import { useUpdatePromptGroup } from '~/data-provider';
-import { Button, Checkbox } from '~/components/ui';
+import { Button, Switch } from '~/components/ui';
 import { useToastContext } from '~/Providers';
 import { useLocalize } from '~/hooks';
 
 type FormValues = {
-  shareGlobal: boolean;
+  [PromptPermissions.SHARED_GLOBAL]: boolean;
 };
 
 const SharePrompt = ({ group, disabled }: { group?: TPromptGroup; disabled: boolean }) => {
@@ -18,6 +29,12 @@ const SharePrompt = ({ group, disabled }: { group?: TPromptGroup; disabled: bool
   const { showToast } = useToastContext();
   const updateGroup = useUpdatePromptGroup();
   const { data: startupConfig = {} as TStartupConfig, isFetching } = useGetStartupConfig();
+  const { instanceProjectId } = startupConfig;
+  const groupIsGlobal = useMemo(
+    () => !!group?.projectIds?.includes(instanceProjectId),
+    [group, instanceProjectId],
+  );
+
   const {
     control,
     setValue,
@@ -27,15 +44,13 @@ const SharePrompt = ({ group, disabled }: { group?: TPromptGroup; disabled: bool
   } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: {
-      shareGlobal: false,
+      [PromptPermissions.SHARED_GLOBAL]: groupIsGlobal,
     },
   });
 
-  const { instanceProjectId } = startupConfig;
-  const groupIsGlobal = useMemo(
-    () => group?.projectIds?.includes(instanceProjectId),
-    [group, instanceProjectId],
-  );
+  useEffect(() => {
+    setValue(PromptPermissions.SHARED_GLOBAL, groupIsGlobal);
+  }, [groupIsGlobal, setValue]);
 
   if (!group || !instanceProjectId) {
     return null;
@@ -46,12 +61,12 @@ const SharePrompt = ({ group, disabled }: { group?: TPromptGroup; disabled: bool
       return;
     }
 
-    const payload = {} as Partial<TPromptGroup>;
+    const payload = {} as TUpdatePromptGroupPayload;
 
-    if (data.shareGlobal) {
+    if (data[PromptPermissions.SHARED_GLOBAL]) {
       payload.projectIds = [startupConfig.instanceProjectId];
     } else {
-      payload.projectIds = [];
+      payload.removeProjectIds = [startupConfig.instanceProjectId];
     }
 
     updateGroup.mutate({
@@ -75,39 +90,18 @@ const SharePrompt = ({ group, disabled }: { group?: TPromptGroup; disabled: bool
       <OGDialogContent className="bg-white dark:border-gray-700 dark:bg-gray-750 dark:text-gray-300">
         <OGDialogTitle>{localize('com_ui_share_var', `"${group.name}"`)}</OGDialogTitle>
         <form className="p-2" onSubmit={handleSubmit(onSubmit)}>
-          <div className="mb-4 flex items-center justify-start gap-2">
-            <Controller
-              name={'shareGlobal'}
-              control={control}
-              disabled={isFetching || updateGroup.isLoading || !instanceProjectId}
-              rules={{
-                validate: (value) => {
-                  const isValid = !(value && groupIsGlobal);
-                  if (!isValid) {
-                    showToast({
-                      message: localize('com_ui_prompt_shared_to_all'),
-                      status: 'error',
-                    });
-                  }
-                  return isValid;
-                },
-              }}
-              render={({ field }) => (
-                <Checkbox
-                  {...field}
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                  value={field?.value?.toString()}
-                />
-              )}
-            />
+          <div className="mb-4 flex items-center justify-between gap-2 py-4">
             <label
               className="cursor-pointer select-none"
-              htmlFor={'shareGlobal'}
+              htmlFor={PromptPermissions.SHARED_GLOBAL}
               onClick={() =>
-                setValue('shareGlobal', !getValues('shareGlobal'), {
-                  shouldDirty: true,
-                })
+                setValue(
+                  PromptPermissions.SHARED_GLOBAL,
+                  !getValues(PromptPermissions.SHARED_GLOBAL),
+                  {
+                    shouldDirty: true,
+                  },
+                )
               }
             >
               {localize('com_ui_share_to_all_users')}
@@ -115,15 +109,42 @@ const SharePrompt = ({ group, disabled }: { group?: TPromptGroup; disabled: bool
                 <span className="ml-2 text-xs">{localize('com_ui_prompt_shared_to_all')}</span>
               )}
             </label>
+            <Controller
+              name={PromptPermissions.SHARED_GLOBAL}
+              control={control}
+              disabled={isFetching || updateGroup.isLoading || !instanceProjectId}
+              rules={{
+                validate: (value) => {
+                  const isValid = !(value && groupIsGlobal);
+                  if (!isValid) {
+                    showToast({
+                      message: localize('com_ui_prompt_already_shared_to_all'),
+                      status: 'warning',
+                    });
+                  }
+                  return isValid;
+                },
+              }}
+              render={({ field }) => (
+                <Switch
+                  {...field}
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  value={field?.value?.toString()}
+                />
+              )}
+            />
           </div>
           <div className="flex justify-end">
-            <button
-              type="submit"
-              disabled={isSubmitting || isFetching}
-              className="btn rounded bg-green-500 font-bold text-white transition-all hover:bg-green-600"
-            >
-              {localize('com_ui_share')}
-            </button>
+            <OGDialogClose asChild>
+              <button
+                type="submit"
+                disabled={isSubmitting || isFetching}
+                className="btn rounded bg-green-500 font-bold text-white transition-all hover:bg-green-600"
+              >
+                {localize('com_ui_save')}
+              </button>
+            </OGDialogClose>
           </div>
         </form>
       </OGDialogContent>

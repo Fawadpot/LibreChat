@@ -56,8 +56,24 @@ const addGroupIdsToProject = async function (projectId, promptGroupIds) {
   );
 };
 
+/**
+ * Remove an array of prompt group IDs from a project's promptGroupIds array.
+ *
+ * @param {string} projectId - The ID of the project to update.
+ * @param {string[]} promptGroupIds - The array of prompt group IDs to remove from the project.
+ * @returns {Promise<MongoProject>} The updated project document.
+ */
+const removeGroupIdsFromProject = async function (projectId, promptGroupIds) {
+  return await Project.findByIdAndUpdate(
+    projectId,
+    { $pull: { promptGroupIds: { $in: promptGroupIds } } },
+    { new: true },
+  );
+};
+
 module.exports = {
   getProjectById,
   getProjectByName,
   addGroupIdsToProject,
+  removeGroupIdsFromProject,
 };
