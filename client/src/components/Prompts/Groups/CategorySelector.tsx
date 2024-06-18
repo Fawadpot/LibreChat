@@ -33,7 +33,9 @@ const CategorySelector = ({
   const { data: categories = loadingCategories } = useGetCategories({
     select: (data) =>
       data.map((category) => ({
-        label: category.label ? localize(`com_ui_${category.label}`) : '',
+        label: category.label
+          ? localize(`com_ui_${category.label}`)
+          : localize('com_ui_none_selected'),
         value: category.value,
         icon: <CategoryIcon category={category.value} />,
       })),
