@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { SystemRoles } from 'librechat-data-provider';
 import { ArrowLeft, MessageSquareQuote } from 'lucide-react';
 import {
   Breadcrumb,
@@ -12,8 +13,8 @@ import {
   // DropdownMenuContent,
   DropdownMenuTrigger,
 } from '~/components/ui';
+import { useLocalize, useCustomLink, useAuthContext } from '~/hooks';
 import AdminSettings from '~/components/Prompts/AdminSettings';
-import { useLocalize, useCustomLink } from '~/hooks';
 import { useDashboardContext } from '~/Providers';
 
 const getConversationId = (prevLocationPath: string) => {
@@ -26,6 +27,7 @@ const getConversationId = (prevLocationPath: string) => {
 
 export default function DashBreadcrumb() {
   const localize = useLocalize();
+  const { user } = useAuthContext();
   const { prevLocationPath } = useDashboardContext();
   const lastConversationId = useMemo(() => getConversationId(prevLocationPath), [prevLocationPath]);
   const chatLinkHandler = useCustomLink('/c/' + lastConversationId);
@@ -76,7 +78,7 @@ export default function DashBreadcrumb() {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <AdminSettings />
+      {user?.role === SystemRoles.ADMIN && <AdminSettings />}
     </div>
   );
 }

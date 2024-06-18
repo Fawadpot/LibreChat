@@ -1,4 +1,18 @@
 /**
+ * Enum for System Defined Roles
+ */
+export enum SystemRoles {
+  /**
+   * The Admin role
+   */
+  ADMIN = 'ADMIN',
+  /**
+   * The default user role
+   */
+  USER = 'USER',
+}
+
+/**
  * Enum for Role-Based Access Control Constants
  */
 export enum PromptPermissions {
