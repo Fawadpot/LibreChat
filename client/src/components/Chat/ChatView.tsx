@@ -1,9 +1,10 @@
 import { memo } from 'react';
 import { useRecoilValue } from 'recoil';
+import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
-import { useForm, FormProvider } from 'react-hook-form';
 import { useGetMessagesByConvoId } from 'librechat-data-provider/react-query';
-import { ChatContext, useFileMapContext } from '~/Providers';
+import type { ChatFormValues } from '~/common';
+import { ChatContext, useFileMapContext, ChatFormProvider } from '~/Providers';
 import MessagesView from './Messages/MessagesView';
 import { useChatHelpers, useSSE } from '~/hooks';
 import { Spinner } from '~/components/svg';
@@ -31,12 +32,19 @@ function ChatView({ index = 0 }: { index?: number }) {
   });
 
   const chatHelpers = useChatHelpers(index, conversationId);
-  const methods = useForm<{ text: string }>({
+  const methods = useForm<ChatFormValues>({
     defaultValues: { text: '' },
   });
 
   return (
-    <FormProvider {...methods}>
+    <ChatFormProvider
+      reset={methods.reset}
+      control={methods.control}
+      setValue={methods.setValue}
+      register={methods.register}
+      getValues={methods.getValues}
+      handleSubmit={methods.handleSubmit}
+    >
       <ChatContext.Provider value={chatHelpers}>
         <Presentation useSidePanel={true}>
           {isLoading && conversationId !== 'new' ? (
@@ -54,7 +62,7 @@ function ChatView({ index = 0 }: { index?: number }) {
           </div>
         </Presentation>
       </ChatContext.Provider>
-    </FormProvider>
+    </ChatFormProvider>
   );
 }
 

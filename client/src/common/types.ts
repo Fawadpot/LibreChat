@@ -53,6 +53,8 @@ export type LastSelectedModels = Record<EModelEndpoint, string>;
 
 export type LocalizeFunction = (phraseKey: string, ...values: string[]) => string;
 
+export type ChatFormValues = { text: string };
+
 export const mainTextareaId = 'prompt-textarea';
 export const globalAudioId = 'global-audio';
 

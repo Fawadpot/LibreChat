@@ -1,12 +1,11 @@
 import { useCallback } from 'react';
-import { useFormContext } from 'react-hook-form';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { useChatContext } from '~/Providers';
+import { useChatContext, useChatFormContext } from '~/Providers';
 import store from '~/store';
 
 export default function useSubmitMessage(helpers?: { clearDraft?: () => void }) {
+  const methods = useChatFormContext();
   const { ask, index } = useChatContext();
-  const methods = useFormContext<{ text: string }>();
   const autoSendPrompts = useRecoilValue(store.autoSendPrompts);
   const setActivePrompt = useSetRecoilState(store.activePromptByIndex(index));
 
