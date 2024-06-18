@@ -4,6 +4,7 @@ import { LocalStorageKeys } from 'librechat-data-provider';
 import { useGetCategories } from '~/data-provider';
 import { SelectDropDown } from '~/components/ui';
 import CategoryIcon from './CategoryIcon';
+import { useLocalize } from '~/hooks';
 import { cn } from '~/utils';
 
 const loadingCategories = [
@@ -27,11 +28,12 @@ const CategorySelector = ({
   onValueChange?: (value: string) => void;
   className?: string;
 }) => {
+  const localize = useLocalize();
   const { control, watch, setValue } = useFormContext();
   const { data: categories = loadingCategories } = useGetCategories({
     select: (data) =>
       data.map((category) => ({
-        label: category.label,
+        label: category.label ? localize(`com_ui_${category.label}`) : '',
         value: category.value,
         icon: <CategoryIcon category={category.value} />,
       })),
