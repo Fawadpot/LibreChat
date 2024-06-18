@@ -3,6 +3,7 @@ import * as f from './types/files';
 import * as q from './types/queries';
 import * as m from './types/mutations';
 import * as a from './types/assistants';
+import * as r from './roles';
 import * as t from './types';
 import * as s from './schemas';
 import request from './request';
@@ -523,6 +524,10 @@ export function getRandomPrompts(
 }
 
 /* Roles */
+export function getRole(roleName: string): Promise<r.TRole> {
+  return request.get(endpoints.getRole(roleName));
+}
+
 export function updatePromptPermissions(
   variables: m.UpdatePromptPermVars,
 ): Promise<m.UpdatePromptPermResponse> {

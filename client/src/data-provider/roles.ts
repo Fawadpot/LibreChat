@@ -1,7 +1,24 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { UseMutationResult } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type {
+  UseMutationResult,
+  QueryObserverResult,
+  UseQueryOptions,
+} from '@tanstack/react-query';
 import { QueryKeys, dataService, promptPermissionsSchema } from 'librechat-data-provider';
 import type * as t from 'librechat-data-provider';
+
+export const useGetRole = (
+  roleName: string,
+  config?: UseQueryOptions<t.TRole>,
+): QueryObserverResult<t.TRole> => {
+  return useQuery<t.TRole>([QueryKeys.roles, roleName], () => dataService.getRole(roleName), {
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+    retry: false,
+    ...config,
+  });
+};
 
 export const useUpdatePromptPermissionsMutation = (
   options?: t.UpdatePromptPermOptions,

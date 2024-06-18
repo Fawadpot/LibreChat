@@ -1,9 +1,10 @@
 import React from 'react';
-import { FileSources } from 'librechat-data-provider';
+import { FileSources, SystemRoles } from 'librechat-data-provider';
 import type * as InputNumberPrimitive from 'rc-input-number';
 import type { ColumnDef } from '@tanstack/react-table';
 import type { SetterOrUpdater } from 'recoil';
 import type {
+  TRole,
   TUser,
   Action,
   TPreset,
@@ -328,6 +329,7 @@ export type TAuthContext = {
   login: (data: TLoginUser) => void;
   logout: () => void;
   setError: React.Dispatch<React.SetStateAction<string | undefined>>;
+  roles?: Record<string, TRole | undefined>;
 };
 
 export type TUserContext = {

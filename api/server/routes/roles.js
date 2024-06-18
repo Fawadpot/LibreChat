@@ -8,6 +8,27 @@ router.use(requireJwtAuth);
 router.use(checkAdmin);
 
 /**
+ * GET /api/roles/:roleName
+ * Get a specific role by name
+ */
+router.get('/:roleName', async (req, res) => {
+  const { roleName: _r } = req.params;
+  // TODO: TEMP, use a better parsing for roleName
+  const roleName = _r.toUpperCase();
+
+  try {
+    const role = await getRoleByName(roleName, '-_id -__v');
+    if (!role) {
+      return res.status(404).send({ message: 'Role not found' });
+    }
+
+    res.status(200).send(role);
+  } catch (error) {
+    return res.status(500).send({ message: 'Failed to retrieve role', error: error.message });
+  }
+});
+
+/**
  * PUT /api/roles/:roleName/prompts
  * Update prompt permissions for a specific role
  */
@@ -23,7 +44,7 @@ router.put('/:roleName/prompts', async (req, res) => {
 
     const role = await getRoleByName(roleName);
     if (!role) {
-      return res.status(404).json({ message: 'Role not found' });
+      return res.status(404).send({ message: 'Role not found' });
     }
 
     const mergedUpdates = {
@@ -34,9 +55,9 @@ router.put('/:roleName/prompts', async (req, res) => {
     };
 
     const updatedRole = await updateRoleByName(roleName, mergedUpdates);
-    res.status(200).json(updatedRole);
+    res.status(200).send(updatedRole);
   } catch (error) {
-    return res.status(400).json({ message: 'Invalid prompt permissions.', error: error.errors });
+    return res.status(400).send({ message: 'Invalid prompt permissions.', error: error.errors });
   }
 });
 
