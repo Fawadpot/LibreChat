@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Outlet, useParams } from 'react-router-dom';
+import AutoSendSwitch from '~/components/Prompts/Groups/AutoSendSwitch';
 import DashBreadcrumb from '~/routes/Layouts/DashBreadcrumb';
 import GroupSidePanel from './Groups/GroupSidePanel';
 import { usePromptGroupsNav } from '~/hooks';
@@ -14,7 +15,9 @@ export default function PromptsView() {
     <div className="flex h-screen w-full flex-col bg-[#f9f9f9] p-0 dark:bg-transparent lg:p-2">
       <DashBreadcrumb />
       <div className="flex w-full flex-grow flex-row divide-x overflow-hidden dark:divide-gray-600">
-        <GroupSidePanel isDetailView={isDetailView} {...groupsNav} />
+        <GroupSidePanel isDetailView={isDetailView} {...groupsNav}>
+          <AutoSendSwitch className="px-2 pt-2 dark:text-white" />
+        </GroupSidePanel>
         <div
           className={cn(
             'w-full overflow-y-auto lg:w-3/4 xl:w-3/4',

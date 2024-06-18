@@ -1,5 +1,4 @@
 import { memo } from 'react';
-import ManagePrompts from '~/components/Prompts/ManagePrompts';
 import { Button, ThemeSelector } from '~/components/ui';
 import { useLocalize } from '~/hooks';
 
@@ -22,7 +21,7 @@ function PanelNavigation({
   return (
     <div className="my-1 flex justify-between px-4">
       <div className="mb-2 flex gap-2">
-        {isChatRoute ? <ManagePrompts /> : <ThemeSelector returnThemeOnly={true} />}
+        {!isChatRoute && <ThemeSelector returnThemeOnly={true} />}
       </div>
       <div className="mb-2 flex gap-2">
         <Button variant="outline" onClick={() => prevPage()} disabled={!hasPreviousPage}>
