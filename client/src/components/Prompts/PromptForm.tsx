@@ -1,7 +1,8 @@
 import { Rocket } from 'lucide-react';
 import { useForm, FormProvider } from 'react-hook-form';
-import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react';
+import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
+import { PermissionTypes, Permissions, SystemRoles } from 'librechat-data-provider';
 import type { TCreatePrompt } from 'librechat-data-provider';
 import {
   useCreatePrompt,
@@ -9,8 +10,8 @@ import {
   useUpdatePromptGroup,
   useMakePromptProduction,
 } from '~/data-provider/mutations';
+import { useAuthContext, usePromptGroupsNav, useHasAccess } from '~/hooks';
 import { useGetPromptGroup, useGetPrompts } from '~/data-provider';
-import { useAuthContext, usePromptGroupsNav } from '~/hooks';
 import CategorySelector from './Groups/CategorySelector';
 import NoPromptGroup from './Groups/NoPromptGroup';
 import { Button, Skeleton } from '~/components/ui';
@@ -38,6 +39,11 @@ const PromptForm = () => {
   const [selectionIndex, setSelectionIndex] = useState<number>(0);
   const isOwner = useMemo(() => user?.id === group?.author, [user, group]);
   const selectedPrompt = useMemo(() => prompts[selectionIndex], [prompts, selectionIndex]);
+
+  const hasShareAccess = useHasAccess({
+    permissionType: PermissionTypes.PROMPTS,
+    permission: Permissions.SHARED_GLOBAL,
+  });
 
   const methods = useForm({
     defaultValues: {
@@ -113,7 +119,7 @@ const PromptForm = () => {
   }, [selectedPrompt, group?.category, setValue]);
 
   const { groupsQuery } = useOutletContext<ReturnType<typeof usePromptGroupsNav>>();
-  if (!isOwner && groupsQuery.data) {
+  if (!isOwner && groupsQuery.data && user?.role !== SystemRoles.ADMIN) {
     const fetchedPrompt = findPromptGroup(
       groupsQuery.data,
       (group) => group._id === params.promptId,
@@ -158,7 +164,7 @@ const PromptForm = () => {
                   })
                 }
               />
-              <SharePrompt group={group} disabled={isLoadingGroup} />
+              {hasShareAccess && <SharePrompt group={group} disabled={isLoadingGroup} />}
               <Button
                 size={'sm'}
                 className="h-10 border border-transparent bg-green-400 transition-all hover:bg-green-500 dark:border-green-600 dark:bg-transparent dark:hover:bg-green-900"

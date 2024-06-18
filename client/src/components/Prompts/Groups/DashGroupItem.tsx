@@ -1,7 +1,7 @@
 import { useState, useRef, useMemo } from 'react';
 import { MenuIcon, EarthIcon } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
-import type { TPromptGroup } from 'librechat-data-provider';
+import { SystemRoles, type TPromptGroup } from 'librechat-data-provider';
 import { useDeletePromptGroup, useUpdatePromptGroup } from '~/data-provider';
 import {
   Input,
@@ -15,7 +15,7 @@ import CategoryIcon from '~/components/Prompts/Groups/CategoryIcon';
 import { RenameButton } from '~/components/Conversations';
 import { useLocalize, useAuthContext } from '~/hooks';
 import { NewTrashIcon } from '~/components/svg';
-import { cn, getSnippet } from '~/utils';
+import { cn } from '~/utils';
 
 export default function DashGroupItem({
   group,
@@ -129,54 +129,45 @@ export default function DashGroupItem({
                 </div>
                 <div className="flex flex-row items-center gap-1">
                   {groupIsGlobal && <EarthIcon className="icon-md text-green-400" />}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
+                  {(isOwner || user?.role === SystemRoles.ADMIN) && (
+                    <>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="h-7 w-7 p-0 hover:bg-gray-200 dark:bg-gray-800/50 dark:text-gray-400 dark:hover:border-gray-400 dark:focus:border-gray-500"
+                          >
+                            <MenuIcon className="icon-md dark:text-gray-300" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="mt-2 w-36 rounded-lg" collisionPadding={2}>
+                          <DropdownMenuGroup>
+                            <RenameButton
+                              renaming={false}
+                              renameHandler={(e) => {
+                                e.stopPropagation();
+                                setNameEditFlag(true);
+                              }}
+                              appendLabel={true}
+                              className={cn('m-0 w-full p-2')}
+                            />
+                          </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                       <Button
-                        disabled={!isOwner}
                         variant="outline"
-                        className="h-7 w-7 p-0 hover:bg-gray-200 dark:bg-gray-800/50 dark:text-gray-400 dark:hover:border-gray-400 dark:focus:border-gray-500"
+                        className={cn(
+                          'h-7 w-7 p-0 hover:bg-gray-200 dark:bg-gray-800/50 dark:text-gray-400 dark:hover:border-gray-400 dark:focus:border-gray-500',
+                        )}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deletePromptGroupMutation.mutate({ id: group?._id || '' });
+                        }}
                       >
-                        <MenuIcon className="icon-md dark:text-gray-300" />
+                        <NewTrashIcon />
                       </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="mt-2 w-36 rounded-lg" collisionPadding={2}>
-                      <DropdownMenuGroup>
-                        <RenameButton
-                          renaming={false}
-                          disabled={!isOwner}
-                          renameHandler={(e) => {
-                            e.stopPropagation();
-                            if (!isOwner) {
-                              return;
-                            }
-                            setNameEditFlag(true);
-                          }}
-                          appendLabel={true}
-                          className={cn(
-                            'm-0 w-full p-2',
-                            !isOwner && 'cursor-not-allowed opacity-50',
-                          )}
-                        />
-                      </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                  <Button
-                    variant="outline"
-                    disabled={!isOwner}
-                    className={cn(
-                      'h-7 w-7 p-0 hover:bg-gray-200 dark:bg-gray-800/50 dark:text-gray-400 dark:hover:border-gray-400 dark:focus:border-gray-500',
-                      !isOwner && 'cursor-not-allowed opacity-50',
-                    )}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!isOwner) {
-                        return;
-                      }
-                      deletePromptGroupMutation.mutate({ id: group?._id || '' });
-                    }}
-                  >
-                    <NewTrashIcon />
-                  </Button>
+                    </>
+                  )}
                 </div>
               </div>
               <div className="ellipsis text-balance text-sm text-gray-600 dark:text-gray-400">
