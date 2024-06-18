@@ -1,6 +1,12 @@
+import { useMemo, useEffect } from 'react';
 import { ShieldEllipsis } from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
-import { PromptPermissions, SystemRoles } from 'librechat-data-provider';
+import {
+  PermissionTypes,
+  PromptPermissions,
+  SystemRoles,
+  roleDefaults,
+} from 'librechat-data-provider';
 import type { Control, UseFormSetValue, UseFormGetValues } from 'react-hook-form';
 import { OGDialog, OGDialogTitle, OGDialogContent, OGDialogTrigger } from '~/components/ui';
 import { useUpdatePromptPermissionsMutation } from '~/data-provider';
@@ -16,6 +22,8 @@ type LabelControllerProps = {
   setValue: UseFormSetValue<FormValues>;
   getValues: UseFormGetValues<FormValues>;
 };
+
+const defaultValues = roleDefaults[SystemRoles.USER];
 
 const LabelController: React.FC<LabelControllerProps> = ({
   control,
@@ -53,10 +61,11 @@ const LabelController: React.FC<LabelControllerProps> = ({
 
 const AdminSettings = () => {
   const localize = useLocalize();
-  const { user } = useAuthContext();
+  const { user, roles } = useAuthContext();
   const { mutate } = useUpdatePromptPermissionsMutation();
 
   const {
+    reset,
     control,
     setValue,
     getValues,
@@ -64,12 +73,20 @@ const AdminSettings = () => {
     formState: { isSubmitting },
   } = useForm<FormValues>({
     mode: 'onChange',
-    defaultValues: {
-      [PromptPermissions.USE]: true,
-      [PromptPermissions.CREATE]: true,
-      [PromptPermissions.SHARED_GLOBAL]: false,
-    },
+    defaultValues: useMemo(() => {
+      if (roles?.[SystemRoles.USER]) {
+        return roles[SystemRoles.USER][PermissionTypes.PROMPTS];
+      }
+
+      return defaultValues[PermissionTypes.PROMPTS];
+    }, [roles]),
   });
+
+  useEffect(() => {
+    if (roles?.[SystemRoles.USER]?.[PermissionTypes.PROMPTS]) {
+      reset(roles[SystemRoles.USER][PermissionTypes.PROMPTS]);
+    }
+  }, [roles, reset]);
 
   if (user?.role !== SystemRoles.ADMIN) {
     return null;
