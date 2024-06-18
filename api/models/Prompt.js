@@ -317,7 +317,7 @@ module.exports = {
    * @param {Object} options - The options for deleting the prompt.
    * @param {ObjectId} options.promptId - The ID of the prompt to delete.
    * @param {ObjectId} options.author - The author of the prompt.
-   * @return {TDeletePromptResponse} An object containing the result of the deletion.
+   * @return {Promise<TDeletePromptResponse>} An object containing the result of the deletion.
    * If the prompt was deleted successfully, the object will have a property 'prompt' with the value 'Prompt deleted successfully'.
    * If the prompt group was deleted successfully, the object will have a property 'promptGroup' with the message 'Prompt group deleted successfully' and id of the deleted group.
    * If there was an error deleting the prompt, the object will have a property 'message' with the value 'Error deleting prompt'.
