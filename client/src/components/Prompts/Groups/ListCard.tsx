@@ -28,7 +28,7 @@ export default function ListCard({
         </div>
         <div>{children}</div>
       </div>
-      <div className="break-word line-clamp-3 select-none text-balance text-sm text-gray-600 dark:text-gray-400">
+      <div className="ellipsis select-none text-balance text-sm text-gray-600 dark:text-gray-400">
         {snippet}
       </div>
     </div>

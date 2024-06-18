@@ -179,10 +179,8 @@ export default function DashGroupItem({
                   </Button>
                 </div>
               </div>
-              <div className="break-word line-clamp-3 text-balance text-sm text-gray-600 dark:text-gray-400">
-                {group.oneliner
-                  ? group.oneliner
-                  : getSnippet(group?.productionPrompt?.prompt ?? '', 40)}
+              <div className="ellipsis text-balance text-sm text-gray-600 dark:text-gray-400">
+                {group.oneliner ? group.oneliner : group?.productionPrompt?.prompt ?? ''}
               </div>
             </>
           )}

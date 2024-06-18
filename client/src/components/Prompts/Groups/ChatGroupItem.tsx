@@ -53,9 +53,7 @@ export default function ChatGroupItem({
         name={group.name}
         category={group.category ?? ''}
         onClick={onCardClick}
-        snippet={
-          group.oneliner ? group.oneliner : getSnippet(group?.productionPrompt?.prompt ?? '', 40)
-        }
+        snippet={group.oneliner ? group.oneliner : group?.productionPrompt?.prompt ?? ''}
       >
         <div className="flex flex-row items-center gap-2">
           {groupIsGlobal && <EarthIcon className="icon-md text-green-400" />}
