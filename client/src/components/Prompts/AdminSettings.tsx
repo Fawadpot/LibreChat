@@ -1,23 +1,18 @@
 import { useMemo, useEffect } from 'react';
 import { ShieldEllipsis } from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
-import {
-  PermissionTypes,
-  PromptPermissions,
-  SystemRoles,
-  roleDefaults,
-} from 'librechat-data-provider';
+import { Permissions, SystemRoles, roleDefaults, PermissionTypes } from 'librechat-data-provider';
 import type { Control, UseFormSetValue, UseFormGetValues } from 'react-hook-form';
 import { OGDialog, OGDialogTitle, OGDialogContent, OGDialogTrigger } from '~/components/ui';
 import { useUpdatePromptPermissionsMutation } from '~/data-provider';
 import { useLocalize, useAuthContext } from '~/hooks';
 import { Button, Switch } from '~/components/ui';
 
-type FormValues = Record<PromptPermissions, boolean>;
+type FormValues = Record<Permissions, boolean>;
 
 type LabelControllerProps = {
   label: string;
-  promptPerm: PromptPermissions;
+  promptPerm: Permissions;
   control: Control<FormValues, unknown, FormValues>;
   setValue: UseFormSetValue<FormValues>;
   getValues: UseFormGetValues<FormValues>;
@@ -94,15 +89,15 @@ const AdminSettings = () => {
 
   const labelControllerData = [
     {
-      promptPerm: PromptPermissions.SHARED_GLOBAL,
+      promptPerm: Permissions.SHARED_GLOBAL,
       label: localize('com_ui_prompts_allow_share_global'),
     },
     {
-      promptPerm: PromptPermissions.USE,
+      promptPerm: Permissions.USE,
       label: localize('com_ui_prompts_allow_use'),
     },
     {
-      promptPerm: PromptPermissions.CREATE,
+      promptPerm: Permissions.CREATE,
       label: localize('com_ui_prompts_allow_create'),
     },
   ];

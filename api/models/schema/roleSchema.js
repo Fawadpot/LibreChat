@@ -1,4 +1,4 @@
-const { PermissionTypes, PromptPermissions } = require('librechat-data-provider');
+const { PermissionTypes, Permissions } = require('librechat-data-provider');
 const mongoose = require('mongoose');
 
 const roleSchema = new mongoose.Schema({
@@ -9,15 +9,15 @@ const roleSchema = new mongoose.Schema({
     index: true,
   },
   [PermissionTypes.PROMPTS]: {
-    [PromptPermissions.SHARED_GLOBAL]: {
+    [Permissions.SHARED_GLOBAL]: {
       type: Boolean,
       default: false,
     },
-    [PromptPermissions.USE]: {
+    [Permissions.USE]: {
       type: Boolean,
       default: true,
     },
-    [PromptPermissions.CREATE]: {
+    [Permissions.CREATE]: {
       type: Boolean,
       default: true,
     },

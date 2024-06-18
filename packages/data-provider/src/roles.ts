@@ -27,30 +27,18 @@ export enum PermissionTypes {
 /**
  * Enum for Role-Based Access Control Constants
  */
-export enum PromptPermissions {
-  /**
-   * Sharing prompts to all users
-   */
+export enum Permissions {
   SHARED_GLOBAL = 'SHARED_GLOBAL',
-  /**
-   * Access/use prompts
-   */
   USE = 'USE',
-  /**
-   * Creating Prompts
-   */
   CREATE = 'CREATE',
-  /**
-   * Sharing prompts with other users
-   */
   SHARE = 'SHARE',
 }
 
 export const promptPermissionsSchema = z.object({
-  [PromptPermissions.SHARED_GLOBAL]: z.boolean().default(false),
-  [PromptPermissions.USE]: z.boolean().default(true),
-  [PromptPermissions.CREATE]: z.boolean().default(true),
-  [PromptPermissions.SHARE]: z.boolean().default(false),
+  [Permissions.SHARED_GLOBAL]: z.boolean().default(false),
+  [Permissions.USE]: z.boolean().default(true),
+  [Permissions.CREATE]: z.boolean().default(true),
+  [Permissions.SHARE]: z.boolean().default(false),
 });
 
 export const roleSchema = z.object({
@@ -65,10 +53,10 @@ const defaultRolesSchema = z.object({
   [SystemRoles.ADMIN]: roleSchema.extend({
     name: z.literal(SystemRoles.ADMIN),
     [PermissionTypes.PROMPTS]: promptPermissionsSchema.extend({
-      [PromptPermissions.SHARED_GLOBAL]: z.boolean().default(true),
-      [PromptPermissions.USE]: z.boolean().default(true),
-      [PromptPermissions.CREATE]: z.boolean().default(true),
-      [PromptPermissions.SHARE]: z.boolean().default(true),
+      [Permissions.SHARED_GLOBAL]: z.boolean().default(true),
+      [Permissions.USE]: z.boolean().default(true),
+      [Permissions.CREATE]: z.boolean().default(true),
+      [Permissions.SHARE]: z.boolean().default(true),
     }),
   }),
   [SystemRoles.USER]: roleSchema.extend({

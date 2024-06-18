@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { Share2Icon } from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
-import { PromptPermissions } from 'librechat-data-provider';
+import { Permissions } from 'librechat-data-provider';
 import { useGetStartupConfig } from 'librechat-data-provider/react-query';
 import type {
   TPromptGroup,
@@ -21,7 +21,7 @@ import { useToastContext } from '~/Providers';
 import { useLocalize } from '~/hooks';
 
 type FormValues = {
-  [PromptPermissions.SHARED_GLOBAL]: boolean;
+  [Permissions.SHARED_GLOBAL]: boolean;
 };
 
 const SharePrompt = ({ group, disabled }: { group?: TPromptGroup; disabled: boolean }) => {
@@ -44,12 +44,12 @@ const SharePrompt = ({ group, disabled }: { group?: TPromptGroup; disabled: bool
   } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: {
-      [PromptPermissions.SHARED_GLOBAL]: groupIsGlobal,
+      [Permissions.SHARED_GLOBAL]: groupIsGlobal,
     },
   });
 
   useEffect(() => {
-    setValue(PromptPermissions.SHARED_GLOBAL, groupIsGlobal);
+    setValue(Permissions.SHARED_GLOBAL, groupIsGlobal);
   }, [groupIsGlobal, setValue]);
 
   if (!group || !instanceProjectId) {
@@ -63,7 +63,7 @@ const SharePrompt = ({ group, disabled }: { group?: TPromptGroup; disabled: bool
 
     const payload = {} as TUpdatePromptGroupPayload;
 
-    if (data[PromptPermissions.SHARED_GLOBAL]) {
+    if (data[Permissions.SHARED_GLOBAL]) {
       payload.projectIds = [startupConfig.instanceProjectId];
     } else {
       payload.removeProjectIds = [startupConfig.instanceProjectId];
@@ -93,15 +93,11 @@ const SharePrompt = ({ group, disabled }: { group?: TPromptGroup; disabled: bool
           <div className="mb-4 flex items-center justify-between gap-2 py-4">
             <label
               className="cursor-pointer select-none"
-              htmlFor={PromptPermissions.SHARED_GLOBAL}
+              htmlFor={Permissions.SHARED_GLOBAL}
               onClick={() =>
-                setValue(
-                  PromptPermissions.SHARED_GLOBAL,
-                  !getValues(PromptPermissions.SHARED_GLOBAL),
-                  {
-                    shouldDirty: true,
-                  },
-                )
+                setValue(Permissions.SHARED_GLOBAL, !getValues(Permissions.SHARED_GLOBAL), {
+                  shouldDirty: true,
+                })
               }
             >
               {localize('com_ui_share_to_all_users')}
@@ -110,7 +106,7 @@ const SharePrompt = ({ group, disabled }: { group?: TPromptGroup; disabled: bool
               )}
             </label>
             <Controller
-              name={PromptPermissions.SHARED_GLOBAL}
+              name={Permissions.SHARED_GLOBAL}
               control={control}
               disabled={isFetching || updateGroup.isLoading || !instanceProjectId}
               rules={{
