@@ -2,13 +2,14 @@ const { SystemRoles } = require('librechat-data-provider');
 const { getRoleByName } = require('~/models/Role');
 
 /**
- * Middleware to check if a user has one or more required permissions.
+ * Middleware to check if a user has one or more required permissions, optionally based on `req.body` properties.
  *
  * @param {PermissionTypes} permissionType - The type of permission to check.
  * @param {Permissions[]} permissions - The list of specific permissions to check.
+ * @param {Record<Permissions, string[]>} [bodyProps] - An optional object where keys are permissions and values are arrays of `req.body` properties to check.
  * @returns {Function} Express middleware function.
  */
-const generateCheckAccess = (permissionType, permissions) => {
+const generateCheckAccess = (permissionType, permissions, bodyProps = {}) => {
   return async (req, res, next) => {
     try {
       const { user } = req;
@@ -22,7 +23,20 @@ const generateCheckAccess = (permissionType, permissions) => {
 
       const role = await getRoleByName(user.role);
       if (role && role[permissionType]) {
-        const hasAnyPermission = permissions.some((permission) => role[permissionType][permission]);
+        const hasAnyPermission = permissions.some((permission) => {
+          if (role[permissionType][permission]) {
+            return true;
+          }
+
+          if (bodyProps[permission] && req.body) {
+            return bodyProps[permission].some((prop) =>
+              Object.prototype.hasOwnProperty.call(req.body, prop),
+            );
+          }
+
+          return false;
+        });
+
         if (hasAnyPermission) {
           return next();
         }

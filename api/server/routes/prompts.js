@@ -23,6 +23,13 @@ const checkPromptCreate = generateCheckAccess(PermissionTypes.PROMPTS, [
   Permissions.USE,
   Permissions.CREATE,
 ]);
+const checkGlobalPromptShare = generateCheckAccess(
+  PermissionTypes.PROMPTS,
+  [Permissions.USE, Permissions.CREATE],
+  {
+    [Permissions.SHARED_GLOBAL]: ['projectIds', 'removeProjectIds'],
+  },
+);
 
 router.use(requireJwtAuth);
 router.use(checkPromptAccess);
@@ -109,7 +116,7 @@ const patchPromptGroup = async (req, res) => {
   }
 };
 
-router.patch('/groups/:groupId', checkPromptCreate, patchPromptGroup);
+router.patch('/groups/:groupId', checkGlobalPromptShare, patchPromptGroup);
 
 // router.patch('/:promptId/tags/production', async (req, res) => {
 //   try {
