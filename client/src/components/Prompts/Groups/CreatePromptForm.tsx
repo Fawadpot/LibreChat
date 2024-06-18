@@ -36,9 +36,15 @@ const CreatePromptForm = ({
   });
 
   useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout>;
     if (!hasAccess) {
-      navigate('/c/new');
+      timeoutId = setTimeout(() => {
+        navigate('/c/new');
+      }, 1000);
     }
+    return () => {
+      clearTimeout(timeoutId);
+    };
   }, [hasAccess, navigate]);
 
   const methods = useForm({

@@ -7,6 +7,7 @@ import { OGDialog, OGDialogTitle, OGDialogContent, OGDialogTrigger } from '~/com
 import { useUpdatePromptPermissionsMutation } from '~/data-provider';
 import { useLocalize, useAuthContext } from '~/hooks';
 import { Button, Switch } from '~/components/ui';
+import { useToastContext } from '~/Providers';
 
 type FormValues = Record<Permissions, boolean>;
 
@@ -57,7 +58,15 @@ const LabelController: React.FC<LabelControllerProps> = ({
 const AdminSettings = () => {
   const localize = useLocalize();
   const { user, roles } = useAuthContext();
-  const { mutate } = useUpdatePromptPermissionsMutation();
+  const { showToast } = useToastContext();
+  const { mutate, isLoading } = useUpdatePromptPermissionsMutation({
+    onSuccess: () => {
+      showToast({ status: 'success', message: localize('com_endpoint_preset_saved') });
+    },
+    onError: () => {
+      showToast({ status: 'error', message: localize('com_ui_error_save_admin_settings') });
+    },
+  });
 
   const {
     reset,
@@ -138,7 +147,7 @@ const AdminSettings = () => {
           <div className="flex justify-end">
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isLoading}
               className="btn rounded bg-green-500 font-bold text-white transition-all hover:bg-green-600"
             >
               {localize('com_ui_save')}

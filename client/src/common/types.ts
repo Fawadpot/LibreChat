@@ -329,7 +329,7 @@ export type TAuthContext = {
   login: (data: TLoginUser) => void;
   logout: () => void;
   setError: React.Dispatch<React.SetStateAction<string | undefined>>;
-  roles?: Record<string, TRole | undefined>;
+  roles?: Record<string, TRole | null | undefined>;
 };
 
 export type TUserContext = {
